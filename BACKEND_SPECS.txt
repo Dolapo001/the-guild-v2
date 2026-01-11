@@ -3,6 +3,7 @@ Role: Senior Backend System Architect & Product Manager
 Stack: Django (Python) + PostgreSQL (PostGIS) + Redis + Celery
 
 This document outlines the technical requirements and logic for the backend infrastructure of The Guild, a premium verified marketplace.
+Official Branding: Deep Royal Blue (#1A237E) & Soft Gold (#FFB74D).
 
 ---
 
@@ -44,6 +45,14 @@ This document outlines the technical requirements and logic for the backend infr
     2. Backend checks StaffAvailability for the requested time slot.
     3. Returns the highest-rated available staff member for auto-assignment.
 
+### Feature: Integrated Smart Mix (Recommendations)
+- Backend Logic: Maestro engine generates a "Smart Mix" of exactly 4 recommendations (2 Services + 2 Products) based on user history and category affinity.
+- Data Flow: `GET /recommendations` returns a polymorphic list of items, each tagged with a "Maestro Reason" (e.g., "🛍️ Recommended for Skin").
+
+### Feature: Maestro Smart Suggestions (Inbox)
+- Backend Logic: Context-aware reply generation based on the last 5 messages in a thread.
+- Data Flow: Frontend requests suggestions; Backend returns a list of 5 "Smart Replies" (e.g., "I'm on my way 🚗").
+
 ---
 
 ## 3. Service Booking System (State Machine)
@@ -55,6 +64,10 @@ This document outlines the technical requirements and logic for the backend infr
     2. **Duration-Based Locking**: When a Staff member is booked, the system creates a "Busy" block in the `StaffAvailability` table for `start_time` to `start_time + service_duration`. 
     3. **Manual Override**: Staff remain "Locked" if the job status is `IN_PROGRESS`, even if the estimated duration has passed. They only become "Available" again once the status moves to `COMPLETED`.
 - Data Flow: On `POST /bookings`, the backend runs an atomic check against both the schedule and existing booking blocks (including a 15-min "buffer" between jobs).
+
+### Feature: Premium CEO/Owner Booking
+- Backend Logic: If `staff_id` matches the `Business.owner_id`, apply a `1.5x` multiplier to the base service price.
+- Data Flow: The `BookingModal` calculates the premium in real-time when the CEO is selected, and the backend enforces this during the `POST /bookings` validation.
 
 ### Feature: Booking State Machine & Notifications
 - Backend Logic: Use `django-fsm` for transitions and `Celery` for asynchronous side-effects.
@@ -128,6 +141,7 @@ This document outlines the technical requirements and logic for the backend infr
 - Data Flow: 
     1. Frontend sends object_id and content_type.
     2. Backend toggles the record in the Favorite table for the request.user.
+    3. Frontend provides visual feedback via haptic-style toast notifications (❤️ Saved / 💔 Removed).
 
 ---
 
@@ -189,3 +203,31 @@ This document outlines the technical requirements and logic for the backend infr
 4. Payment: Frontend calls Payment Gateway. On success, Gateway calls Backend Webhook.
 5. Update: Backend moves Booking to CONFIRMED and locks funds in Escrow.
 6. Completion: Staff clicks "Complete". Backend moves funds to Business_Wallet and triggers a "Review Request" notification.
+
+---
+
+## 7. Communication Hub (Inbox)
+*Role-based messaging with job context.*
+
+### Feature: Role-Based Thread Isolation
+- Backend Logic: Filter conversations by `request.user.role`.
+    - **Staff**: Threads with Clients (linked to Job IDs) + Admin.
+    - **Customer**: Threads with Staff (linked to Active Bookings) + Admin.
+    - **CEO**: Threads with Staff (Management) + Operations/Admin.
+- Data Flow: `GET /conversations` returns threads with a `job_context` object if applicable.
+
+### Feature: Job Context Strips
+- Backend Logic: Conversations linked to a `booking_id` must expose `job_id`, `job_title`, and `job_time`.
+- Data Flow: Frontend renders a persistent "Context Strip" at the top of the chat window for active jobs.
+
+---
+
+## 8. Progressive Web App (PWA) & Mobile Experience
+*Zero-install mobile optimization.*
+
+### Feature: Cross-Platform Install Logic
+- Backend Logic: Serve `manifest.json` and `sw.js`.
+- Mobile Workflow:
+    - **iOS**: Custom instructions modal for "Add to Home Screen" via Safari Share menu.
+    - **Android/Desktop**: Handle `beforeinstallprompt` to trigger native install UI.
+- Data Flow: The `Footer` component tracks the `deferredPrompt` and platform type to show appropriate install UI.
