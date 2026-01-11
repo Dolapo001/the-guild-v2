@@ -61,6 +61,7 @@ interface ActiveBooking {
 }
 
 export default function CustomerDashboard() {
+    const { user } = useAuth();
     const [activeBooking, setActiveBooking] = useState<ActiveBooking | null>(MOCK_CUSTOMER_DATA.activeBooking);
     const data = MOCK_CUSTOMER_DATA;
 
@@ -98,7 +99,7 @@ export default function CustomerDashboard() {
         }
     };
 
-    const getGoogleCalendarUrl = (booking: typeof data.activeBooking) => {
+    const getGoogleCalendarUrl = (booking: ActiveBooking) => {
         let datePart = booking.time.split(',')[0].trim();
         const timePart = booking.time.split(',')[1].trim();
 
@@ -237,7 +238,7 @@ export default function CustomerDashboard() {
                                             </div>
                                         </div>
 
-                                        {activeBooking.status === "DECLINED_WITH_OPTION" ? (
+                                        {activeBooking.status === "DECLINED_WITH_OPTION" && activeBooking.replacementProposal ? (
                                             <div className="space-y-6">
                                                 <div className="p-5 rounded-2xl bg-white/40 dark:bg-white/5 border border-white/20 backdrop-blur-xl shadow-xl">
                                                     <p className="text-sm font-bold text-foreground/80 mb-4">
@@ -340,7 +341,7 @@ export default function CustomerDashboard() {
                                             {activeBooking.status.replace(/_/g, ' ')}
                                         </div>
                                         <a
-                                            href={getGoogleCalendarUrl(activeBooking)}
+                                            href={activeBooking ? getGoogleCalendarUrl(activeBooking) : "#"}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             title="Add to Google Calendar"

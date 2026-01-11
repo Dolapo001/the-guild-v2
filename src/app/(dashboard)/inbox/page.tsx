@@ -27,8 +27,29 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 
+interface Conversation {
+    id: number;
+    name: string;
+    role: string;
+    jobId?: string;
+    jobTitle?: string;
+    jobTime?: string;
+    lastMessage: string;
+    timestamp: string;
+    unread: number;
+    online: boolean;
+    avatar: string;
+    history: {
+        id: number;
+        sender: string;
+        text: string;
+        time: string;
+        status?: string;
+    }[];
+}
+
 // Mock Data Structure
-const MOCK_CONVERSATIONS = {
+const MOCK_CONVERSATIONS: Record<string, Conversation[]> = {
     staff: [
         {
             id: 1,

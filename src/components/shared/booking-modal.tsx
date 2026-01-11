@@ -96,6 +96,12 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
         }
     }, [isOpen, initialStaffId, mode, initialData]);
 
+    const displayedStaffId = bookingState.staffId === 'AUTO'
+        ? bookingState.assignedStaffId
+        : bookingState.staffId;
+
+    const selectedStaffMember = MOCK_STAFF.find(s => s.id === displayedStaffId);
+
     const isCEOSelected = selectedStaffMember?.isOwner;
     const priceMultiplier = isCEOSelected ? 1.5 : 1; // 50% premium for CEO
 
@@ -161,12 +167,6 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
 
     const currentStepIndex = steps.findIndex(s => s.id === step);
 
-    // Determine displayed staff
-    const displayedStaffId = bookingState.staffId === 'AUTO'
-        ? bookingState.assignedStaffId
-        : bookingState.staffId;
-
-    const selectedStaffMember = MOCK_STAFF.find(s => s.id === displayedStaffId);
     const initialStaffMember = MOCK_STAFF.find(s => s.id === initialStaffId);
 
     // Mock Calendar Days (Next 14 days)
