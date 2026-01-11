@@ -86,53 +86,6 @@ export function TopNav() {
     };
 
     const isVerified = user?.role === "ceo" && user?.verificationStatus === "verified";
-    const userRole = user?.role || "ceo";
-    const isSolo = user?.isSoloOperator ?? true;
-
-    const roleLinks = {
-        ceo: [
-            { title: "Overview", href: "/business", icon: LayoutDashboard },
-            { title: "Bookings", href: "/bookings", icon: Calendar },
-            ...(isSolo
-                ? [{ title: "My Availability", href: "/business/profile", icon: CalendarClock }]
-                : [{ title: "Staff Management", href: "/staff", icon: Users }]
-            ),
-            ...(!isSolo ? [
-                { title: "Wallet & Payroll", href: "/wallet", icon: Wallet },
-            ] : []),
-            { title: "Inventory", href: "/inventory", icon: Package },
-            { title: "Orders", href: "/business/orders", icon: ShoppingBag },
-            { title: "Reviews", href: "/reviews", icon: Star },
-            { title: "Inbox", href: "/inbox", icon: MessageSquare },
-            { title: "Business Profile", href: "/business/profile", icon: Settings },
-        ],
-        customer: [
-            { title: "Explore Services", href: "/search", icon: Search },
-            { title: "Marketplace", href: "/marketplace", icon: ShoppingBag },
-            { title: "My Bookings", href: "/customer", icon: Calendar },
-            { title: "Favorites", href: "/favorites", icon: Heart },
-            { title: "Recent Activities", href: "/customer/activities", icon: History },
-            { title: "Wallet", href: "/wallet", icon: Wallet },
-            { title: "Inbox", href: "/inbox", icon: MessageSquare },
-            { title: "Profile", href: "/profile", icon: UserCircle },
-        ],
-        staff: [
-            { title: "Dashboard", href: "/staff-portal", icon: LayoutDashboard },
-            { title: "Active Session", href: "/active-job", icon: PlayCircle },
-            { title: "Job History", href: "/job-history", icon: History },
-            { title: "Wallet", href: "/wallet", icon: Wallet },
-            { title: "Inbox", href: "/inbox", icon: MessageSquare },
-            { title: "Profile", href: "/profile", icon: UserCircle },
-        ],
-        admin: [
-            { title: "Dashboard", href: "/admin", icon: LayoutDashboard },
-            { title: "Verification Queue", href: "/admin/verification", icon: ShieldAlert },
-            { title: "User Management", href: "/admin/users", icon: Users },
-            { title: "Disputes", href: "/admin/disputes", icon: ShieldCheck },
-        ],
-    };
-
-    const sidebarItems = roleLinks[userRole as keyof typeof roleLinks] || roleLinks.ceo;
 
     const notifications = [
         { id: 1, title: "New Booking Request", time: "2 mins ago", icon: CalendarIcon, color: "text-primary" },
@@ -143,63 +96,16 @@ export function TopNav() {
     if (!mounted) return null;
 
     return (
-        <header className="h-16 border-b border-glass-border bg-glass-surface dark:bg-[#0f111a] backdrop-blur-md sticky top-0 z-50 px-6 flex items-center justify-between shadow-sm">
-            {/* Left Side: Dynamic Title & Verification Badge */}
-            <div className="flex items-center gap-4 lg:gap-8">
-                {/* Mobile Menu Trigger */}
+        <header className="h-16 border-b border-glass-border bg-glass-surface dark:bg-[#0f111a]/80 backdrop-blur-md sticky top-0 z-50 px-4 md:px-6 flex items-center justify-between shadow-sm pt-safe">
+            {/* Left Side: Back Button (Mobile) or Dynamic Title (Desktop) */}
+            <div className="flex items-center gap-4">
                 <div className="lg:hidden">
-                    <Sheet>
-                        <SheetTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-muted">
-                                <Menu className="h-6 w-6 text-foreground" />
-                            </Button>
-                        </SheetTrigger>
-                        <SheetContent side="left" className="w-72 p-0 border-r border-glass-border bg-glass-surface dark:bg-[#0f111a] backdrop-blur-xl">
-                            <div className="flex h-20 items-center px-6 border-b border-glass-border">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="h-9 w-9 bg-primary rounded-lg overflow-hidden shadow-lg">
-                                        <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
-                                    </div>
-                                    <span className="font-bold text-xl tracking-tight text-foreground">The Guild</span>
-                                </div>
-                            </div>
-                            <div className="flex-1 overflow-y-auto py-6">
-                                <nav className="grid gap-1.5 px-3">
-                                    {sidebarItems.map((item, index) => {
-                                        const isActive = pathname === item.href;
-                                        return (
-                                            <Link
-                                                key={index}
-                                                href={item.href}
-                                                className={cn(
-                                                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300",
-                                                    isActive
-                                                        ? "bg-primary text-white shadow-lg shadow-primary/20"
-                                                        : "text-foreground/50 hover:bg-primary/5 hover:text-primary"
-                                                )}
-                                            >
-                                                <item.icon className={cn("h-5 w-5 transition-colors", isActive ? "text-secondary" : "text-foreground/30")} />
-                                                {item.title}
-                                            </Link>
-                                        );
-                                    })}
-                                </nav>
-                            </div>
-                            <div className="p-4 mt-auto border-t border-glass-border">
-                                <Button
-                                    onClick={logout}
-                                    variant="ghost"
-                                    className="w-full justify-start gap-3 text-red-500 hover:bg-red-500/10 hover:text-red-600 font-bold"
-                                >
-                                    <LogOut className="h-5 w-5" />
-                                    Sign Out
-                                </Button>
-                            </div>
-                        </SheetContent>
-                    </Sheet>
+                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-muted" onClick={() => router.back()}>
+                        <Menu className="h-6 w-6 text-foreground" />
+                    </Button>
                 </div>
 
-                <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
+                <div className="hidden lg:flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
                     <h1 className="text-lg font-extrabold text-foreground tracking-tight">{getTitle()}</h1>
                     {isVerified && (
                         <div className="flex items-center gap-1.5 bg-accent/10 text-accent px-2 py-0.5 rounded-lg border border-accent/20">
@@ -208,37 +114,40 @@ export function TopNav() {
                         </div>
                     )}
                 </div>
+            </div>
 
-                {/* Integrated Search Bar */}
-                <div className="hidden lg:flex items-center relative group w-80">
-                    <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${isSearching ? 'text-secondary' : 'text-foreground/20 group-focus-within:text-primary'}`} />
-                    <Input
-                        placeholder="Ask for what you need..."
-                        onFocus={() => setIsSearching(true)}
-                        onBlur={() => setIsSearching(false)}
-                        className={`pl-10 h-10 bg-muted/50 border-glass-border rounded-xl transition-all text-sm ${isSearching ? 'ring-2 ring-secondary/20 border-secondary/50 w-96' : 'focus:ring-primary/10 w-80'}`}
-                    />
-                    {isSearching && (
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5"
-                        >
-                            <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">
-                                <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Maestro</span> Intelligence
-                            </span>
-                            <Sparkles className="h-3 w-3 text-secondary animate-pulse" />
-                        </motion.div>
-                    )}
-                </div>
+            {/* Center: Page Title (Mobile Only) */}
+            <div className="lg:hidden absolute left-1/2 -translate-x-1/2">
+                <h1 className="text-sm font-extrabold text-foreground uppercase tracking-[0.2em]">{getTitle()}</h1>
+            </div>
+
+            {/* Integrated Search Bar (Desktop) */}
+            <div className="hidden lg:flex items-center relative group w-80">
+                <Search className={`absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors ${isSearching ? 'text-secondary' : 'text-foreground/20 group-focus-within:text-primary'}`} />
+                <Input
+                    placeholder="Ask for what you need..."
+                    onFocus={() => setIsSearching(true)}
+                    onBlur={() => setIsSearching(false)}
+                    className={`pl-10 h-10 bg-muted/50 border-glass-border rounded-xl transition-all text-sm ${isSearching ? 'ring-2 ring-secondary/20 border-secondary/50 w-96' : 'focus:ring-primary/10 w-80'}`}
+                />
+                {isSearching && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5"
+                    >
+                        <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">
+                            <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Maestro</span> Intelligence
+                        </span>
+                        <Sparkles className="h-3 w-3 text-secondary animate-pulse" />
+                    </motion.div>
+                )}
             </div>
 
             {/* Right Side: Actions */}
             <div className="flex items-center gap-2 md:gap-4">
-                {/* Theme Toggle */}
                 <ThemeToggle />
 
-                {/* Notifications */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-xl hover:bg-muted transition-colors">
@@ -271,7 +180,6 @@ export function TopNav() {
 
                 <div className="h-8 w-px bg-glass-border mx-1 hidden md:block" />
 
-                {/* User Profile Menu */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="h-11 px-2 md:pl-2 md:pr-4 rounded-xl hover:bg-muted transition-colors gap-3">
@@ -315,6 +223,5 @@ export function TopNav() {
                 </DropdownMenu>
             </div>
         </header>
-
     );
 }
