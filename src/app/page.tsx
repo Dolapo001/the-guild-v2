@@ -39,6 +39,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { AmbientBackground } from "@/components/shared/ambient-background";
 import { Footer } from "@/components/shared/footer";
+import { PWARedirect } from "@/components/shared/pwa-redirect";
 import { cn } from "@/lib/utils";
 
 // --- Components ---
@@ -85,7 +86,7 @@ const Navbar = () => {
 
                 <div className="flex items-center gap-4">
                     <ThemeToggle />
-                    <Link href="/register">
+                    <Link href="/register" className="hidden md:block">
                         <Button className="bg-gradient-to-r from-primary to-primary/80 text-white font-bold rounded-full px-8 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
                             Get Started
                         </Button>
@@ -533,6 +534,7 @@ export default function LandingPage() {
 
     return (
         <div className="min-h-screen transition-colors duration-700 overflow-x-hidden">
+            <PWARedirect />
             <AmbientBackground />
             <Navbar />
 
