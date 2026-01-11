@@ -1,0 +1,191 @@
+# Backend Functional Specifications: "The Guild"
+Role: Senior Backend System Architect & Product Manager
+Stack: Django (Python) + PostgreSQL (PostGIS) + Redis + Celery
+
+This document outlines the technical requirements and logic for the backend infrastructure of The Guild, a premium verified marketplace.
+
+---
+
+## 1. Authentication & Role-Based Access Control (RBAC)
+*The foundation of the "3-Role" ecosystem.*
+
+### Feature: JWT-Based Multi-Role Auth
+- Backend Logic: Use SimpleJWT with custom claims. Upon login, the token payload includes role (Customer, Staff, SME Employee, Business Owner/CEO).
+- Data Flow: 
+    1. User submits credentials.
+    2. Backend validates against User model.
+    3. Generates JWT with user_id and role.
+    4. Frontend stores token and uses role claim for client-side routing.
+
+### Feature: Role-Specific Profile Models
+- Backend Logic: Implement a Profile base model with OneToOneField to User. Use polymorphic or separate models for role-specific data.
+    - CEO: Fields for cac_number, business_name, verification_status, and bank_details.
+    - Staff: Fields for skills (ManyToMany), bio, and availability_slots.
+    - Customer: Fields for saved_addresses (JSONField or separate Address model).
+- Data Flow: On profile fetch, the API uses the JWT role to determine which serializer to use, ensuring sensitive data like cac_number is only exposed to CEOs/Admins.
+
+---
+
+## 2. The "Maestro" AI Engine (Search & Discovery)
+*The intelligence layer for location-aware matching.*
+
+### Feature: Geo-Spatial Maestro Sorting
+- Backend Logic: Use PostGIS to store PointField coordinates. Implement a custom database function to calculate:  
+  Score = (Normalized_Distance * 0.6) + (Normalized_Rating * 0.4).
+- Data Flow: 
+    1. Frontend sends user_lat, user_long.
+    2. Backend queries Business table using ST_Distance.
+    3. Results are sorted by the calculated Score and returned as a paginated list.
+
+### Feature: Smart Staff Matcher
+- Backend Logic: An endpoint that filters Staff based on business_id, category_match, and availability_overlap.
+- Data Flow: 
+    1. User selects a service.
+    2. Backend checks StaffAvailability for the requested time slot.
+    3. Returns the highest-rated available staff member for auto-assignment.
+
+---
+
+## 3. Service Booking System (State Machine)
+*Managing the lifecycle of a verified service.*
+
+### Feature: Hierarchical Availability & Staff Locking
+- Backend Logic: 
+    1. **Operating Hours Check**: Verify Business is open.
+    2. **Duration-Based Locking**: When a Staff member is booked, the system creates a "Busy" block in the `StaffAvailability` table for `start_time` to `start_time + service_duration`. 
+    3. **Manual Override**: Staff remain "Locked" if the job status is `IN_PROGRESS`, even if the estimated duration has passed. They only become "Available" again once the status moves to `COMPLETED`.
+- Data Flow: On `POST /bookings`, the backend runs an atomic check against both the schedule and existing booking blocks (including a 15-min "buffer" between jobs).
+
+### Feature: Booking State Machine & Notifications
+- Backend Logic: Use `django-fsm` for transitions and `Celery` for asynchronous side-effects.
+- Lifecycle Side-Effects:
+    1. **On Approval**: When Staff approves a schedule, trigger `SendApprovalEmail`.
+    2. **Actionable Emails**: Approval emails must contain signed, time-limited URLs for "Cancel" and "Reschedule" actions.
+    3. **T-1hr Reminders**: Use `Celery Beat` to scan for upcoming bookings. At `start_time - 1 hour`, trigger both a Push Notification (FCM) and an Email Reminder to the Customer.
+- Data Flow: 
+    - `Staff.approve()` -> `Booking.status = CONFIRMED` -> `Task: send_email_to_customer`.
+    - `Celery Beat` -> `Task: check_reminders` -> `Task: send_push_notification`.
+
+---
+
+## 4. The Marketplace & Logistics (Smart Cart)
+*E-commerce with flexible fulfillment.*
+
+### Feature: Two-Step Order Processing (Smart Cart)
+- Backend Logic: 
+    1. **Fee Setting (Awaiting Quote)**: Orders created with `delivery_fee_status = 'PENDING_QUOTE'`. 
+    2. **State Transition**: `PATCH /orders/{id}/set-fee` updates `delivery_fee`, sets status to `AWAITING_PAYMENT`, and triggers a Customer notification.
+    3. **Dispatch Logic**: Once paid, status moves to `PROCESSING`. `POST /orders/{id}/dispatch` accepts `rider_name`, `rider_phone`, and `logistics_company`.
+- Data Flow: 
+    - `Order.create()` -> `Status: NEW`.
+    - `CEO.set_fee()` -> `Status: PENDING_PAYMENT` -> `Notify: Customer`.
+    - `Customer.pay()` -> `Status: PROCESSING`.
+    - `CEO.dispatch()` -> `Status: OUT_FOR_DELIVERY` -> `Notify: Customer (Rider Details)`.
+
+### Feature: Customer Real-Time Updates (Logistics Sync)
+- Backend Logic: 
+    1. **Fee Notification**: When `delivery_fee` is updated, trigger a WebSocket message (Django Channels) or Push Notification (FCM) to the Customer.
+    2. **Rider Sync**: When a Rider is assigned, the `Order` object is updated with `rider_details`. The frontend polls or listens for this change to render the Logistics Card.
+    3. **Actionable Links**: The `rider_phone` must be exposed to the customer to enable the "Call Rider" functionality.
+- Data Flow: 
+    - `CEO.set_fee()` -> `Order.delivery_fee_status = 'SET'` -> `Notify: Customer`.
+    - `CEO.dispatch()` -> `Order.status = 'OUT_FOR_DELIVERY'` -> `Order.rider = RiderData` -> `Notify: Customer`.
+
+### Feature: Atomic Inventory Management
+- Backend Logic: Use `F()` expressions in Django to prevent race conditions during stock updates.
+- Data Flow: 
+    1. On `Payment_Success`, decrement `stock_count`.
+    2. If an order is `CANCELLED` or `EXPIRED`, increment `stock_count` back.
+
+---
+
+## 5. Wallet & Escrow Financial System (The Ledger)
+*Ensuring trust through held payments.*
+
+### Feature: Double-Entry Escrow Ledger
+- Backend Logic: Every payment creates two entries: a Credit to the System_Escrow_Wallet and a Pending_Credit record linked to the Business.
+- Data Flow: 
+    1. **User Pays**: Funds held in System Escrow.
+    2. **Staff Completes Job**: Status moves to `PENDING_CLEARANCE`.
+    3. **Release Trigger**:
+        - **Manual**: Customer clicks "Confirm Release" -> Funds move to Business Wallet instantly.
+        - **Auto-Release**: If no action is taken within 24 hours, a `Celery Beat` task auto-triggers the release to the Business Wallet.
+    4. **Payout**: System triggers a Transfer from Escrow to the Business's Withdrawable_Balance.
+
+### Feature: Role-Based Financial Views
+- Backend Logic: Querysets filtered by request.user.
+- Data Flow: 
+    1. GET /wallet/balance returns tips_only for Staff.
+    2. Returns total_revenue, pending_escrow, and available_payout for CEOs.
+
+---
+
+## 6. Favorites & Social Features
+*Unified engagement tracking.*
+
+### Feature: Polymorphic Favorites
+- Backend Logic: Use Django ContentTypes to create a Favorite model that can point to a Business, Service, or Product using a single GenericForeignKey.
+- Data Flow: 
+    1. Frontend sends object_id and content_type.
+    2. Backend toggles the record in the Favorite table for the request.user.
+
+---
+
+### Feature: Staff Portal & Job Lifecycle
+- Backend Logic: 
+    1. **Job Timer (Server-Side Sync)**: When a job is `STARTED`, record `actual_start_time`. When `COMPLETED`, record `actual_end_time`. Calculate `duration_minutes` for analytics.
+    2. **Status Transitions**: 
+        - `PENDING` -> `IN_PROGRESS` (Requires Staff Action).
+        - `IN_PROGRESS` -> `COMPLETED` (Requires Staff Action).
+    3. **Contact Privacy & Logging**: 
+        - Customer contact info is only exposed to Staff when the booking is `CONFIRMED` or `IN_PROGRESS`.
+        - Log every "Contact Customer" click for security and dispute resolution.
+- Data Flow: 
+    - `Staff.start_job()` -> `Booking.status = IN_PROGRESS` -> `Booking.actual_start_time = now()`.
+    - `Staff.complete_job()` -> `Booking.status = COMPLETED` -> `Booking.actual_end_time = now()` -> `Trigger: Payment Release from Escrow`.
+
+### Feature: Staff Schedule & Decline Logic
+- Backend Logic: 
+    1. **Decline Workflow & Ranking Impact**:
+        - Endpoint `POST /bookings/{id}/decline` requires a `reason_code` and optional `note`.
+        - Logic: If a staff member declines >3 jobs in a rolling 7-day period, flag for "Ranking Review".
+        - Ranking Review: Temporarily lower the `maestro_score` which affects search visibility.
+    2. **Monthly Schedule API**:
+        - Endpoint `GET /staff/schedule?month=YYYY-MM` returns a list of dates with job counts for calendar dot indicators.
+        - Endpoint `GET /staff/schedule?date=YYYY-MM-DD` returns full job details for the selected day.
+- Data Flow: 
+    - `Staff.decline_job()` -> `Booking.status = DECLINED` -> `System.evaluate_decline_impact()`.
+    - `Frontend.fetch_schedule()` -> `Backend.return_staff_bookings()`.
+ 
+### Feature: Decline Recovery System (Customer Side)
+- Backend Logic:
+    1. **AI Replacement Matching**: When a booking is `DECLINED`, immediately trigger the `Maestro_Matching_Engine` to find the next best available staff member for that slot.
+    2. **State Transition**: Move booking status to `DECLINED_WITH_OPTION`.
+    3. **Fail-Safe Alert (Business Owner)**: 
+        - Start a 2-hour countdown timer upon entering `DECLINED_WITH_OPTION`.
+        - If the customer does not accept the replacement or choose another option within 2 hours, trigger a high-priority notification to the Business Owner: "Job #{id} at risk: Customer hasn't responded to replacement."
+    4. **Recovery Actions**:
+        - `Accept Replacement`: Update booking with new `staff_id` and move status back to `CONFIRMED`.
+        - `Choose Someone Else`: Open the staff selection pool for the customer.
+        - `Cancel`: Trigger immediate refund to `Customer_Wallet` and mark booking as `CANCELLED_BY_SYSTEM`.
+
+### Feature: Active Session Cockpit & Safety
+- Backend Logic: 
+    1. **SOS Emergency Protocol**: A high-priority endpoint `POST /bookings/{id}/sos` that:
+        - Alerts all Business Managers via Push/SMS.
+        - Triggers a background audio recording task (if supported by client/app).
+        - Logs the exact GPS coordinates of the staff member.
+    2. **Dynamic Upsell Billing**: Endpoint `PATCH /bookings/{id}/add-extra` to append products/services to the active booking. This updates the `total_price` and triggers a "Payment Required" notification to the customer upon job completion.
+    3. **SOP Compliance Tracking**: Store the checklist state in a JSONField `sop_checklist` to ensure quality control and audit trails.
+- Data Flow: 
+    - `Staff.trigger_sos()` -> `System.alert_managers()` -> `System.log_emergency()`.
+    - `Staff.add_extra(item)` -> `Booking.total_price += item.price` -> `Booking.extras.add(item)`.
+    - `Staff.complete_job()` -> `System.calculate_final_bill()` -> `Notify: Customer (Final Amount)`.
+
+### Summary of Data Flow (Example: Booking a Service)
+1. Request: POST /bookings/ (Service ID, Time, User Lat/Long).
+2. Validation: Backend checks Business hours and Staff availability.
+3. Creation: Creates Booking (Status: PENDING) and Transaction (Status: HELD).
+4. Payment: Frontend calls Payment Gateway. On success, Gateway calls Backend Webhook.
+5. Update: Backend moves Booking to CONFIRMED and locks funds in Escrow.
+6. Completion: Staff clicks "Complete". Backend moves funds to Business_Wallet and triggers a "Review Request" notification.

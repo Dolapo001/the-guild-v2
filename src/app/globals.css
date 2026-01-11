@@ -1,26 +1,110 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
-@theme inline {
+@theme {
+  --font-sans: var(--font-plus-jakarta), var(--font-inter), ui-sans-serif, system-ui;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+
+  --color-glass-border: var(--glass-border);
+  --color-glass-surface: var(--glass-surface);
+  --color-glass-highlight: var(--glass-highlight);
+  --color-mesh-1: var(--mesh-1);
+  --color-mesh-2: var(--mesh-2);
+  --color-mesh-3: var(--mesh-3);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+  --shadow-glass-sm: 0 4px 16px 0 rgba(31, 38, 135, 0.05);
+  --shadow-premium: 0 20px 50px rgba(0, 0, 0, 0.1);
+
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  --animate-spin-slow: spin-slow 8s linear infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@utility text-glow {
+  text-shadow: 0 0 20px rgba(26, 35, 126, 0.3);
+}
+
+@utility text-glow-amber {
+  text-shadow: 0 0 20px rgba(255, 183, 77, 0.4);
+}
+
+@utility shadow-premium-violet {
+  box-shadow: 0 20px 50px -10px rgba(26, 35, 126, 0.3);
+}
+
+@utility bg-mesh-gradient {
+  background-image: radial-gradient(at 0% 0%, var(--mesh-1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, var(--mesh-2) 0, transparent 50%),
+    radial-gradient(at 100% 0%, var(--mesh-3) 0, transparent 50%);
+}
+
+@utility bg-grid-slate-900 {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(15 23 42 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+}
+
+@utility bg-grid-white {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+}
+
+:root {
+  --background: #fdfdfd;
+  --foreground: #0f172a;
+  --primary: #1a237e;
+  --secondary: #ffb74d;
+  --accent: #00695c;
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-surface: rgba(255, 255, 255, 0.8);
+  --glass-highlight: rgba(255, 255, 255, 0.9);
+  --mesh-1: rgba(26, 35, 126, 0.03);
+  --mesh-2: rgba(255, 183, 77, 0.03);
+  --mesh-3: rgba(0, 105, 92, 0.03);
+
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+}
+
+.dark {
+  --background: #020617;
+  --foreground: #ffffff;
+  --primary: #5c6bc0;
+  --secondary: #ffcc80;
+  --accent: #26a69a;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-surface: rgba(15, 23, 42, 0.6);
+  --glass-highlight: rgba(255, 255, 255, 0.05);
+  --mesh-1: rgba(92, 107, 192, 0.15);
+  --mesh-2: rgba(255, 204, 128, 0.15);
+  --mesh-3: rgba(38, 166, 154, 0.15);
+
+  --card: #0f172a;
+  --card-foreground: #f8fafc;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-background text-foreground antialiased selection:bg-primary/10 selection:text-primary transition-colors duration-700;
 }
