@@ -157,8 +157,8 @@ export function TopNav() {
                         <SheetContent side="left" className="w-72 p-0 border-r border-glass-border bg-glass-surface dark:bg-[#0f111a] backdrop-blur-xl">
                             <div className="flex h-20 items-center px-6 border-b border-glass-border">
                                 <div className="flex items-center gap-2.5">
-                                    <div className="bg-primary p-1.5 rounded-lg shadow-lg">
-                                        <ShieldCheck className="h-6 w-6 text-secondary" />
+                                    <div className="h-9 w-9 bg-primary rounded-lg overflow-hidden shadow-lg">
+                                        <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
                                     </div>
                                     <span className="font-bold text-xl tracking-tight text-foreground">The Guild</span>
                                 </div>

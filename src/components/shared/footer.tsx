@@ -76,8 +76,8 @@ export function Footer() {
             <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16">
                 <div className="space-y-8">
                     <Link href="/" className="flex items-center gap-2.5 group">
-                        <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
-                            <ShieldCheck className="h-6 w-6" />
+                        <div className="h-10 w-10 rounded-xl bg-primary overflow-hidden flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                            <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
                         </div>
                         <span className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">The Guild</span>
                     </Link>

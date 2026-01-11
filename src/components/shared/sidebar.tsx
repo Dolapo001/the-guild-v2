@@ -83,8 +83,8 @@ export function Sidebar() {
         <aside className="hidden h-screen w-64 flex-col border-r border-glass-border bg-glass-surface dark:bg-[#0f111a] backdrop-blur-xl lg:flex fixed left-0 top-0 z-40 shadow-premium">
             <div className="flex h-20 items-center px-6">
                 <Link href="/" className="flex items-center gap-2.5 group">
-                    <div className="bg-primary p-1.5 rounded-lg group-hover:scale-110 transition-transform shadow-lg">
-                        <ShieldCheck className="h-6 w-6 text-secondary" />
+                    <div className="h-9 w-9 bg-primary rounded-lg overflow-hidden group-hover:scale-110 transition-transform shadow-lg">
+                        <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
                     </div>
                     <span className="font-bold text-xl tracking-tight text-foreground">The Guild</span>
                 </Link>

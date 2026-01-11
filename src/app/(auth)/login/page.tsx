@@ -31,8 +31,8 @@ export default function LoginPage() {
                 className="w-full max-w-md"
             >
                 <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-primary mb-6 shadow-xl shadow-primary/20">
-                        <ShieldCheck className="h-8 w-8 text-secondary" />
+                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-primary mb-6 shadow-xl shadow-primary/20 overflow-hidden">
+                        <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
                     </div>
                     <h1 className="text-3xl font-extrabold text-primary tracking-tight">Welcome Back</h1>
                     <p className="text-foreground/50 font-medium mt-2">Sign in to manage your business pulse.</p>

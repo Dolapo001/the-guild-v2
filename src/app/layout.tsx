@@ -20,6 +20,10 @@ const plusJakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "The Guild | Verified Service Marketplace",
   description: "Connect with verified service providers in Nigeria.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  }
 };
 
 export default function RootLayout({

@@ -49,8 +49,8 @@ export default function RegisterPage() {
                 className="w-full max-w-xl"
             >
                 <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-primary mb-6 shadow-xl shadow-primary/20">
-                        <ShieldCheck className="h-8 w-8 text-secondary" />
+                    <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-primary mb-6 shadow-xl shadow-primary/20 overflow-hidden">
+                        <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
                     </div>
                     <h1 className="text-3xl font-extrabold text-primary tracking-tight">Create Account</h1>
                     <p className="text-foreground/50 font-medium mt-2">Join the future of Nigerian service commerce.</p>
@@ -76,8 +76,8 @@ export default function RegisterPage() {
                                             key={item.id}
                                             onClick={() => setRole(item.id as any)}
                                             className={`p-6 rounded-2xl border text-left transition-all flex items-center gap-6 ${role === item.id
-                                                    ? 'bg-primary/5 border-primary shadow-sm'
-                                                    : 'bg-white/40 border-glass-border hover:border-primary/30'
+                                                ? 'bg-primary/5 border-primary shadow-sm'
+                                                : 'bg-white/40 border-glass-border hover:border-primary/30'
                                                 }`}
                                         >
                                             <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${role === item.id ? 'bg-primary text-white' : 'bg-primary/5 text-primary'}`}>
