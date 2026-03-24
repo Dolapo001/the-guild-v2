@@ -96,7 +96,7 @@ export function TopNav() {
     if (!mounted) return null;
 
     return (
-        <header className="h-16 border-b border-glass-border bg-glass-surface dark:bg-[#0f111a]/80 backdrop-blur-md sticky top-0 z-50 px-4 md:px-6 flex items-center justify-between shadow-sm pt-safe">
+        <header className="h-16 border-b border-[--border] bg-glass-surface dark:bg-[#0f111a]/80 backdrop-blur-md sticky top-0 z-50 px-4 md:px-6 flex items-center justify-between shadow-sm pt-safe">
             {/* Left Side: Back Button (Mobile) or Dynamic Title (Desktop) */}
             <div className="flex items-center gap-4">
                 <div className="lg:hidden">
@@ -105,12 +105,12 @@ export function TopNav() {
                     </Button>
                 </div>
 
-                <div className="hidden lg:flex flex-col md:flex-row md:items-center gap-1 md:gap-3">
-                    <h1 className="text-lg font-extrabold text-foreground tracking-tight">{getTitle()}</h1>
+                <div className="hidden lg:flex flex-col md:flex-row md:items-center gap-1 md:gap-2.5">
+                    <h1 className="text-base font-bold text-foreground tracking-tight">{getTitle()}</h1>
                     {isVerified && (
-                        <div className="flex items-center gap-1.5 bg-accent/10 text-accent px-2 py-0.5 rounded-lg border border-accent/20">
+                        <div className="flex items-center gap-1.5 bg-accent/10 text-accent px-2.5 py-1 rounded-lg border border-accent/20">
                             <ShieldCheck className="h-3.5 w-3.5" />
-                            <span className="text-[10px] font-extrabold uppercase tracking-wider hidden sm:block">Verified Business</span>
+                            <span className="text-xs font-semibold hidden sm:block">Verified Business</span>
                         </div>
                     )}
                 </div>
@@ -118,7 +118,7 @@ export function TopNav() {
 
             {/* Center: Page Title (Mobile Only) */}
             <div className="lg:hidden absolute left-1/2 -translate-x-1/2">
-                <h1 className="text-sm font-extrabold text-foreground uppercase tracking-[0.2em]">{getTitle()}</h1>
+                <h1 className="text-sm font-semibold text-foreground tracking-tight">{getTitle()}</h1>
             </div>
 
             {/* Integrated Search Bar (Desktop) */}
@@ -155,24 +155,24 @@ export function TopNav() {
                             <span className="absolute right-3 top-3 h-2 w-2 rounded-full bg-accent border-2 border-background" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-80 p-2 border-glass-border bg-card/95 backdrop-blur-xl shadow-premium rounded-2xl">
-                        <DropdownMenuLabel className="px-4 py-3 text-sm font-extrabold text-foreground uppercase tracking-widest">Notifications</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-glass-border" />
-                        <div className="py-2">
+                    <DropdownMenuContent align="end" className="w-80 p-2 border-[--border] bg-card/95 backdrop-blur-xl shadow-glass rounded-2xl">
+                        <DropdownMenuLabel className="px-4 py-2.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Notifications</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-[--border]" />
+                        <div className="py-1.5">
                             {notifications.map((n) => (
-                                <DropdownMenuItem key={n.id} className="flex items-start gap-4 p-4 rounded-xl hover:bg-muted cursor-pointer transition-colors">
-                                    <div className={cn("h-8 w-8 rounded-lg bg-muted flex items-center justify-center shadow-sm shrink-0", n.color)}>
+                                <DropdownMenuItem key={n.id} className="flex items-start gap-3 px-3 py-3 rounded-xl hover:bg-muted cursor-pointer transition-colors duration-150">
+                                    <div className={cn("h-8 w-8 rounded-lg bg-muted flex items-center justify-center shadow-sm shrink-0 mt-0.5", n.color)}>
                                         <n.icon className="h-4 w-4" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-bold text-foreground truncate">{n.title}</p>
-                                        <p className="text-[10px] font-medium text-foreground/40 mt-0.5">{n.time}</p>
+                                        <p className="text-sm font-semibold text-foreground truncate">{n.title}</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">{n.time}</p>
                                     </div>
                                 </DropdownMenuItem>
                             ))}
                         </div>
-                        <DropdownMenuSeparator className="bg-glass-border" />
-                        <Button variant="ghost" className="w-full h-10 text-xs font-bold text-foreground/60 hover:bg-muted">
+                        <DropdownMenuSeparator className="bg-[--border]" />
+                        <Button variant="ghost" className="w-full h-9 text-xs font-medium text-muted-foreground hover:bg-muted">
                             Mark all as read
                         </Button>
                     </DropdownMenuContent>
@@ -190,34 +190,34 @@ export function TopNav() {
                             <span className="text-sm font-bold text-foreground hidden md:block">{user?.name?.split(' ')[0]}</span>
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-64 p-2 border-glass-border bg-card/95 backdrop-blur-xl shadow-premium rounded-2xl">
-                        <div className="px-4 py-4 mb-2">
-                            <p className="text-sm font-extrabold text-foreground">{user?.name}</p>
-                            <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest mt-1">
+                    <DropdownMenuContent align="end" className="w-60 p-2 border-[--border] bg-card/95 backdrop-blur-xl shadow-glass rounded-2xl">
+                        <div className="px-3 py-3 mb-1">
+                            <p className="text-sm font-semibold text-foreground">{user?.name}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">
                                 {user?.role === "ceo" ? "CEO @ Glow Spa" : user?.role === "staff" ? "Senior Professional" : "Premium Member"}
                             </p>
                         </div>
-                        <DropdownMenuSeparator className="bg-glass-border" />
+                        <DropdownMenuSeparator className="bg-[--border]" />
                         <Link href="/profile">
-                            <DropdownMenuItem className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted cursor-pointer transition-colors">
-                                <UserCircle className="h-4 w-4 text-foreground/40" />
-                                <span className="text-sm font-bold text-foreground">Profile Settings</span>
+                            <DropdownMenuItem className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer transition-colors duration-150">
+                                <UserCircle className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm font-medium text-foreground">Profile Settings</span>
                             </DropdownMenuItem>
                         </Link>
                         <DropdownMenuItem
                             onClick={() => { }}
-                            className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted cursor-pointer transition-colors"
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-muted cursor-pointer transition-colors duration-150"
                         >
-                            <RefreshCw className="h-4 w-4 text-foreground/40" />
-                            <span className="text-sm font-bold text-foreground">Switch Role (Dev)</span>
+                            <RefreshCw className="h-4 w-4 text-muted-foreground" />
+                            <span className="text-sm font-medium text-foreground">Switch Role (Dev)</span>
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator className="bg-glass-border" />
+                        <DropdownMenuSeparator className="bg-[--border]" />
                         <DropdownMenuItem
                             onClick={logout}
-                            className="flex items-center gap-3 p-3 rounded-xl hover:bg-red-500/5 text-red-500 cursor-pointer transition-colors"
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/8 text-red-500 cursor-pointer transition-colors duration-150"
                         >
                             <LogOut className="h-4 w-4" />
-                            <span className="text-sm font-bold">Log Out</span>
+                            <span className="text-sm font-medium">Log Out</span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

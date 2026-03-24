@@ -187,12 +187,12 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
             <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden border-0 bg-transparent shadow-none">
                 <GlassCard className="border-white/40 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl">
                     {/* Header */}
-                    <div className="p-6 border-b border-glass-border flex justify-between items-center bg-white/40 dark:bg-white/5">
+                    <div className="px-6 py-4 border-b border-[--border] flex justify-between items-center bg-white/40 dark:bg-white/5">
                         <div>
-                            <h2 className="text-xl font-extrabold text-gray-900 dark:text-white">
+                            <h2 className="text-lg font-bold text-foreground">
                                 {mode === 'reschedule' ? 'Reschedule Appointment' : 'Book Appointment'}
                             </h2>
-                            <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest">{service.businessName}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{service.businessName}</p>
                         </div>
                         {/* Removed manual X button, relying on Dialog primitives or custom close if needed. 
                             Since DialogContent usually has a close, we can hide it via CSS or use a custom one.
@@ -227,7 +227,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                             <div className="flex justify-between mt-2">
                                 {steps.map((s, i) => (
                                     <span key={s.id} className={cn(
-                                        "text-[10px] font-bold uppercase tracking-wider transition-colors",
+                                        "text-xs font-medium uppercase tracking-wide transition-colors",
                                         i === currentStepIndex ? "text-primary" : "text-foreground/30"
                                     )}>
                                         {s.title}
@@ -256,7 +256,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                                     <Sparkles className="h-3 w-3" /> Booking with {initialStaffMember.name}
                                                 </div>
                                             )}
-                                            <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white">Select Services</h3>
+                                            <h3 className="text-2xl font-extrabold text-foreground">Select Services</h3>
                                             <p className="text-foreground/60 font-medium">Choose the services you&apos;d like to book.</p>
                                         </div>
                                         <div className="grid gap-3">
@@ -281,8 +281,8 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                                             {bookingState.selectedServices.includes(s.name) && <CheckCircle2 className="h-3.5 w-3.5 text-white" />}
                                                         </div>
                                                         <div>
-                                                            <span className="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors block">{s.name}</span>
-                                                            <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest flex items-center gap-1 mt-1">
+                                                            <span className="font-bold text-foreground group-hover:text-primary transition-colors block">{s.name}</span>
+                                                            <span className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
                                                                 <Clock className="h-3 w-3" /> 60 Mins
                                                             </span>
                                                         </div>
@@ -302,7 +302,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                 {step === "datetime" && (
                                     <div className="space-y-8">
                                         <div className="text-center mb-6">
-                                            <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white">Date & Time</h3>
+                                            <h3 className="text-2xl font-extrabold text-foreground">Date & Time</h3>
                                             <p className="text-foreground/60 font-medium">When should we arrive?</p>
                                         </div>
 
@@ -325,7 +325,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                                                     : "bg-white/40 dark:bg-white/5 border-transparent hover:border-primary/30"
                                                             )}
                                                         >
-                                                            <span className="text-[10px] font-bold uppercase opacity-60">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                                                            <span className="text-xs font-medium uppercase opacity-60">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
                                                             <span className="text-xl font-extrabold">{date.getDate()}</span>
                                                         </button>
                                                     )
@@ -361,7 +361,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                 {step === "customization" && (
                                     <div className="space-y-8">
                                         <div className="text-center mb-6">
-                                            <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white">Customize</h3>
+                                            <h3 className="text-2xl font-extrabold text-foreground">Customize</h3>
                                             <p className="text-foreground/60 font-medium">Tailor your experience.</p>
                                         </div>
 
@@ -392,7 +392,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                 {step === "staff" && (
                                     <div className="space-y-6">
                                         <div className="text-center mb-6">
-                                            <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white">Choose Professional</h3>
+                                            <h3 className="text-2xl font-extrabold text-foreground">Choose Professional</h3>
                                             <p className="text-foreground/60 font-medium">Select who you&apos;d like to work with.</p>
                                         </div>
 
@@ -411,8 +411,8 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                                     <Sparkles className="h-6 w-6 text-white" />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <p className="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">✨ Ask <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Maestro</span></p>
-                                                    <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">
+                                                    <p className="font-bold text-foreground group-hover:text-primary transition-colors">✨ Ask <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Maestro</span></p>
+                                                    <p className="text-xs text-muted-foreground uppercase tracking-wide">
                                                         Let Maestro find the perfect artisan for your specific needs.
                                                     </p>
                                                 </div>
@@ -445,7 +445,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                                     </Avatar>
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-2">
-                                                            <p className="font-bold text-gray-900 dark:text-white group-hover:text-primary transition-colors">{staff.name}</p>
+                                                            <p className="font-bold text-foreground group-hover:text-primary transition-colors">{staff.name}</p>
                                                             {staff.isOwner && (
                                                                 <Badge className="bg-amber-500 text-white border-0 text-[8px] font-extrabold px-1.5 py-0">
                                                                     ✨ PREMIUM
@@ -453,10 +453,10 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                                             )}
                                                         </div>
                                                         <div className="flex items-center gap-2">
-                                                            <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{staff.role}</span>
+                                                            <span className="text-xs text-muted-foreground uppercase tracking-wide">{staff.role}</span>
                                                             <div className="flex items-center gap-0.5 text-amber-500">
                                                                 <Star className="h-3 w-3 fill-amber-500" />
-                                                                <span className="text-[10px] font-bold">{staff.rating}</span>
+                                                                <span className="text-xs font-semibold">{staff.rating}</span>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -475,7 +475,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                 {step === "summary" && (
                                     <div className="space-y-6">
                                         <div className="text-center mb-6">
-                                            <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white">Review & Pay</h3>
+                                            <h3 className="text-2xl font-extrabold text-foreground">Review & Pay</h3>
                                             <p className="text-foreground/60 font-medium">Secure your booking with escrow.</p>
                                         </div>
 
@@ -483,12 +483,12 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                             <div className="space-y-4">
                                                 <div className="flex justify-between items-start">
                                                     <div>
-                                                        <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-2">Services</p>
+                                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Services</p>
                                                         <div className="space-y-1">
                                                             {bookingState.selectedServices.map(s => (
                                                                 <div key={s} className="flex items-center gap-2">
-                                                                    <p className="text-sm font-bold text-gray-900 dark:text-white">{s}</p>
-                                                                    <span className="text-[10px] font-bold text-foreground/40">• 60 Mins</span>
+                                                                    <p className="text-sm font-bold text-foreground">{s}</p>
+                                                                    <span className="text-xs text-muted-foreground">• 60 Mins</span>
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -499,19 +499,19 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
 
                                                 <div className="grid grid-cols-2 gap-6">
                                                     <div>
-                                                        <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-1">Date & Time</p>
-                                                        <p className="text-sm font-bold text-gray-900 dark:text-white">
+                                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Date & Time</p>
+                                                        <p className="text-sm font-bold text-foreground">
                                                             {bookingState.date?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} at {bookingState.timeSlot}
                                                         </p>
                                                     </div>
                                                     <div>
-                                                        <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-1">Professional</p>
+                                                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">Professional</p>
                                                         <div className="flex flex-col">
-                                                            <p className="text-sm font-bold text-gray-900 dark:text-white">
+                                                            <p className="text-sm font-bold text-foreground">
                                                                 {selectedStaffMember?.name}
                                                             </p>
                                                             {bookingState.staffId === 'AUTO' && (
-                                                                <span className="text-[10px] font-bold text-amber-500 flex items-center gap-1">
+                                                                <span className="text-xs font-medium text-amber-500 flex items-center gap-1">
                                                                     <Sparkles className="h-3 w-3" /> <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Maestro&apos;s</span> Choice (Pending Assignment)
                                                                 </span>
                                                             )}
@@ -542,7 +542,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                             <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                                             <div>
                                                 <p className="text-xs font-bold text-emerald-700 dark:text-emerald-300">Secure Escrow Payment</p>
-                                                <p className="text-[10px] font-medium text-emerald-600/80 dark:text-emerald-400/80 mt-0.5">
+                                                <p className="text-xs text-emerald-600/80 dark:text-emerald-400/80 mt-0.5 leading-relaxed">
                                                     Your payment is held safely in escrow. The provider only gets paid after you confirm the service is completed.
                                                 </p>
                                             </div>
@@ -562,14 +562,14 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
                                         </motion.div>
 
                                         <div>
-                                            <h3 className="text-2xl font-extrabold text-gray-900 dark:text-white mb-2">Booking Confirmed!</h3>
+                                            <h3 className="text-2xl font-extrabold text-foreground mb-2">Booking Confirmed!</h3>
                                             <p className="text-foreground/60 font-medium">Your payment is securely held in escrow.</p>
                                         </div>
 
                                         <div className="bg-white/50 dark:bg-white/5 rounded-2xl p-6 border border-glass-border max-w-sm mx-auto text-left relative overflow-hidden">
                                             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary" />
                                             <div className="flex justify-between items-center mb-4">
-                                                <span className="text-[10px] font-extrabold uppercase tracking-widest text-foreground/40">Ticket ID</span>
+                                                <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Ticket ID</span>
                                                 <span className="font-mono font-bold text-primary">{bookingState.ticketId}</span>
                                             </div>
                                             <div className="space-y-3">

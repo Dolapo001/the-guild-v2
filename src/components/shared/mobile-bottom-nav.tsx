@@ -77,7 +77,7 @@ export function MobileBottomNav() {
                                     <item.icon className="h-7 w-7" />
                                 </motion.div>
                                 <span className={cn(
-                                    "absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-widest",
+                                    "absolute -bottom-5 left-1/2 -translate-x-1/2 text-[11px] font-semibold uppercase tracking-wide",
                                     isActive ? "text-primary text-glow" : "text-white/40"
                                 )}>
                                     {item.label}
@@ -97,7 +97,7 @@ export function MobileBottomNav() {
                                 isActive ? "text-primary scale-110" : "text-white/40"
                             )} />
                             <span className={cn(
-                                "text-[10px] font-bold uppercase tracking-widest transition-all",
+                                "text-[11px] font-semibold uppercase tracking-wide transition-all",
                                 isActive ? "text-primary text-glow" : "text-white/40"
                             )}>
                                 {item.label}
@@ -111,7 +111,7 @@ export function MobileBottomNav() {
                     <SheetTrigger asChild>
                         <button className="flex flex-col items-center justify-center gap-1 w-16">
                             <Menu className="h-5 w-5 text-white/40" />
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Menu</span>
+                            <span className="text-[11px] font-semibold uppercase tracking-wide text-white/40">Menu</span>
                         </button>
                     </SheetTrigger>
                     <SheetContent side="bottom" className="h-[70vh] rounded-t-[32px] bg-slate-950 border-white/10 p-0 overflow-hidden">

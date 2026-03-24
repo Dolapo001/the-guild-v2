@@ -62,7 +62,7 @@ export function FilterPanel({
             <div className="space-y-8 flex-1 overflow-y-auto pr-2">
                 {/* Categories */}
                 <div>
-                    <p className="text-[10px] font-extrabold text-foreground/40 dark:text-white uppercase tracking-widest mb-4">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                         Categories
                     </p>
                     <div className="space-y-2">
@@ -101,7 +101,7 @@ export function FilterPanel({
 
                 {/* Verification */}
                 <div>
-                    <p className="text-[10px] font-extrabold text-foreground/40 dark:text-white uppercase tracking-widest mb-4">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                         Verification
                     </p>
                     <label className="flex items-center gap-3 cursor-pointer group">
@@ -129,7 +129,7 @@ export function FilterPanel({
 
                 {/* Location Radius */}
                 <div>
-                    <p className="text-[10px] font-extrabold text-foreground/40 dark:text-white uppercase tracking-widest mb-4">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
                         Location Radius
                     </p>
                     <div className="space-y-4">
@@ -148,7 +148,7 @@ export function FilterPanel({
                                 style={{ width: `${(filters.radius / 50) * 100}%` }}
                             />
                         </div>
-                        <div className="flex justify-between text-[10px] font-bold text-foreground/40">
+                        <div className="flex justify-between text-xs font-medium text-muted-foreground">
                             <span>0km</span>
                             <span className="text-primary font-extrabold">Within {filters.radius}km</span>
                             <span>50km+</span>

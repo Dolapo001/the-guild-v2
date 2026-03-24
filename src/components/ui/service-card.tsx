@@ -34,8 +34,8 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
             transition={{ duration: 0.3 }}
         >
             <Link href={`/service/${service.id}`} className="block h-full">
-                <div className={`h-full flex flex-col overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#1e293b]/80 backdrop-blur-md shadow-sm hover:shadow-md transition-all group ${isMaestroMatch ? 'ring-2 ring-secondary/50 shadow-xl shadow-secondary/10' : ''}`}>
-                    <div className="relative h-48 w-full overflow-hidden bg-gray-100 dark:bg-white/5">
+                <div className={`h-full flex flex-col overflow-hidden rounded-2xl border border-[--border] bg-card backdrop-blur-md shadow-sm hover:shadow-md transition-all duration-200 group ${isMaestroMatch ? 'ring-2 ring-secondary/50 shadow-xl shadow-secondary/10' : ''}`}>
+                    <div className="relative h-48 w-full overflow-hidden bg-muted dark:bg-white/5">
                         <Image
                             src={service.image}
                             alt={service.name}
@@ -63,7 +63,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
 
                         <div className="absolute top-3 left-3 flex flex-wrap gap-2">
                             {(isMaestroMatch || tag) && (
-                                <div className="bg-secondary text-primary text-[10px] font-extrabold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl animate-pulse">
+                                <div className="bg-secondary text-primary text-[10px] font-extrabold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg">
                                     <Sparkles className="h-3 w-3 fill-primary" />
                                     {tag || (
                                         <span>
@@ -98,51 +98,51 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
 
                     <div className="p-5 flex-1 flex flex-col relative">
                         <div className="flex justify-between items-start mb-2">
-                            <h3 className="font-bold text-lg text-gray-900 dark:text-dark leading-tight group-hover:text-primary dark:group-hover:text-blue-400 transition-colors">
+                            <h3 className="font-bold text-base text-foreground leading-snug group-hover:text-primary transition-colors duration-150">
                                 {service.businessName}
                             </h3>
-                            <div className="flex items-center gap-1 text-sm font-bold text-gray-900 dark:text-white">
+                            <div className="flex items-center gap-1 text-sm font-bold text-foreground shrink-0 ml-2">
                                 <Star className="h-4 w-4 fill-secondary text-secondary" />
                                 {service.rating}
                             </div>
                         </div>
 
-                        <p className="text-sm text-gray-500 dark:text-gray-400 font-medium mb-4 line-clamp-1">
+                        <p className="text-sm text-muted-foreground font-medium mb-3 line-clamp-1">
                             {service.name}
                         </p>
 
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-6">
+                        <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground uppercase tracking-wide mb-5">
                             <MapPin className="h-3.5 w-3.5" />
                             {service.location}
                         </div>
 
-                        <div className="mt-auto pt-4 border-t border-gray-100 dark:border-white/10">
+                        <div className="mt-auto pt-4 border-t border-[--border]">
                             {/* Mobile Layout (Always Visible) */}
                             <div className="flex lg:hidden flex-col gap-3">
                                 <div className="flex justify-between items-end">
                                     <div>
-                                        <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Starting at</p>
+                                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Starting at</p>
                                         <p className="text-lg font-extrabold text-amber-600 dark:text-amber-400">₦{service.price.toLocaleString()}</p>
                                     </div>
                                 </div>
-                                <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center dark:border-blue-400 dark:text-blue-400 font-bold">
+                                <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center font-semibold text-sm transition-colors duration-150 hover:bg-primary hover:text-white">
                                     Book Now
                                 </div>
                             </div>
 
                             {/* Desktop Layout (Hover Animation) */}
                             <div className="hidden lg:block h-14 relative overflow-hidden">
-                                <div className="absolute top-4 left-0 w-full flex items-center justify-between group-hover:-translate-y-full group-hover:opacity-0 transition-all duration-300">
+                                <div className="absolute top-4 left-0 w-full flex items-center justify-between group-hover:-translate-y-full group-hover:opacity-0 transition-all duration-200">
                                     <div>
-                                        <p className="text-[10px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Starting at</p>
+                                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Starting at</p>
                                         <p className="text-lg font-extrabold text-amber-600 dark:text-amber-400">₦{service.price.toLocaleString()}</p>
                                     </div>
-                                    <div className="text-sm font-bold text-primary dark:text-blue-400 flex items-center gap-1">
+                                    <div className="text-sm font-semibold text-primary flex items-center gap-1">
                                         View <ArrowRight className="h-4 w-4" />
                                     </div>
                                 </div>
 
-                                <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center dark:border-blue-400 dark:text-blue-400 font-bold transition-all absolute top-0 left-0 translate-y-full opacity-0 group-hover:translate-y-4 group-hover:opacity-100 duration-300">
+                                <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center font-semibold text-sm transition-all duration-200 absolute top-0 left-0 translate-y-full opacity-0 group-hover:translate-y-4 group-hover:opacity-100 hover:bg-primary hover:text-white">
                                     Book Now
                                 </div>
                             </div>

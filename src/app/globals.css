@@ -98,6 +98,9 @@
   --primary: #1a237e;
   --secondary: #ffb74d;
   --accent: #00695c;
+  --accent-foreground: #ffffff;
+  --primary-foreground: #ffffff;
+  --secondary-foreground: #1a237e;
   --glass-border: rgba(0, 0, 0, 0.05);
   --glass-surface: rgba(255, 255, 255, 0.8);
   --glass-highlight: rgba(255, 255, 255, 0.9);
@@ -109,6 +112,12 @@
   --card-foreground: #0f172a;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
+
+  /* Component tokens */
+  --border: rgba(0, 0, 0, 0.08);
+  --input: rgba(0, 0, 0, 0.08);
+  --ring: #1a237e;
+  --radius: 0.75rem;
 }
 
 .dark {
@@ -117,6 +126,9 @@
   --primary: #5c6bc0;
   --secondary: #ffcc80;
   --accent: #26a69a;
+  --accent-foreground: #ffffff;
+  --primary-foreground: #ffffff;
+  --secondary-foreground: #1a237e;
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-surface: rgba(15, 23, 42, 0.6);
   --glass-highlight: rgba(255, 255, 255, 0.05);
@@ -128,10 +140,16 @@
   --card-foreground: #f8fafc;
   --muted: #1e293b;
   --muted-foreground: #94a3b8;
+
+  /* Component tokens */
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.08);
+  --ring: #5c6bc0;
+  --radius: 0.75rem;
 }
 
 body {
   overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
-  @apply bg-background text-foreground antialiased selection:bg-primary/10 selection:text-primary transition-colors duration-700;
+  @apply bg-background text-foreground antialiased selection:bg-primary/10 selection:text-primary transition-colors duration-300;
 }

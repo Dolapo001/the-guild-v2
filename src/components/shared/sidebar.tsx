@@ -80,17 +80,17 @@ export function Sidebar() {
     const sidebarItems = roleLinks[userRole as keyof typeof roleLinks] || roleLinks.ceo;
 
     return (
-        <aside className="hidden h-screen w-64 flex-col border-r border-glass-border bg-glass-surface dark:bg-[#0f111a] backdrop-blur-xl lg:flex fixed left-0 top-0 z-40 shadow-premium">
-            <div className="flex h-20 items-center px-6">
+        <aside className="hidden h-screen w-64 flex-col border-r border-[--border] bg-glass-surface dark:bg-[#0f111a] backdrop-blur-xl lg:flex fixed left-0 top-0 z-40 shadow-glass">
+            <div className="flex h-16 items-center px-5 border-b border-[--border]">
                 <Link href="/" className="flex items-center gap-2.5 group">
-                    <div className="h-9 w-9 bg-primary rounded-lg overflow-hidden group-hover:scale-110 transition-transform shadow-lg">
+                    <div className="h-8 w-8 bg-primary rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-150 shadow-md">
                         <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
                     </div>
-                    <span className="font-bold text-xl tracking-tight text-foreground">The Guild</span>
+                    <span className="font-bold text-lg tracking-tight text-foreground">The Guild</span>
                 </Link>
             </div>
-            <div className="flex-1 overflow-y-auto py-6">
-                <nav className="grid gap-1.5 px-3">
+            <div className="flex-1 overflow-y-auto py-4 no-scrollbar">
+                <nav className="grid gap-1 px-3">
                     {sidebarItems.map((item, index) => {
                         const isActive = pathname === item.href;
                         return (
@@ -98,15 +98,15 @@ export function Sidebar() {
                                 key={index}
                                 href={item.href}
                                 className={cn(
-                                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300",
+                                    "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150",
                                     isActive
-                                        ? "bg-primary text-white shadow-lg shadow-primary/20"
-                                        : "text-foreground/50 hover:bg-primary/5 hover:text-primary"
+                                        ? "bg-primary text-white shadow-md shadow-primary/20 font-semibold"
+                                        : "text-foreground/65 hover:bg-primary/8 hover:text-primary"
                                 )}
                             >
                                 <item.icon className={cn(
-                                    "h-5 w-5 transition-colors",
-                                    isActive ? "text-secondary" : "text-foreground/30",
+                                    "h-4.5 w-4.5 shrink-0 transition-colors",
+                                    isActive ? "text-secondary" : "text-foreground/45",
                                     item.title === "Active Session" && "animate-pulse text-primary"
                                 )} />
                                 {item.title}
@@ -115,20 +115,20 @@ export function Sidebar() {
                     })}
                 </nav>
             </div>
-            <div className="p-4 mt-auto">
+            <div className="p-4 mt-auto border-t border-[--border]">
                 {userRole === "ceo" && (
-                    <div className="bg-accent/5 border border-accent/10 rounded-2xl p-4 mb-4 backdrop-blur-sm">
-                        <div className="flex items-center gap-2 text-accent font-bold text-xs uppercase tracking-wider mb-1">
+                    <div className="bg-accent/5 border border-accent/15 rounded-xl p-3.5 mb-3 backdrop-blur-sm">
+                        <div className="flex items-center gap-2 text-accent font-semibold text-xs uppercase tracking-wide mb-1">
                             <ShieldCheck className="h-3.5 w-3.5" />
                             Verified SME
                         </div>
-                        <p className="text-[10px] text-foreground/40 leading-tight font-medium">
-                            Your business is CAC verified and eligible for escrow payments.
+                        <p className="text-xs text-muted-foreground leading-snug">
+                            CAC verified &amp; eligible for escrow payments.
                         </p>
                     </div>
                 )}
-                <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-500 transition-all hover:bg-red-500/5 group">
-                    <LogOut className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+                <button className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-red-500 transition-all duration-150 hover:bg-red-500/8 group">
+                    <LogOut className="h-4 w-4 group-hover:-translate-x-0.5 transition-transform duration-150" />
                     Sign Out
                 </button>
             </div>
