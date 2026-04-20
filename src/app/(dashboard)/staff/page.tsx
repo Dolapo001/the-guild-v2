@@ -1,248 +1,618 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-    Users,
-    Plus,
-    Star,
-    Mail,
-    Calendar as CalendarIcon,
-    TrendingUp,
-    MoreVertical,
-    ChevronRight,
-    Search
+ Users,
+ Plus,
+ Star,
+ Mail,
+ Calendar as CalendarIcon,
+ TrendingUp,
+ MoreVertical,
+ ChevronRight,
+ Search,
+ MessageSquare,
+ Download,
+ UserX,
+ UserCheck,
+ CalendarCheck,
+ Clock,
+ CheckCircle2,
+ XCircle
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+ Dialog,
+ DialogContent,
+ DialogHeader,
+ DialogTitle,
+ DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Cell
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import {
+ BarChart,
+ Bar,
+ XAxis,
+ YAxis,
+ CartesianGrid,
+ Tooltip,
+ ResponsiveContainer,
+ Cell
 } from 'recharts';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MOCK_STAFF } from "@/lib/mock-data";
+import { staffService, PerformanceData } from "@/services/staff.service";
+import { User } from "@/types/api";
 
 export default function StaffPage() {
-    const [staffList] = useState(MOCK_STAFF);
-    const [selectedStaff, setSelectedStaff] = useState(MOCK_STAFF[0]);
-    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+ const [staffList, setStaffList] = useState<User[]>([]);
+ const [selectedStaff, setSelectedStaff] = useState<User | null>(null);
+ const [performance, setPerformance] = useState<PerformanceData | null>(null);
+ const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+ const [inviteEmail, setInviteEmail] = useState("");
+ const [inviteRole, setInviteRole] = useState("");
+ const [searchQuery, setSearchQuery] = useState("");
+ const [loading, setLoading] = useState(true);
+ const [roles, setRoles] = useState<any[]>([]);
+ const [isAddingRole, setIsAddingRole] = useState(false);
+ const [newRoleName, setNewRoleName] = useState("");
+ const [activeTab, setActiveTab] = useState<"team" | "invites">("team");
+ const [invitations, setInvitations] = useState<any[]>([]);
+ const [performancePeriod, setPerformancePeriod] = useState<"weekly" | "monthly" | "yearly">("monthly");
+ const router = useRouter();
 
-    return (
-        <div className="space-y-10">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                >
-                    <h1 className="text-3xl font-extrabold tracking-tight text-primary">Workforce Management</h1>
-                    <p className="text-foreground/50 font-medium">Manage your team, schedules, and performance.</p>
-                </motion.div>
+ const fetchStaff = async () => {
+    setLoading(true);
+    try {
+        const list = await staffService.getStaffList();
+        setStaffList(list);
+        if (list.length > 0) {
+            // No auto-selection to follow user request
+        }
+    } catch (err) {
+        console.error("Failed to fetch staff", err);
+    } finally {
+        setLoading(false);
+    }
+ };
 
-                <Dialog open={isInviteModalOpen} onOpenChange={setIsInviteModalOpen}>
-                    <DialogTrigger asChild>
-                        <Button className="bg-primary hover:bg-primary/90 text-white rounded-xl h-11 px-6 font-bold shadow-lg shadow-primary/20">
-                            <Plus className="mr-2 h-4 w-4" /> Invite Staff
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border-0 bg-transparent shadow-none">
-                        <GlassCard className="border-white/40 shadow-2xl p-8 space-y-6">
-                            <DialogHeader>
-                                <DialogTitle className="text-2xl font-extrabold text-primary">Invite Team Member</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                                <p className="text-sm font-medium text-foreground/50">Send an invitation to join your business workspace.</p>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest px-1">Email Address</label>
-                                    <div className="relative">
-                                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/30" />
-                                        <Input placeholder="staff@example.com" className="pl-11 h-12 rounded-xl bg-white/50 border-glass-border" />
-                                    </div>
-                                </div>
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest px-1">Assign Role</label>
-                                    <select className="w-full h-12 rounded-xl border border-glass-border bg-white/50 px-4 text-sm font-bold text-primary focus:outline-none focus:ring-2 focus:ring-primary/10">
-                                        <option>Stylist</option>
-                                        <option>Therapist</option>
-                                        <option>Technician</option>
-                                        <option>Receptionist</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <Button className="w-full h-12 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20" onClick={() => setIsInviteModalOpen(false)}>
-                                Send Invitation
-                            </Button>
-                        </GlassCard>
-                    </DialogContent>
-                </Dialog>
+ const fetchPerformance = async (uid: string, period: string = performancePeriod) => {
+    try {
+        const data = await staffService.getStaffPerformance(uid, period);
+        setPerformance(data);
+    } catch (err) {
+        console.error("Failed to fetch performance", err);
+    }
+ };
+
+ useEffect(() => {
+    fetchStaff();
+    fetchRoles();
+    fetchInvitations();
+ }, []);
+
+ const fetchInvitations = async () => {
+    try {
+        const data = await staffService.getInvitations();
+        setInvitations(data);
+    } catch (err) {
+        console.error("Failed to fetch invitations", err);
+    }
+ };
+
+ const fetchRoles = async () => {
+    try {
+        const data = await staffService.getStaffRoles();
+        setRoles(data);
+    } catch (err) {
+        console.error("Failed to fetch roles", err);
+    }
+ };
+
+  const handleAddRole = async () => {
+    if (!newRoleName) return;
+    const toastId = toast.loading(`Creating role "${newRoleName}"...`);
+    try {
+        await staffService.createStaffRole(newRoleName);
+        setNewRoleName("");
+        setIsAddingRole(false);
+        fetchRoles();
+        toast.success("Role created successfully!", { id: toastId });
+    } catch (err: any) {
+        console.error("Failed to add role", err);
+        toast.error(err?.message || "Failed to add role", { id: toastId });
+    }
+  };
+
+ useEffect(() => {
+    if (selectedStaff && (selectedStaff as any).view_status === 'ACTIVE') {
+        fetchPerformance(selectedStaff.uid, performancePeriod);
+    } else {
+        setPerformance(null);
+    }
+ }, [selectedStaff, performancePeriod]);
+
+  useEffect(() => {
+    setSelectedStaff(null); // Clear selection when switching tabs
+  }, [activeTab]);
+
+  const handleInvite = async () => {
+    if (!inviteEmail) return;
+    const toastId = toast.loading(`Sending invitation to ${inviteEmail}...`);
+    try {
+        await staffService.inviteStaff(inviteEmail, inviteRole);
+        toast.success(`Invite sent to ${inviteEmail}`, { id: toastId });
+        setIsInviteModalOpen(false);
+        setInviteEmail("");
+        fetchInvitations();
+    } catch (err: any) {
+        console.error("Invite failed", err);
+        toast.error(err?.message || "Failed to send invitation", { id: toastId });
+    }
+  };
+
+  const filteredStaff = staffList.filter(s => 
+    (s.first_name + " " + (s.last_name || "")).toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.username.toLowerCase().includes(searchQuery.toLowerCase())
+  ).map(s => ({
+    ...s,
+    view_status: 'ACTIVE',
+    display_name: s.first_name ? `${s.first_name} ${s.last_name || ""}` : s.username,
+    display_role: s.staff_profile?.job_title || s.role
+  }));
+
+  const filteredInvites = invitations.filter(i => 
+    i.email.toLowerCase().includes(searchQuery.toLowerCase())
+  ).map(i => ({
+    uid: i.uid,
+    username: i.email,
+    name: i.email,
+    display_name: i.email,
+    display_role: i.job_title || 'Staff',
+    view_status: i.status,
+    is_invitation: true
+  }));
+
+  const currentList = activeTab === 'team' ? filteredStaff : filteredInvites;
+
+ return (
+  <div className={cn("space-y-6 sm:space-y-10 pb-24 pt-6 md:pt-0 overflow-x-hidden w-full max-w-full px-1 sm:px-0")}>
+   {/* Desktop/Mobile Header */}
+   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <motion.div
+     initial={{ opacity: 0, x: -20 }}
+     animate={{ opacity: 1, x: 0 }}
+     className={cn(selectedStaff && "hidden md:block")}
+    >
+     <h1 className="text-3xl font-extrabold tracking-tight text-primary">Workforce</h1>
+     <p className="text-foreground/50 font-medium">Manage your team and performance.</p>
+    </motion.div>
+
+    <div className={cn("flex items-center gap-3", selectedStaff && "hidden md:flex")}>
+     <Dialog open={isInviteModalOpen} onOpenChange={setIsInviteModalOpen}>
+      <DialogTrigger asChild>
+       <Button className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-white rounded-xl h-11 px-6 font-bold shadow-lg shadow-primary/20">
+        <Plus className="mr-2 h-4 w-4" /> Invite Staff
+       </Button>
+      </DialogTrigger>
+      <DialogContent className="w-[calc(100%-2rem)] sm:max-w-[450px] p-0 overflow-hidden border-0 bg-transparent shadow-none">
+       <GlassCard className="border-white/40 shadow-2xl p-6 sm:p-8 space-y-6">
+        <DialogHeader>
+         <DialogTitle className="text-2xl font-extrabold text-primary">Invite Team</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+         <p className="text-sm font-medium text-foreground/50">Send an invitation to join your business.</p>
+         <div className="space-y-2">
+          <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest px-1">Email</label>
+          <div className="relative">
+           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/30" />
+           <Input 
+            placeholder="staff@example.com" 
+            className="pl-11 h-12 rounded-xl bg-white/50 border-glass-border" 
+            value={inviteEmail}
+            onChange={(e) => setInviteEmail(e.target.value)}
+           />
+          </div>
+         </div>
+         <div className="space-y-2">
+           <div className="flex items-center justify-between px-1">
+            <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest">Role</label>
+            <button 
+             onClick={() => setIsAddingRole(!isAddingRole)}
+             className="text-[10px] font-extrabold text-primary uppercase hover:underline"
+            >
+             {isAddingRole ? "Cancel" : "+ New"}
+            </button>
+           </div>
+           
+           {isAddingRole ? (
+            <div className="flex gap-2">
+             <Input 
+              placeholder="Title" 
+              value={newRoleName}
+              onChange={(e) => setNewRoleName(e.target.value)}
+              className="h-12 rounded-xl bg-white/50 border-glass-border flex-1"
+             />
+             <Button onClick={handleAddRole} size="icon" className="h-12 w-12 shrink-0 rounded-xl bg-primary text-white">
+              <Plus className="h-4 w-4" />
+             </Button>
             </div>
-
-            <div className="grid gap-8 lg:grid-cols-3">
-                {/* Staff List */}
-                <div className="lg:col-span-1 space-y-6">
-                    <div className="flex items-center justify-between px-1">
-                        <h3 className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest">Team Members</h3>
-                        <span className="text-[10px] font-extrabold text-primary bg-primary/5 px-2 py-1 rounded-lg">{staffList.length} Total</span>
-                    </div>
-                    <div className="space-y-4">
-                        {staffList.map((staff) => (
-                            <motion.div
-                                key={staff.id}
-                                whileHover={{ x: 4 }}
-                                onClick={() => setSelectedStaff(staff)}
-                                className={`cursor-pointer transition-all ${selectedStaff.id === staff.id ? 'scale-[1.02]' : ''}`}
-                            >
-                                <GlassCard className={`p-4 border-white/40 hover:bg-white/60 transition-all ${selectedStaff.id === staff.id ? 'bg-white/80 border-primary/20 shadow-xl shadow-primary/5' : ''}`}>
-                                    <div className="flex items-center gap-4">
-                                        <Avatar className="h-12 w-12 rounded-xl border-2 border-white shadow-sm">
-                                            <AvatarImage src={staff.image} />
-                                            <AvatarFallback>{staff.name[0]}</AvatarFallback>
-                                        </Avatar>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-2">
-                                                <p className="font-bold text-primary truncate">{staff.name}</p>
-                                                {staff.isOwner && (
-                                                    <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[8px] font-extrabold px-1.5 py-0">
-                                                        OWNER
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                            <p className="text-xs font-medium text-foreground/40">{staff.role}</p>
-                                        </div>
-                                        <div className="flex items-center gap-1 text-accent">
-                                            <Star className="h-3 w-3 fill-accent" />
-                                            <span className="text-xs font-bold">{staff.rating}</span>
-                                        </div>
-                                    </div>
-                                </GlassCard>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Staff Detail & Performance */}
-                <div className="lg:col-span-2 space-y-8">
-                    <GlassCard className="p-8 border-white/40">
-                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
-                            <div className="flex items-center gap-6">
-                                <Avatar className="h-20 w-20 rounded-2xl border-4 border-white shadow-xl">
-                                    <AvatarImage src={selectedStaff.image} />
-                                    <AvatarFallback>{selectedStaff.name[0]}</AvatarFallback>
-                                </Avatar>
-                                <div>
-                                    <h2 className="text-2xl font-extrabold text-primary">{selectedStaff.name}</h2>
-                                    <div className="flex items-center gap-3 mt-1">
-                                        <span className="text-sm font-bold text-foreground/40">{selectedStaff.role}</span>
-                                        <span className="h-1 w-1 rounded-full bg-foreground/20" />
-                                        <span className="text-xs font-extrabold text-green-600 bg-green-500/10 px-2 py-0.5 rounded-lg uppercase tracking-widest">{selectedStaff.status}</span>
-                                        {selectedStaff.isOwner && (
-                                            <Badge className="bg-amber-500 text-white border-0 text-[10px] font-extrabold px-3 py-1 rounded-full shadow-lg shadow-amber-500/20">
-                                                Owner / Master Pro
-                                            </Badge>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                {selectedStaff.isOwner && (
-                                    <div className="flex items-center gap-3 px-4 py-2 bg-white/50 rounded-xl border border-glass-border">
-                                        <span className="text-xs font-bold text-primary/60">Available for Bookings</span>
-                                        <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-primary cursor-pointer">
-                                            <span className="inline-block h-4 w-4 transform rounded-full bg-white transition translate-x-6" />
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="flex gap-3">
-                                    <Button variant="outline" className="h-11 rounded-xl border-glass-border font-bold text-primary">
-                                        <CalendarIcon className="mr-2 h-4 w-4" /> Schedule
-                                    </Button>
-                                    <Button variant="ghost" size="icon" className="h-11 w-11 rounded-xl border border-glass-border">
-                                        <MoreVertical className="h-5 w-5 text-foreground/40" />
-                                    </Button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-8">
-                            <div>
-                                <div className="flex items-center justify-between mb-6">
-                                    <h3 className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest">Revenue Performance (₦)</h3>
-                                    <div className="flex items-center gap-2 text-green-600 font-bold text-xs">
-                                        <TrendingUp className="h-4 w-4" /> +12% vs last month
-                                    </div>
-                                </div>
-                                <div className="h-[300px] w-full">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart data={selectedStaff.revenue}>
-                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-                                            <XAxis
-                                                dataKey="month"
-                                                axisLine={false}
-                                                tickLine={false}
-                                                tick={{ fontSize: 10, fontWeight: 800, fill: '#94A3B8' }}
-                                                dy={10}
-                                            />
-                                            <YAxis
-                                                axisLine={false}
-                                                tickLine={false}
-                                                tick={{ fontSize: 10, fontWeight: 800, fill: '#94A3B8' }}
-                                                tickFormatter={(value) => `₦${value / 1000}k`}
-                                            />
-                                            <Tooltip
-                                                cursor={{ fill: 'rgba(var(--primary), 0.05)' }}
-                                                contentStyle={{
-                                                    borderRadius: '16px',
-                                                    border: 'none',
-                                                    boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-                                                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                                                    backdropFilter: 'blur(8px)'
-                                                }}
-                                            />
-                                            <Bar dataKey="amount" radius={[8, 8, 0, 0]}>
-                                                {selectedStaff.revenue.map((entry, index) => (
-                                                    <Cell
-                                                        key={`cell-${index}`}
-                                                        fill={index === selectedStaff.revenue.length - 1 ? '#0F172A' : '#94A3B8'}
-                                                        fillOpacity={index === selectedStaff.revenue.length - 1 ? 1 : 0.2}
-                                                    />
-                                                ))}
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {[
-                                    { label: "Jobs Completed", value: "142", icon: Users },
-                                    { label: "Avg. Rating", value: selectedStaff.rating, icon: Star },
-                                    { label: "Retention Rate", value: "84%", icon: TrendingUp },
-                                    { label: "Active Hours", value: "160h", icon: CalendarIcon },
-                                ].map((stat, i) => (
-                                    <div key={i} className="p-4 rounded-2xl bg-primary/[0.02] border border-primary/5">
-                                        <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-1">{stat.label}</p>
-                                        <p className="text-xl font-extrabold text-primary">{stat.value}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </GlassCard>
-                </div>
-            </div>
+           ) : (
+            <select 
+             className="w-full h-12 rounded-xl border border-glass-border bg-white/50 px-4 text-sm font-bold text-primary focus:outline-none focus:ring-2 focus:ring-primary/10"
+             value={inviteRole}
+             onChange={(e) => setInviteRole(e.target.value)}
+            >
+             <option value="">Select Role</option>
+             {roles.map(r => <option key={r.uid} value={r.name}>{r.name}</option>)}
+            </select>
+           )}
+         </div>
         </div>
-    );
+        <Button className="w-full h-12 rounded-xl bg-primary text-white font-bold" onClick={handleInvite}>
+         Send Invitation
+        </Button>
+       </GlassCard>
+      </DialogContent>
+     </Dialog>
+    </div>
+   </div>
+
+   <div className="grid gap-8 lg:grid-cols-3">
+    {/* Staff List - Hidden on mobile if staff selected */}
+    <div className={cn("lg:col-span-1 space-y-6", selectedStaff && "hidden lg:block")}>
+        <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/20" />
+            <Input 
+                placeholder="Search staff members..." 
+                className="pl-11 h-12 bg-white/40 border-glass-border rounded-xl font-bold"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+            />
+        </div>
+
+        <div className="flex gap-2 p-1.5 bg-white/30 rounded-2xl mb-4 sm:mb-6 border border-glass-border">
+            <button 
+                onClick={() => setActiveTab("team")}
+                className={cn(
+                    "flex-1 h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                    activeTab === "team" ? "bg-primary text-white shadow-lg" : "text-primary/60 hover:bg-white/40"
+                )}
+            >
+                Staff ({staffList.length})
+            </button>
+            <button 
+                onClick={() => setActiveTab("invites")}
+                className={cn(
+                    "flex-1 h-11 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                    activeTab === "invites" ? "bg-primary text-white shadow-lg" : "text-primary/60 hover:bg-white/40"
+                )}
+            >
+                Invites ({invitations.length})
+            </button>
+        </div>
+
+        <div className="flex items-center justify-between px-1">
+            <h3 className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest">
+                {activeTab === 'team' ? 'Active Team' : 'Invitations'}
+            </h3>
+            <span className="text-[10px] font-extrabold text-primary bg-primary/5 px-2 py-1 rounded-lg">{currentList.length} Total</span>
+        </div>
+        <div className="space-y-3">
+    {loading ? (
+        <p className="text-sm font-medium text-foreground/40 text-center py-10">Loading...</p>
+    ) : (
+        currentList.length === 0 ? (
+            <p className="text-sm font-medium text-foreground/40 text-center py-10 italic">No {activeTab} found matching "{searchQuery}"</p>
+        ) : (
+            currentList.map((item) => (
+            <motion.div
+                key={item.uid}
+                whileHover={{ x: 4 }}
+                onClick={() => setSelectedStaff(item as any)}
+                className={`cursor-pointer group transition-all ${selectedStaff?.uid === item.uid ? 'scale-[1.02]' : ''}`}
+            >
+                <GlassCard className={`p-3 sm:p-4 border-white/40 hover:bg-white/60 transition-all ${selectedStaff?.uid === item.uid ? 'bg-white/80 border-primary/30 shadow-xl shadow-primary/5' : ''}`}>
+                    <div className="flex items-center gap-3 sm:gap-4">
+                        <Avatar className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl border-2 border-white shadow-sm shrink-0">
+                            <AvatarImage src={(item as any).avatar} />
+                            <AvatarFallback className="bg-primary/5 text-primary text-[10px] font-black">{item.username[0].toUpperCase()}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                            <p className="font-bold text-primary truncate text-xs sm:text-base">{(item as any).display_name}</p>
+                            <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                <p className="text-[8px] sm:text-[9px] font-extrabold text-foreground/30 uppercase tracking-widest">{(item as any).display_role}</p>
+                                <span className={cn(
+                                    "text-[7px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter",
+                                    item.view_status === 'ACTIVE' || item.view_status === 'ACCEPTED' ? "bg-green-500/10 text-green-600" : 
+                                    item.view_status === 'PENDING' ? "bg-amber-500/10 text-amber-600" :
+                                    "bg-red-500/10 text-red-600"
+                                )}>
+                                    {item.view_status}
+                                </span>
+                            </div>
+                        </div>
+                        {activeTab === 'team' && (
+                            <div className="flex items-center gap-1 px-1.5 py-1 rounded-lg bg-accent/5 shrink-0">
+                                <Star className="h-2.5 w-2.5 fill-accent text-accent" />
+                                <span className="text-[10px] font-black text-primary">{(item as any).profile?.average_rating || '0.0'}</span>
+                            </div>
+                        )}
+                        {activeTab === 'invites' && (
+                            <Mail className="h-4 w-4 text-primary/30 shrink-0" />
+                        )}
+                    </div>
+                </GlassCard>
+            </motion.div>
+        ))
+    )
+    )}
+</div>
+  </div>
+
+  {/* Staff Detail & Performance */}
+  <div className={cn("lg:col-span-2 space-y-8", !selectedStaff && "hidden lg:block")}>
+  {selectedStaff ? (
+  <GlassCard className="p-5 sm:p-8 border-white/40">
+   <div className="flex lg:hidden mb-4">
+    <Button 
+     variant="ghost" 
+     onClick={() => setSelectedStaff(null)}
+     className="p-0 h-auto font-black text-primary text-[10px] uppercase tracking-widest flex items-center gap-1.5 hover:bg-transparent"
+    >
+     <ChevronRight className="h-3.5 w-3.5 rotate-180" /> Back to List
+    </Button>
+   </div>
+
+   <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+  <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+  <Avatar className="h-12 w-12 sm:h-20 sm:w-20 rounded-2xl border-4 border-white shadow-xl flex-shrink-0">
+  <AvatarImage src={selectedStaff.avatar} />
+  <AvatarFallback>{selectedStaff.username[0]}</AvatarFallback>
+  </Avatar>
+  <div className="min-w-0">
+  <h2 className="text-base sm:text-2xl font-black text-primary truncate">{(selectedStaff as any).display_name}</h2>
+  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
+  <span className="text-[10px] sm:text-sm font-bold text-foreground/40 text-capitalize">{(selectedStaff as any).display_role}</span>
+  <span className="h-1 w-1 rounded-full bg-foreground/20 hidden sm:block" />
+  <span className={cn(
+      "text-[7px] sm:text-[10px] font-black px-2 py-0.5 rounded-lg uppercase tracking-widest",
+      (selectedStaff as any).view_status === 'ACTIVE' || (selectedStaff as any).view_status === 'ACCEPTED' ? "text-green-600 bg-green-500/10" : "text-amber-600 bg-amber-500/10"
+  )}>
+      {(selectedStaff as any).view_status || 'ACTIVE'}
+  </span>
+  </div>
+  </div>
+  </div>
+
+  <div className="flex gap-2 flex-wrap sm:flex-nowrap justify-start sm:justify-end items-center sm:pr-4 w-full sm:w-auto">
+      {(selectedStaff as any).view_status === 'ACTIVE' ? (
+          <>
+          <Button 
+              onClick={() => router.push(`/staff/${selectedStaff.uid}`)}
+              className="flex-1 sm:flex-none h-10 sm:h-11 rounded-xl bg-primary shadow-lg shadow-primary/20 font-bold text-white px-4 sm:px-6 transition-all hover:scale-105 text-xs sm:text-sm"
+          >
+              Profile
+          </Button>
+          <Button 
+              variant="outline" 
+              onClick={() => router.push(`/bookings?staff=${selectedStaff.uid}`)}
+              className="h-10 sm:h-11 rounded-xl border-glass-border font-bold text-primary px-3 sm:px-4 bg-white/50 hover:bg-white transition-all flex-1 sm:flex-none text-xs sm:text-sm"
+          >
+              <CalendarCheck className="sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Schedule</span>
+          </Button>
+          </>
+      ) : (
+          <Button 
+              onClick={async () => {
+                  const toastId = toast.loading(`Resending invitation...`);
+                  try {
+                      await staffService.resendInvitation(selectedStaff.uid);
+                      toast.success(`Invitation resent!`, { id: toastId });
+                  } catch (err: any) {
+                      toast.error(err?.message || "Failed to resend", { id: toastId });
+                  }
+              }}
+              className="flex-1 sm:flex-none h-10 sm:h-11 rounded-xl bg-amber-600 shadow-lg shadow-amber-600/20 font-bold text-white px-4 sm:px-6 transition-all text-xs"
+          >
+              <Mail className="mr-2 h-4 w-4" /> Resend
+          </Button>
+      )}
+      
+      <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl border border-glass-border hover:bg-white transition-all flex-shrink-0">
+                  <MoreVertical className="h-5 w-5 text-foreground/40" />
+              </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl border-glass-border bg-white/95 backdrop-blur-xl">
+              <DropdownMenuLabel className="text-[10px] font-black text-foreground/30 uppercase tracking-widest px-2 py-3">Staff Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-glass-border mx-2" />
+              <DropdownMenuItem 
+                  onClick={() => toast.info(`Messaging ${selectedStaff.username}...`)}
+                  className="rounded-xl h-11 px-3 focus:bg-primary/5 cursor-pointer"
+              >
+                  <MessageSquare className="mr-3 h-4 w-4 text-primary" />
+                  <span className="font-bold text-primary">Send Message</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                  onClick={() => toast.info("Exporting performance data...")}
+                  className="rounded-xl h-11 px-3 focus:bg-primary/5 cursor-pointer"
+              >
+                  <Download className="mr-3 h-4 w-4 text-primary" />
+                  <span className="font-bold text-primary">Export Performance</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator className="bg-glass-border mx-2" />
+              <DropdownMenuItem 
+                  onClick={async () => {
+                      if (window.confirm(`Are you sure you want to deactivate ${selectedStaff.username}?`)) {
+                          const toastId = toast.loading(`Deactivating ${selectedStaff.username}...`);
+                          try {
+                              await staffService.removeStaff(selectedStaff.uid);
+                              toast.success("Staff member deactivated.", { id: toastId });
+                              fetchStaff();
+                              setSelectedStaff(null);
+                          } catch (err: any) {
+                              toast.error(err?.message || "Failed to deactivate staff", { id: toastId });
+                          }
+                      }
+                  }}
+                  className="rounded-xl h-11 px-3 focus:bg-red-50 text-red-600 cursor-pointer"
+              >
+                  <UserX className="mr-3 h-4 w-4" />
+                  <span className="font-bold">Deactivate Account</span>
+              </DropdownMenuItem>
+          </DropdownMenuContent>
+      </DropdownMenu>
+  </div>
+  </div>
+
+  {(selectedStaff as any).view_status === 'ACTIVE' && (
+      <div className="space-y-8">
+      <div>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+      <div className="flex flex-col gap-2">
+          <h3 className="text-[9px] font-black text-foreground/30 uppercase tracking-widest px-1">Revenue Performance (₦)</h3>
+          <div className="flex items-center gap-2">
+              <div className="flex bg-primary/5 p-1 rounded-xl border border-primary/10 w-fit">
+                  {['weekly', 'monthly', 'yearly'].map((p) => (
+                      <button
+                          key={p}
+                          onClick={() => setPerformancePeriod(p as any)}
+                          className={cn(
+                              "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tight transition-all",
+                              performancePeriod === p ? "bg-primary text-white shadow-sm" : "text-primary/40 hover:text-primary"
+                          )}
+                      >
+                          {p.replace('ly', '')}
+                      </button>
+                  ))}
+              </div>
+          </div>
+      </div>
+      {performance?.trend && (
+          <div className="flex items-center gap-1.5 text-green-600 font-bold text-[10px] bg-green-500/5 px-2 py-1 rounded-lg border border-green-500/10 h-fit">
+              <TrendingUp className="h-3 w-3" />
+              <span>{performance.trend.value} {performance.trend.label}</span>
+          </div>
+      )}
+      </div>
+      <div className="h-[300px] w-full">
+      <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={performance?.revenue_chart || []}>
+      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+      <XAxis
+      dataKey="label"
+      axisLine={false}
+      tickLine={false}
+      tick={{ fontSize: 10, fontWeight: 700, opacity: 0.5 }}
+      dy={10}
+      />
+      <YAxis
+      axisLine={false}
+      tickLine={false}
+      tick={{ fontSize: 10, fontWeight: 700, opacity: 0.5 }}
+      tickFormatter={(value) => {
+          if (value >= 1000000) return `₦${(value / 1000000).toFixed(1)}M`;
+          if (value >= 1000) return `₦${(value / 1000).toFixed(0)}k`;
+          return `₦${value}`;
+      }}
+      />
+      <Tooltip
+      cursor={{ fill: 'rgba(var(--primary), 0.05)' }}
+      contentStyle={{
+      borderRadius: '12px',
+      border: 'none',
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backdropFilter: 'blur(8px)'
+      }}
+      formatter={(value: any) => [`₦${Number(value).toLocaleString()}`, 'Revenue']}
+      />
+      <Bar dataKey="amount" radius={[4, 4, 4, 4]} barSize={performancePeriod === 'weekly' ? 40 : 30}>
+      {(performance?.revenue_chart || []).map((entry, index) => (
+      <Cell
+      key={`cell-${index}`}
+      fill={index === (performance?.revenue_chart.length || 0) - 1 ? '#1a237e' : '#1a237e'}
+      fillOpacity={index === (performance?.revenue_chart.length || 0) - 1 ? 1 : 0.2}
+      />
+      ))}
+      </Bar>
+      </BarChart>
+      </ResponsiveContainer>
+      </div>
+      </div>
+    
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {[
+      { label: "Jobs Completed", value: performance?.total_jobs || "0", icon: Users },
+      { label: "Avg. Rating", value: performance?.rating || "0.0", icon: Star },
+      { label: "Retention Rate", value: performance?.completion_rate || "0%", icon: TrendingUp },
+      { label: "Active Hours", value: performance?.active_hours || "0h", icon: CalendarIcon },
+      ].map((stat, i) => (
+      <div key={i} className="p-4 rounded-2xl bg-primary/[0.02] border border-primary/5">
+      <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-1">{stat.label}</p>
+      <p className="text-xl font-extrabold text-primary">{stat.value}</p>
+      </div>
+      ))}
+      </div>
+      </div>
+  )}
+  {(selectedStaff as any).view_status !== 'ACTIVE' && (
+      <div className="h-[400px] flex flex-col items-center justify-center text-center space-y-6">
+          <div className="h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center">
+              <Clock className="h-10 w-10 text-amber-600 animate-pulse" />
+          </div>
+          <div>
+              <p className="text-xl font-extrabold text-primary">Invitation Pending</p>
+              <p className="text-sm font-medium text-foreground/40 mt-1 max-w-sm">
+                  This staff member has been invited but has not yet accepted. Performance metrics will appear once they join.
+              </p>
+          </div>
+          <Button 
+              onClick={async () => {
+                const toastId = toast.loading(`Resending invitation to ${selectedStaff.username}...`);
+                try {
+                    await staffService.resendInvitation(selectedStaff.uid);
+                    toast.success(`Invitation resent to ${selectedStaff.username}`, { id: toastId });
+                } catch (err: any) {
+                    toast.error(err?.message || "Failed to resend invitation", { id: toastId });
+                }
+              }}
+              variant="outline" 
+              className="border-amber-600/20 text-amber-600 hover:bg-amber-50 rounded-xl px-10"
+          >
+              Resend Invite Email
+          </Button>
+      </div>
+  )}
+  </GlassCard>
+  ) : (
+    <div className="h-full flex flex-col items-center justify-center p-20 text-center space-y-6">
+        <div className="h-24 w-24 rounded-full bg-primary/5 flex items-center justify-center animate-pulse">
+            <Users className="h-10 w-10 text-primary/20" />
+        </div>
+        <div className="space-y-2">
+            <h3 className="text-xl font-bold text-primary/40">No Staff Selected</h3>
+            <p className="text-sm text-foreground/40 max-w-[280px]">Select a team member from the list to view their live performance and management tools.</p>
+        </div>
+    </div>
+  )}
+  </div>
+  </div>
+  </div>
+  );
 }

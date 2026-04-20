@@ -6,63 +6,77 @@ import { WalletProvider } from "@/contexts/WalletContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { ThemeProvider } from "@/components/theme-provider";
+import { RoleSwitcher } from "@/components/shared/role-switcher";
+import { Toaster } from "sonner";
 
 const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
+ variable: "--font-inter",
+ subsets: ["latin"],
 });
 
 const plusJakarta = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta",
-  subsets: ["latin"],
+ variable: "--font-plus-jakarta",
+ subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "The Guild | Verified Service Marketplace",
-  description: "Connect with verified service providers in Nigeria.",
-  icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
-  }
+ title: "The Guild | Verified Service Marketplace",
+ description: "Connect with verified service providers in Nigeria.",
+ icons: {
+ icon: "/logo.png",
+ apple: "/logo.png",
+ }
 };
 
 export const viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  viewportFit: "cover",
-  themeColor: "#1A237E",
+ width: "device-width",
+ initialScale: 1,
+ maximumScale: 1,
+ userScalable: false,
+ viewportFit: "cover",
+ themeColor: "#1A237E",
 };
 
 export default function RootLayout({
-  children,
+ children,
 }: Readonly<{
-  children: React.ReactNode;
+ children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} ${plusJakarta.variable} antialiased bg-background text-foreground min-h-screen bg-mesh-gradient`}
-        suppressHydrationWarning
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <AuthProvider>
-            <WalletProvider>
-              <CartProvider>
-                <FavoritesProvider>
-                  {children}
-                </FavoritesProvider>
-              </CartProvider>
-            </WalletProvider>
-          </AuthProvider>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+ return (
+ <html lang="en" suppressHydrationWarning>
+ <body
+ className={`${inter.variable} ${plusJakarta.variable} antialiased bg-background text-foreground min-h-screen bg-mesh-gradient`}
+ suppressHydrationWarning
+ >
+ <ThemeProvider
+ attribute="class"
+ defaultTheme="light"
+ enableSystem={false}
+ forcedTheme="light"
+ disableTransitionOnChange
+ >
+ <AuthProvider>
+ <WalletProvider>
+ <CartProvider>
+ <FavoritesProvider>
+ {children}
+ <RoleSwitcher />
+ <Toaster position="top-right" richColors expand={true} toastOptions={{
+    style: {
+      background: 'rgba(255, 255, 255, 0.98)',
+      backdropFilter: 'blur(8px)',
+      border: '1px solid rgba(26, 35, 126, 0.1)',
+      borderRadius: '16px',
+      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+      color: '#1A237E',
+    }
+  }} />
+ </FavoritesProvider>
+ </CartProvider>
+ </WalletProvider>
+ </AuthProvider>
+ </ThemeProvider>
+ </body>
+ </html>
+ );
 }

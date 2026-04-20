@@ -24,7 +24,7 @@ Official Branding: Deep Royal Blue (#1A237E) & Soft Gold (#FFB74D).
     - Staff: Fields for skills (ManyToMany), bio, and availability_slots.
     - Customer: Fields for saved_addresses (JSONField or separate Address model).
 - Data Flow: On profile fetch, the API uses the JWT role to determine which serializer to use, ensuring sensitive data like cac_number is only exposed to CEOs/Admins.
-
+integrated
 ---
 
 ## 2. The "Maestro" AI Engine (Search & Discovery)
@@ -74,10 +74,10 @@ Official Branding: Deep Royal Blue (#1A237E) & Soft Gold (#FFB74D).
 - Lifecycle Side-Effects:
     1. **On Approval**: When Staff approves a schedule, trigger `SendApprovalEmail`.
     2. **Actionable Emails**: Approval emails must contain signed, time-limited URLs for "Cancel" and "Reschedule" actions.
-    3. **T-1hr Reminders**: Use `Celery Beat` to scan for upcoming bookings. At `start_time - 1 hour`, trigger both a Push Notification (FCM) and an Email Reminder to the Customer.
+    3. **T-1hr Reminders**: Use `django task scheduler  ` to scan for upcoming bookings. At `start_time - 1 hour`, trigger both a Push Notification (FCM) and an Email Reminder to the Customer.
 - Data Flow: 
     - `Staff.approve()` -> `Booking.status = CONFIRMED` -> `Task: send_email_to_customer`.
-    - `Celery Beat` -> `Task: check_reminders` -> `Task: send_push_notification`.
+    - `django task scheduler` -> `Task: check_reminders` -> `Task: send_push_notification`.
 
 ---
 

@@ -1,0 +1,216 @@
+# Backend API Endpoints Needed: "The Guild"
+# Base URL: https://api.theguild.com/v1 (Placeholder)
+
+This document lists the essential endpoints required by the frontend to function with a real backend, based on the current UI implementation and BACKEND_SPECS.txt.
+
+---
+
+## 1. Authentication & User Profile
+Endpoints for managing user sessions and role-specific data.
+
+### POST /auth/login
+- **Description**: Authenticates user and returns JWT tokens.
+- **Request Body**:
+  ```json
+  { "email": "user@example.com", "password": "password123" }
+  ```
+- **Response**:
+  ```json
+  {
+    "access": "jwt_access_token",
+    "refresh": "jwt_refresh_token",
+    "user": {
+      "id": "u1",
+      "name": "Adedolapo",
+      "email": "user@example.com",
+      "role": "customer|ceo|staff|admin",
+      "verificationStatus": "unverified|pending|verified|rejected",
+      "isSoloOperator": true
+    }
+  }
+  ```
+
+### GET /auth/profile
+- **Description**: Fetches the current user's profile details.
+- **Response**: (Same as user object in login)
+
+### PATCH /auth/profile
+- **Description**: Updates user profile (name, avatar, etc.).
+- **Request Body**: `{ "name": "New Name", "avatar": "base64_or_url" }`
+
+---
+
+## 2. Maestro Discovery & Recommendations
+The intelligence layer for matching and sorting.
+
+### GET /maestro/discovery
+- **Description**: Returns sorted list of businesses/services based on location and rating.
+- **Query Params**: `lat`, `lng`, `category`, `search`
+- **Response**:
+  ```json
+  {
+    "results": [
+      {
+        "id": "b1",
+        "name": "Glow Spa Lekki",
+        "category": "beauty",
+        "rating": 4.9,
+        "location": "Lekki Phase 1, Lagos",
+        "image": "url",
+        "isVerified": true,
+        "maestroScore": 98
+      }
+    ]
+  }
+  ```
+
+### GET /maestro/recommendations
+- **Description**: Returns exactly 4 items (2 services + 2 products) for the "Smart Mix".
+- **Response**:
+  ```json
+  [
+    { "id": "s1", "type": "service", "name": "Nail Studio", "tag": "Maestro Match: 98%", ... },
+    { "id": "p1", "type": "product", "name": "Face Oil", "tag": "Recommended for Skin", ... }
+  ]
+  ```
+
+---
+
+## 3. Service Booking System
+Managing the lifecycle of a service appointment.
+
+### POST /bookings
+- **Description**: Creates a new booking and initiates escrow.
+- **Request Body**:
+  ```json
+  {
+    "businessId": "b1",
+    "serviceIds": ["s1", "s2"],
+    "date": "2026-01-15",
+    "timeSlot": "02:00 PM",
+    "staffId": "AUTO|s1",
+    "specialNote": "...",
+    "referenceImage": "url"
+  }
+  ```
+
+### GET /bookings/customer
+- **Description**: Lists all bookings for the logged-in customer.
+
+### GET /bookings/{id}
+- **Description**: Fetches details of a specific booking, including status and assigned staff.
+
+### PATCH /bookings/{id}/status
+- **Description**: Transitions booking state (e.g., START, COMPLETE, CANCEL).
+- **Request Body**: `{ "status": "IN_PROGRESS|COMPLETED|CANCELLED" }`
+
+### POST /bookings/{id}/accept-replacement
+- **Description**: Customer accepts the AI-proposed replacement staff after a decline.
+
+---
+
+## 4. Marketplace & Logistics
+E-commerce functionality for products.
+
+### GET /marketplace/products
+- **Description**: Lists active products with filtering.
+- **Query Params**: `category`, `search`
+
+### POST /marketplace/orders
+- **Description**: Creates a product order.
+- **Request Body**:
+  ```json
+  {
+    "items": [{ "productId": "p1", "quantity": 2 }],
+    "shippingAddress": "..."
+  }
+  ```
+
+### PATCH /marketplace/orders/{id}/set-fee (CEO Only)
+- **Description**: Sets the delivery fee for an order.
+- **Request Body**: `{ "deliveryFee": 2500 }`
+
+---
+
+## 5. Wallet & Financials
+Ledger and escrow management.
+
+### GET /wallet/balance
+- **Description**: Returns current balance, pending escrow, and transaction history.
+- **Response**:
+  ```json
+  {
+    "balance": 150000,
+    "pendingEscrow": 25000,
+    "transactions": [
+      { "id": "t1", "date": "2026-01-13", "amount": 15000, "type": "credit", "status": "Success" }
+    ]
+  }
+  ```
+
+### POST /wallet/release-escrow/{bookingId}
+- **Description**: Manually releases funds to the business after service completion.
+
+---
+
+## 6. Staff Management (CEO Only)
+Managing the workforce.
+
+### GET /staff
+- **Description**: Lists all staff members with performance metrics.
+
+### POST /staff/invite
+- **Description**: Sends an invite email to a new staff member.
+- **Request Body**: `{ "email": "staff@example.com", "role": "Stylist" }`
+
+### GET /staff/{id}/performance
+- **Description**: Returns revenue charts and rating data for a specific staff member.
+
+---
+
+## 7. Communication Hub (Inbox)
+Real-time messaging.
+
+### GET /inbox/conversations
+- **Description**: Lists all active chat threads.
+
+### GET /inbox/conversations/{id}/messages
+- **Description**: Fetches message history for a thread.
+
+### POST /inbox/messages
+- **Description**: Sends a new message.
+- **Request Body**: `{ "conversationId": "c1", "text": "..." }`
+
+### GET /inbox/smart-replies/{conversationId}
+- **Description**: Returns 5 AI-generated replies based on context.
+
+---
+
+## 8. Favorites (Social)
+Unified engagement tracking for businesses, services, and products.
+
+### GET /favorites
+- **Description**: Lists all items favorited by the user.
+- **Response**:
+  ```json
+  [
+    { "id": "f1", "objectId": "b1", "contentType": "business", "data": { ... } },
+    { "id": "f2", "objectId": "p1", "contentType": "product", "data": { ... } }
+  ]
+  ```
+
+### POST /favorites/toggle
+- **Description**: Toggles a favorite record for the user.
+- **Request Body**: `{ "objectId": "b1", "contentType": "business|service|product" }`
+
+---
+
+## 9. Admin & Verification
+System-wide management.
+
+### GET /admin/verification-queue
+- **Description**: Lists businesses awaiting CAC verification.
+
+### POST /admin/verify-business/{id}
+- **Description**: Approves or rejects a business verification request.
+- **Request Body**: `{ "status": "verified|rejected", "reason": "..." }`

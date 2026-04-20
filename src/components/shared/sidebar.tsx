@@ -23,33 +23,34 @@ import {
     History,
     PlayCircle,
     MessageSquare,
-    CalendarClock
+    CalendarClock,
+    AlertTriangle
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-export function Sidebar() {
+export function SidebarContent({ className, onItemClick }: { className?: string; onItemClick?: () => void }) {
     const pathname = usePathname();
-    const { user } = useAuth();
+    const { user, logout } = useAuth();
     const userRole = user?.role || "ceo";
     const isSolo = user?.isSoloOperator ?? true;
 
     const roleLinks = {
         ceo: [
-            { title: "Overview", href: "/business", icon: LayoutDashboard },
+            { title: "Overview", href: "/home", icon: LayoutDashboard },
             { title: "Bookings", href: "/bookings", icon: Calendar },
             ...(isSolo
-                ? [{ title: "My Availability", href: "/business/profile", icon: CalendarClock }]
+                ? [{ title: "Wallet", href: "/wallet", icon: Wallet }]
                 : [{ title: "Staff Management", href: "/staff", icon: Users }]
             ),
             ...(!isSolo ? [
                 { title: "Wallet & Payroll", href: "/wallet", icon: Wallet },
             ] : []),
             { title: "Inventory", href: "/inventory", icon: Package },
-            { title: "Orders", href: "/business/orders", icon: ShoppingBag },
+            { title: "Orders", href: "/home/orders", icon: ShoppingBag },
             { title: "Reviews", href: "/reviews", icon: Star },
             { title: "Inbox", href: "/inbox", icon: MessageSquare },
             { title: "Active Session", href: "/active-job", icon: Clock },
-            { title: "Business Profile", href: "/business/profile", icon: Settings },
+            { title: "Business Profile", href: "/profile", icon: Settings },
         ],
         customer: [
             { title: "Explore Services", href: "/search", icon: Search },
@@ -80,9 +81,9 @@ export function Sidebar() {
     const sidebarItems = roleLinks[userRole as keyof typeof roleLinks] || roleLinks.ceo;
 
     return (
-        <aside className="hidden h-screen w-64 flex-col border-r border-glass-border bg-glass-surface dark:bg-[#0f111a] backdrop-blur-xl lg:flex fixed left-0 top-0 z-40 shadow-premium">
+        <div className={cn("flex flex-col h-full", className)}>
             <div className="flex h-20 items-center px-6">
-                <Link href="/" className="flex items-center gap-2.5 group">
+                <Link href="/" className="flex items-center gap-2.5 group" onClick={onItemClick}>
                     <div className="h-9 w-9 bg-primary rounded-lg overflow-hidden group-hover:scale-110 transition-transform shadow-lg">
                         <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
                     </div>
@@ -97,6 +98,7 @@ export function Sidebar() {
                             <Link
                                 key={index}
                                 href={item.href}
+                                onClick={onItemClick}
                                 className={cn(
                                     "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300",
                                     isActive
@@ -117,21 +119,61 @@ export function Sidebar() {
             </div>
             <div className="p-4 mt-auto">
                 {userRole === "ceo" && (
-                    <div className="bg-accent/5 border border-accent/10 rounded-2xl p-4 mb-4 backdrop-blur-sm">
-                        <div className="flex items-center gap-2 text-accent font-bold text-xs uppercase tracking-wider mb-1">
-                            <ShieldCheck className="h-3.5 w-3.5" />
-                            Verified SME
-                        </div>
-                        <p className="text-[10px] text-foreground/40 leading-tight font-medium">
-                            Your business is CAC verified and eligible for escrow payments.
-                        </p>
+                    <div className={cn(
+                        "rounded-2xl p-4 mb-4 backdrop-blur-sm border transition-all",
+                        user?.verificationStatus === 'verified' 
+                            ? "bg-accent/5 border-accent/10" 
+                            : "bg-amber-500/5 border-amber-500/10"
+                    )}>
+                        {user?.verificationStatus === 'verified' ? (
+                            <>
+                                <div className="flex items-center gap-2 text-accent font-bold text-xs uppercase tracking-wider mb-1">
+                                    <ShieldCheck className="h-3.5 w-3.5" />
+                                    Verified SME
+                                </div>
+                                <p className="text-[10px] text-foreground/40 leading-tight font-medium">
+                                    Your business is CAC verified and eligible for escrow payments.
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <div className="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-wider mb-1">
+                                    <AlertTriangle className="h-3.5 w-3.5" />
+                                    Unverified SME
+                                </div>
+                                <p className="text-[10px] text-foreground/40 leading-tight font-medium mb-3">
+                                    Complete verification to unlock escrow payments and high-tier visibility.
+                                </p>
+                                <Link 
+                                    href="/verification" 
+                                    onClick={onItemClick}
+                                    className="block text-center text-[10px] font-black text-amber-600 border border-amber-600/20 rounded-lg py-1.5 hover:bg-amber-600 hover:text-white transition-all uppercase tracking-tighter"
+                                >
+                                    Verify Now
+                                </Link>
+                            </>
+                        )}
                     </div>
                 )}
-                <button className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-500 transition-all hover:bg-red-500/5 group">
+                <button 
+                  onClick={() => {
+                    logout();
+                    onItemClick?.();
+                  }}
+                  className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-500 transition-all hover:bg-red-500/5 group"
+                >
                     <LogOut className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
                     Sign Out
                 </button>
             </div>
+        </div>
+    );
+}
+
+export function Sidebar() {
+    return (
+        <aside className="hidden h-screen w-64 flex-col border-r border-glass-border bg-glass-surface backdrop-blur-xl lg:flex fixed left-0 top-0 z-40 shadow-premium">
+            <SidebarContent />
         </aside>
     );
 }

@@ -2,115 +2,181 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-
-type UserRole = "customer" | "ceo" | "staff" | "admin";
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    role: UserRole;
-    avatar?: string;
-    verificationStatus?: "unverified" | "pending" | "verified" | "rejected";
-    isSoloOperator?: boolean;
-}
+import { authService } from "@/services/auth.service";
+import { User, UserRole, VerificationStatus } from "@/types/api";
+import { toast } from "sonner";
 
 interface AuthContextType {
-    user: User | null;
-    login: (email: string, role: UserRole) => Promise<void>;
-    logout: () => void;
-    setRole: (role: UserRole) => void;
-    setVerificationStatus: (status: "unverified" | "pending" | "verified" | "rejected") => void;
-    updateUser: (data: Partial<User>) => void;
-    isLoading: boolean;
+  user: User | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (data: any) => Promise<void>;
+  logout: () => void;
+  setRole: (role: UserRole) => Promise<void>;
+  setVerificationStatus: (status: VerificationStatus) => Promise<void>;
+  updateUser: (data: Partial<User>) => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
 }
+
+const getRedirectPath = (role: UserRole) => {
+  switch (role) {
+    case "customer": return "/";
+    case "ceo": return "/home";
+    case "staff": return "/staff-portal";
+    case "admin": return "/admin";
+    default: return "/";
+  }
+};
+
+/** Normalize API user response to include both snake_case and camelCase alias fields */
+const normalizeUser = (u: User): User => ({
+  ...u,
+  // Sync camelCase aliases from snake_case fields and vice versa
+  verification_status: u.verification_status ?? (u.verificationStatus as any),
+  verificationStatus: (u.verificationStatus ?? u.verification_status) as any,
+  is_solo_operator: u.is_solo_operator ?? u.isSoloOperator,
+  isSoloOperator: u.isSoloOperator ?? u.is_solo_operator,
+  name: u.name ?? u.username,
+});
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-    useEffect(() => {
-        // Check for stored user on mount
-        const storedUser = localStorage.getItem("the-guild-user");
-        if (storedUser) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setUser(JSON.parse(storedUser));
-        }
-        setIsLoading(false);
-    }, []);
+  useEffect(() => {
+    // Check for stored user on mount
+    try {
+      const storedUser = localStorage.getItem("the-guild-user");
+      if (storedUser) {
+        setUser(normalizeUser(JSON.parse(storedUser)));
+      }
+    } catch {
+      localStorage.removeItem("the-guild-user");
+    }
+    setIsLoading(false);
+  }, []);
 
-    const login = async (email: string, role: UserRole) => {
-        setIsLoading(true);
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+  const login = async (email: string, password: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await authService.login(email, password);
+      if (response && response.access) {
+        const normalizedUser = normalizeUser(response.user);
+        setUser(normalizedUser);
+        localStorage.setItem("the-guild-token", response.access);
+        localStorage.setItem("the-guild-user", JSON.stringify(normalizedUser));
+        router.push(getRedirectPath(response.user.role));
+      }
+    } catch (err: any) {
+      const message = err?.data?.detail || err?.data?.message || "Login failed. Please check your credentials.";
+      setError(message);
+      throw new Error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        const mockUser: User = {
-            id: "1",
-            name: email.split("@")[0],
-            email,
-            role,
-            avatar: "https://github.com/shadcn.png",
-            verificationStatus: role === "ceo" ? "unverified" : "verified",
-            isSoloOperator: role === "ceo" ? true : false,
-        };
+  const register = async (data: any) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await authService.register(data);
+      if (response && response.access) {
+        const normalizedUser = normalizeUser(response.user);
+        setUser(normalizedUser);
+        localStorage.setItem("the-guild-token", response.access);
+        localStorage.setItem("the-guild-user", JSON.stringify(normalizedUser));
+        router.push(getRedirectPath(response.user.role));
+      }
+    } catch (err: any) {
+      const message = err?.data?.detail || err?.data?.message || "Registration failed. Please try again.";
+      setError(message);
+      throw new Error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        setUser(mockUser);
-        localStorage.setItem("the-guild-user", JSON.stringify(mockUser));
-        setIsLoading(false);
+  const logout = () => {
+    authService.logout();
+    setUser(null);
+    setError(null);
+    localStorage.removeItem("the-guild-user");
+    toast.success("Successfully logged out. See you soon!");
+    router.push("/login");
+  };
 
-        if (role === "customer") {
-            router.push("/");
-        } else if (role === "ceo") {
-            router.push("/business");
-        } else {
-            router.push("/dashboard/home");
-        }
-    };
+  const setRole = async (role: UserRole) => {
+    if (user) {
+      const toastId = toast.loading(`Switching to ${role} view...`);
+      try {
+        const updatedUser = await authService.updateProfile({ role }).catch(err => {
+          console.warn("Backend update failed, updating locally only:", err);
+          return { ...user, role };
+        });
+        const normalized = normalizeUser(updatedUser);
+        setUser(normalized);
+        localStorage.setItem("the-guild-user", JSON.stringify(normalized));
+        toast.success(`Welcome to the ${role} dashboard!`, { id: toastId });
+        router.push(getRedirectPath(normalized.role));
+      } catch (error) {
+        console.error("Failed to update role:", error);
+        toast.error("Failed to switch roles.", { id: toastId });
+      }
+    }
+  };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem("the-guild-user");
-        router.push("/login");
-    };
+  const setVerificationStatus = async (status: VerificationStatus) => {
+    if (user) {
+      try {
+        const updatedUser = await authService.updateProfile({ verification_status: status } as any).catch(err => {
+          console.warn("Backend update failed, updating locally only:", err);
+          return { ...user, verification_status: status, verificationStatus: status };
+        });
+        const normalized = normalizeUser(updatedUser);
+        setUser(normalized);
+        localStorage.setItem("the-guild-user", JSON.stringify(normalized));
+      } catch (error) {
+        console.error("Failed to update verification status:", error);
+      }
+    }
+  };
 
-    const setRole = (role: UserRole) => {
-        if (user) {
-            const updatedUser = { ...user, role };
-            setUser(updatedUser);
-            localStorage.setItem("the-guild-user", JSON.stringify(updatedUser));
-        }
-    };
+  const updateUser = async (data: Partial<User>) => {
+    if (user) {
+      const toastId = toast.loading("Updating your profile...");
+      try {
+        const updatedUser = await authService.updateProfile(data).catch(err => {
+          console.warn("Backend update failed, updating locally only:", err);
+          return { ...user, ...data };
+        });
+        const normalized = normalizeUser(updatedUser);
+        setUser(normalized);
+        localStorage.setItem("the-guild-user", JSON.stringify(normalized));
+        toast.success("Profile updated successfully!", { id: toastId });
+      } catch (error) {
+        console.error("Failed to update user:", error);
+        toast.error("Failed to update profile.", { id: toastId });
+      }
+    }
+  };
 
-    const setVerificationStatus = (status: "unverified" | "pending" | "verified" | "rejected") => {
-        if (user) {
-            const updatedUser = { ...user, verificationStatus: status };
-            setUser(updatedUser);
-            localStorage.setItem("the-guild-user", JSON.stringify(updatedUser));
-        }
-    };
-
-    const updateUser = (data: Partial<User>) => {
-        if (user) {
-            const updatedUser = { ...user, ...data };
-            setUser(updatedUser);
-            localStorage.setItem("the-guild-user", JSON.stringify(updatedUser));
-        }
-    };
-
-    return (
-        <AuthContext.Provider value={{ user, login, logout, setRole, setVerificationStatus, updateUser, isLoading }}>
-            {children}
-        </AuthContext.Provider>
-    );
+  return (
+    <AuthContext.Provider value={{ user, login, register, logout, setRole, setVerificationStatus, updateUser, isLoading, error }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider");
-    }
-    return context;
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }

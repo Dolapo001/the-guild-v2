@@ -1,137 +1,120 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+
 
 @theme {
-  --font-sans: var(--font-plus-jakarta), var(--font-inter), ui-sans-serif, system-ui;
+ --font-sans: var(--font-plus-jakarta), var(--font-inter), ui-sans-serif, system-ui;
 
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+ --color-background: var(--background);
+ --color-foreground: var(--foreground);
 
-  --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
+ --color-primary: var(--primary);
+ --color-secondary: var(--secondary);
+ --color-accent: var(--accent);
 
-  --color-glass-border: var(--glass-border);
-  --color-glass-surface: var(--glass-surface);
-  --color-glass-highlight: var(--glass-highlight);
-  --color-mesh-1: var(--mesh-1);
-  --color-mesh-2: var(--mesh-2);
-  --color-mesh-3: var(--mesh-3);
+ --color-glass-border: var(--glass-border);
+ --color-glass-surface: var(--glass-surface);
+ --color-glass-highlight: var(--glass-highlight);
+ --color-mesh-1: var(--mesh-1);
+ --color-mesh-2: var(--mesh-2);
+ --color-mesh-3: var(--mesh-3);
 
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
+ --color-card: var(--card);
+ --color-card-foreground: var(--card-foreground);
+ --color-muted: var(--muted);
+ --color-muted-foreground: var(--muted-foreground);
 
-  --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  --shadow-glass-sm: 0 4px 16px 0 rgba(31, 38, 135, 0.05);
-  --shadow-premium: 0 20px 50px rgba(0, 0, 0, 0.1);
+ --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+ --shadow-glass-sm: 0 4px 16px 0 rgba(31, 38, 135, 0.05);
+ --shadow-premium: 0 20px 50px rgba(0, 0, 0, 0.1);
 
-  @keyframes spin-slow {
-    from {
-      transform: rotate(0deg);
-    }
+ @keyframes spin-slow {
+ from {
+ transform: rotate(0deg);
+ }
 
-    to {
-      transform: rotate(360deg);
-    }
-  }
+ to {
+ transform: rotate(360deg);
+ }
+ }
 
-  --animate-spin-slow: spin-slow 8s linear infinite;
+ --animate-spin-slow: spin-slow 8s linear infinite;
 }
 
 @utility text-glow {
-  text-shadow: 0 0 20px var(--primary);
+ text-shadow: 0 0 20px var(--primary);
 }
 
 @utility text-glow-amber {
-  text-shadow: 0 0 20px var(--secondary);
+ text-shadow: 0 0 20px var(--secondary);
 }
 
 @utility shadow-premium-violet {
-  box-shadow: 0 20px 40px -10px rgba(26, 35, 126, 0.3);
+ box-shadow: 0 20px 40px -10px rgba(26, 35, 126, 0.3);
 }
 
 @utility pt-safe {
-  padding-top: env(safe-area-inset-top);
+ padding-top: env(safe-area-inset-top);
 }
 
 @utility pb-safe {
-  padding-bottom: env(safe-area-inset-bottom);
+ padding-bottom: env(safe-area-inset-bottom);
 }
 
 @utility pl-safe {
-  padding-left: env(safe-area-inset-left);
+ padding-left: env(safe-area-inset-left);
 }
 
 @utility pr-safe {
-  padding-right: env(safe-area-inset-right);
+ padding-right: env(safe-area-inset-right);
 }
 
 @utility no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+ -ms-overflow-style: none;
+ scrollbar-width: none;
 
-  &::-webkit-scrollbar {
-    display: none;
-  }
+ &::-webkit-scrollbar {
+ display: none;
+ }
 }
 
 @utility bg-mesh-gradient {
-  background-image: radial-gradient(at 0% 0%, var(--mesh-1) 0, transparent 50%),
-    radial-gradient(at 50% 0%, var(--mesh-2) 0, transparent 50%),
-    radial-gradient(at 100% 0%, var(--mesh-3) 0, transparent 50%);
+ background-image: radial-gradient(at 0% 0%, var(--mesh-1) 0, transparent 50%),
+ radial-gradient(at 50% 0%, var(--mesh-2) 0, transparent 50%),
+ radial-gradient(at 100% 0%, var(--mesh-3) 0, transparent 50%);
 }
 
 @utility bg-grid-slate-900 {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(15 23 42 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+ background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(15 23 42 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
 }
 
 @utility bg-grid-white {
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
+ background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32' fill='none' stroke='rgb(255 255 255 / 0.04)'%3e%3cpath d='M0 .5H31.5V32'/%3e%3c/svg%3e");
 }
 
 :root {
-  --background: #fdfdfd;
-  --foreground: #0f172a;
+  --background: #f4f7fa;
+  --foreground: #1e293b;
   --primary: #1a237e;
   --secondary: #ffb74d;
   --accent: #00695c;
-  --glass-border: rgba(0, 0, 0, 0.05);
-  --glass-surface: rgba(255, 255, 255, 0.8);
-  --glass-highlight: rgba(255, 255, 255, 0.9);
-  --mesh-1: rgba(26, 35, 126, 0.03);
-  --mesh-2: rgba(255, 183, 77, 0.03);
-  --mesh-3: rgba(0, 105, 92, 0.03);
+  --glass-border: rgba(30, 41, 59, 0.1);
+  --glass-surface: rgba(255, 255, 255, 0.65);
+  --glass-highlight: rgba(255, 255, 255, 0.85);
+  --mesh-1: rgba(26, 35, 126, 0.08);
+  --mesh-2: rgba(255, 183, 77, 0.08);
+  --mesh-3: rgba(0, 105, 92, 0.08);
 
   --card: #ffffff;
-  --card-foreground: #0f172a;
+  --card-foreground: #1e293b;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
 }
 
-.dark {
-  --background: #02040a;
-  --foreground: #ffffff;
-  --primary: #5c6bc0;
-  --secondary: #ffcc80;
-  --accent: #26a69a;
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-surface: rgba(15, 23, 42, 0.6);
-  --glass-highlight: rgba(255, 255, 255, 0.05);
-  --mesh-1: rgba(92, 107, 192, 0.15);
-  --mesh-2: rgba(255, 204, 128, 0.15);
-  --mesh-3: rgba(38, 166, 154, 0.15);
 
-  --card: #0f172a;
-  --card-foreground: #f8fafc;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-}
 
 body {
-  overscroll-behavior-y: none;
-  -webkit-tap-highlight-color: transparent;
-  @apply bg-background text-foreground antialiased selection:bg-primary/10 selection:text-primary transition-colors duration-700;
+ overscroll-behavior-y: none;
+ -webkit-tap-highlight-color: transparent;
+ @apply bg-background text-foreground antialiased selection:bg-primary/10 selection:text-primary transition-colors duration-700;
 }
