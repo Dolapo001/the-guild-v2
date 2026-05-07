@@ -1,6 +1,39 @@
 import { api } from '../lib/api-client';
 import { Booking } from '../types/api';
 
+/** Paginated response envelope returned by list endpoints. */
+export interface Paginated<T> {
+  count: number;
+  page: number;
+  page_size: number;
+  num_pages: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+/** Type guard: did the backend wrap the response in a pagination envelope? */
+export function isPaginated<T>(value: unknown): value is Paginated<T> {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    'results' in (value as any) &&
+    'count' in (value as any) &&
+    Array.isArray((value as any).results)
+  );
+}
+
+/**
+ * Unwrap a maybe-paginated response into a plain array. Useful while we
+ * incrementally migrate list endpoints to the paginated envelope.
+ */
+export function asList<T>(value: T[] | Paginated<T> | undefined | null): T[] {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  if (isPaginated<T>(value)) return value.results;
+  return [];
+}
+
 export const bookingService = {
   createBooking: async (data: {
     business: string;
@@ -20,22 +53,26 @@ export const bookingService = {
     return api.post<Booking>('/bookings/', data);
   },
 
-  getAvailability: async (serviceId: string, date: string): Promise<Array<{ start_time: string; end_time: string; is_available: boolean }>> => {
-    return api.get<Array<{ start_time: string; end_time: string; is_available: boolean }>>('/bookings/availability/', {
-      params: { service_id: serviceId, date }
-    });
+  getAvailability: async (
+    serviceId: string,
+    date: string,
+  ): Promise<Array<{ start_time: string; end_time: string; is_available: boolean }>> => {
+    return api.get<Array<{ start_time: string; end_time: string; is_available: boolean }>>(
+      '/bookings/availability/',
+      { params: { service_id: serviceId, date } },
+    );
   },
 
-  getBookings: async (): Promise<Booking[]> => {
-    return api.get<Booking[]>('/bookings/');
+  getBookings: async (params?: { page?: number; page_size?: number }): Promise<Paginated<Booking> | Booking[]> => {
+    return api.get<Paginated<Booking> | Booking[]>('/bookings/', { params: params as any });
   },
 
-  getMyBookings: async (): Promise<Booking[]> => {
-    return api.get<Booking[]>('/bookings/my/');
+  getMyBookings: async (params?: { page?: number; page_size?: number }): Promise<Paginated<Booking> | Booking[]> => {
+    return api.get<Paginated<Booking> | Booking[]>('/bookings/my/', { params: params as any });
   },
 
-  getProviderBookings: async (): Promise<Booking[]> => {
-    return api.get<Booking[]>('/bookings/provider/');
+  getProviderBookings: async (params?: { page?: number; page_size?: number }): Promise<Paginated<Booking> | Booking[]> => {
+    return api.get<Paginated<Booking> | Booking[]>('/bookings/provider/', { params: params as any });
   },
 
   getBookingDetails: async (id: string): Promise<Booking> => {
@@ -63,10 +100,10 @@ export const bookingService = {
   },
 
   getStaffSchedule: async (params: { month?: string; date?: string }): Promise<any> => {
-    return api.get('/bookings/staff/schedule/', { params });
+    return api.get('/bookings/staff/schedule/', { params: params as any });
   },
 
   getActiveJob: async (): Promise<Booking | null> => {
     return api.get<Booking | null>('/bookings/active/');
-  }
+  },
 };
