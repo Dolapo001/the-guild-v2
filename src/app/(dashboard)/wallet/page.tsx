@@ -224,10 +224,6 @@ function CustomerWalletView({ balance, pendingEscrow, isObscured, toggleObscure,
     </div>
   );
 }
-ons} />
- </div>
- );
-}
 
 
 

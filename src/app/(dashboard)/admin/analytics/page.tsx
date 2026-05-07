@@ -10,7 +10,7 @@ import {
   TrendingUp, Users, Calendar, DollarSign, Download, 
   AlertTriangle, ArrowUpRight, ArrowDownRight, Activity, Map
 } from "lucide-react";
-import { GlassCard } from "@/components/shared/glass-card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { analyticsService, AnalyticsSummary, TrendItem } from "@/services/analytics.service";
 import { toast } from "sonner";
 
@@ -21,7 +21,7 @@ export default function AdminAnalyticsPage() {
   const [userData, setUserData] = useState<{ summary: AnalyticsSummary; trends: TrendItem[] } | null>(null);
   const [conversionData, setConversionData] = useState<any>(null);
   const [sectorData, setSectorData] = useState<any>(null);
-  const [fraudData, setFraudData] = useState<{ summary: AnalyticsSummary } | null>(null);
+  const [fraudData, setFraudData] = useState<{ total_fraud_flags: number } | null>(null);
   const [days, setDays] = useState(30);
 
   useEffect(() => {
@@ -111,11 +111,11 @@ export default function AdminAnalyticsPage() {
         />
         <StatCard 
           title="Fraud Alerts" 
-          value={fraudData?.summary.total_fraud_flags || 0} 
+          value={fraudData?.total_fraud_flags || 0} 
           icon={<AlertTriangle className="h-5 w-5" />}
-          trend={fraudData?.summary.total_fraud_flags ? "+1" : "Stable"}
+          trend={fraudData?.total_fraud_flags ? "+1" : "Stable"}
           isUp={false}
-          isWarning={!!fraudData?.summary.total_fraud_flags}
+          isWarning={!!fraudData?.total_fraud_flags}
         />
       </div>
 
@@ -195,7 +195,7 @@ export default function AdminAnalyticsPage() {
             <AlertTriangle className="h-5 w-5 text-primary/30" />
           </div>
           <div className="space-y-4">
-             {fraudData?.summary.total_fraud_flags ? (
+             {fraudData?.total_fraud_flags ? (
                <div className="p-4 rounded-xl bg-rose-50 border border-rose-100 flex items-start gap-3">
                  <AlertTriangle className="h-5 w-5 text-rose-500 shrink-0" />
                  <div>

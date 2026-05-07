@@ -115,8 +115,6 @@ export default function CheckoutPage() {
       }, 1200);
 
     } catch (err: any) {
-
-    } catch (err: any) {
       setIsProcessing(false);
       console.error("Checkout failed:", err);
       const msg = err.response?.data?.message || err.message || "Failed to checkout. Ensure city consistency and stock availability.";

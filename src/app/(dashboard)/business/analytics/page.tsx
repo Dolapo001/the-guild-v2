@@ -10,7 +10,7 @@ import {
   TrendingUp, Users, Calendar, DollarSign, Download, 
   Clock, ArrowUpRight, ArrowDownRight, Filter
 } from "lucide-react";
-import { GlassCard } from "@/components/shared/glass-card";
+import { GlassCard } from "@/components/ui/glass-card";
 import { analyticsService, AnalyticsSummary, TrendItem, PeakData } from "@/services/analytics.service";
 import { toast } from "sonner";
 
