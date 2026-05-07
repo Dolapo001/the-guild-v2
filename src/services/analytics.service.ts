@@ -1,4 +1,4 @@
-import { api } from "./api.service";
+import { api } from "../lib/api-client";
 
 export interface AnalyticsSummary {
   total_bookings?: number;
@@ -28,44 +28,57 @@ export interface PeakData {
 class AnalyticsService {
   // Business Analytics
   async getBusinessBookings(days = 30) {
-    const res = await api.get(\`/analytics/business/bookings/?days=\${days}\`);
-    return res.data.data;
+    return api.get<{ summary: AnalyticsSummary; trends: TrendItem[] }>(
+      `/analytics/business/bookings/`,
+      { params: { days: String(days) } }
+    );
   }
 
   async getBusinessRevenue(days = 30) {
-    const res = await api.get(\`/analytics/business/revenue/?days=\${days}\`);
-    return res.data.data;
+    return api.get<{ summary: AnalyticsSummary; trends: TrendItem[] }>(
+      `/analytics/business/revenue/`,
+      { params: { days: String(days) } }
+    );
   }
 
   async getBusinessCustomers(days = 30) {
-    const res = await api.get(\`/analytics/business/customers/?days=\${days}\`);
-    return res.data.data;
+    return api.get<{ summary: AnalyticsSummary }>(
+      `/analytics/business/customers/`,
+      { params: { days: String(days) } }
+    );
   }
 
   async getBusinessPeakHours() {
-    const res = await api.get(\`/analytics/business/peak-hours/\`);
-    return res.data.data;
+    return api.get<PeakData>(`/analytics/business/peak-hours/`);
   }
 
   // Admin Analytics
   async getAdminUsers(days = 30) {
-    const res = await api.get(\`/analytics/admin/users/?days=\${days}\`);
-    return res.data.data;
+    return api.get<{ summary: AnalyticsSummary; trends: TrendItem[] }>(
+      `/analytics/admin/users/`,
+      { params: { days: String(days) } }
+    );
   }
 
   async getAdminConversions() {
-    const res = await api.get(\`/analytics/admin/conversions/\`);
-    return res.data.data;
+    return api.get<{
+      search_to_booking: number;
+      booking_to_payment: number;
+      visitor_to_signup: number;
+    }>(`/analytics/admin/conversions/`);
   }
 
   async getAdminSectors() {
-    const res = await api.get(\`/analytics/admin/sectors/\`);
-    return res.data.data;
+    return api.get<{
+      sector_bookings?: Record<string, number>;
+      sector_revenue?: Record<string, number>;
+    }>(`/analytics/admin/sectors/`);
   }
 
   async getAdminFraud(days = 30) {
-    const res = await api.get(\`/analytics/admin/fraud/?days=\${days}\`);
-    return res.data.data;
+    return api.get<{ total_fraud_flags: number }>(`/analytics/admin/fraud/`, {
+      params: { days: String(days) },
+    });
   }
 }
 
