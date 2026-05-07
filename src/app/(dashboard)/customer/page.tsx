@@ -105,7 +105,7 @@ export default function CustomerDashboard() {
 
   const handleGetDirections = () => {
   if (!activeBooking) return;
-  const destination = encodeURIComponent(activeBooking.location || activeBooking.business_name || '');
+   const destination = encodeURIComponent(activeBooking.location || (activeBooking as any).business_name || '');
   const url = `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${destination}`;
   window.open(url, '_blank');
   };
@@ -165,7 +165,7 @@ export default function CustomerDashboard() {
 
   const params = new URLSearchParams({
   action: 'TEMPLATE',
-  text: `${booking.service_name} - ${booking.business_name}`,
+  text: `${booking.service_name} - ${(booking as any).business_name}`,
   dates: `${formatISO(validStart)}/${formatISO(end)}`,
   details: `Booking Reference: #${booking.uid.slice(0,8)}. Staff: ${booking.staff_name || 'TBD'}. Booking with The Guild`,
   location: booking.location || ''
@@ -218,7 +218,7 @@ export default function CustomerDashboard() {
           <div className="space-y-6 flex-1 min-w-0">
             <div>
               <h4 className="text-xl sm:text-3xl font-black text-primary truncate">{activeBooking.service_name}</h4>
-              <p className="text-xs sm:text-sm font-bold text-foreground/60">{activeBooking.business_name}</p>
+              <p className="text-xs sm:text-sm font-bold text-foreground/60">{(activeBooking as any).business_name}</p>
             </div>
 
             <div className="flex flex-wrap gap-x-6 gap-y-3">
@@ -429,7 +429,7 @@ export default function CustomerDashboard() {
    </div>
    <div className="min-w-0">
    <p className="font-bold text-primary text-sm sm:text-base truncate">{item.service_name}</p>
-   <p className="text-[10px] sm:text-xs font-medium text-foreground/40 truncate">{item.business_name} • {item.date}</p>
+   <p className="text-[10px] sm:text-xs font-medium text-foreground/40 truncate">{(item as any).business_name} • {item.date}</p>
    </div>
    </div>
    <div className="text-right flex flex-col items-end shrink-0">
@@ -482,7 +482,7 @@ export default function CustomerDashboard() {
   <BookingModal
   isOpen={isRescheduleModalOpen}
   onClose={() => setIsRescheduleModalOpen(false)}
-  service={null}
+  service={null as any}
   mode="reschedule"
   initialData={{
   selectedServices: [activeBooking?.service_name || ""],
