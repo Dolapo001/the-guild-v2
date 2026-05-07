@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback } fr
 import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
 import { useWebSocket } from "@/hooks/use-websocket";
+import { useTicketedWsUrl } from "@/hooks/use-ticketed-ws-url";
 
 interface Notification {
   uid: string;
@@ -46,14 +47,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     fetchNotifications();
   }, [fetchNotifications]);
 
-  // Build the WS URL when authenticated. The hook handles connect / reconnect.
-  const wsUrl = (() => {
-    if (typeof window === "undefined" || !user) return null;
-    const token = localStorage.getItem("the-guild-token");
-    if (!token) return null;
-    const base = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
-    return `${base}/ws/notifications/?token=${encodeURIComponent(token)}`;
-  })();
+  // Use a short-lived ticket instead of the long-lived JWT in the WS URL.
+  const wsUrl = useTicketedWsUrl(user ? "/ws/notifications/" : null);
 
   const { status } = useWebSocket({
     url: wsUrl,
@@ -76,7 +71,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       setNotifications((prev) =>
         prev.map((n) => {
           if (n.uid !== uid) return n;
-          // Only decrement if it was actually unread.
           if (!n.is_read) setUnreadCount((c) => Math.max(0, c - 1));
           return { ...n, is_read: true };
         }),

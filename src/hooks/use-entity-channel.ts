@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { useWebSocket } from "./use-websocket";
+import { useTicketedWsUrl } from "./use-ticketed-ws-url";
 
 interface UseEntityChannelOptions {
   entityType: "booking" | "order" | "wallet" | "inventory" | "business" | "staff";
@@ -21,6 +22,8 @@ interface UseEntityChannelOptions {
  * with the existing `useQuery({ queryKey: [entityType, uid] })`
  * pattern so server-driven updates are reflected in the UI without
  * any local refetch wiring.
+ *
+ * Auth is via the short-lived `?ticket=` flow.
  */
 export function useEntityChannel({
   entityType,
@@ -30,14 +33,8 @@ export function useEntityChannel({
 }: UseEntityChannelOptions) {
   const qc = useQueryClient();
 
-  const url = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    if (!uid) return null;
-    const token = localStorage.getItem("the-guild-token");
-    if (!token) return null;
-    const base = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
-    return `${base}/ws/entities/${entityType}/${uid}/?token=${encodeURIComponent(token)}`;
-  }, [entityType, uid]);
+  const path = uid ? `/ws/entities/${entityType}/${uid}/` : null;
+  const url = useTicketedWsUrl(path);
 
   const { status } = useWebSocket({
     url,
@@ -48,11 +45,7 @@ export function useEntityChannel({
     },
   });
 
-  useEffect(() => {
-    return () => {
-      // Nothing to clean up beyond what useWebSocket already does.
-    };
-  }, []);
+  useEffect(() => () => undefined, []);
 
   return { status };
 }
