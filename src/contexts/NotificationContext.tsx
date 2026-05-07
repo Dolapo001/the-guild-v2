@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
+import { useWebSocket } from "@/hooks/use-websocket";
 
 interface Notification {
   uid: string;
@@ -19,6 +20,7 @@ interface NotificationContextType {
   unreadCount: number;
   markAsRead: (uid: string) => void;
   markAllAsRead: () => void;
+  status: "connecting" | "open" | "closed" | "error";
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -27,7 +29,6 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const { user } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
-  const [socket, setSocket] = useState<WebSocket | null>(null);
 
   const fetchNotifications = useCallback(async () => {
     if (!user) return;
@@ -35,7 +36,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       const { api } = await import("@/lib/api-client");
       const data = await api.get<Notification[]>("/auth/notifications/");
       setNotifications(data || []);
-      setUnreadCount((data || []).filter(n => !n.is_read).length);
+      setUnreadCount((data || []).filter((n) => !n.is_read).length);
     } catch (err) {
       console.error("Failed to fetch notifications", err);
     }
@@ -45,53 +46,41 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     fetchNotifications();
   }, [fetchNotifications]);
 
-  useEffect(() => {
-    if (!user) return;
-
+  // Build the WS URL when authenticated. The hook handles connect / reconnect.
+  const wsUrl = (() => {
+    if (typeof window === "undefined" || !user) return null;
     const token = localStorage.getItem("the-guild-token");
-    if (!token) return;
+    if (!token) return null;
+    const base = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
+    return `${base}/ws/notifications/?token=${encodeURIComponent(token)}`;
+  })();
 
-    const wsUrl = `${process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000"}/ws/notifications/?token=${token}`;
-    const ws = new WebSocket(wsUrl);
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "notification") {
-        const newNotif = data.notification;
-        setNotifications(prev => [newNotif, ...prev]);
-        setUnreadCount(prev => prev + 1);
-        
-        // Show toast
+  const { status } = useWebSocket({
+    url: wsUrl,
+    onMessage: (data) => {
+      if (data?.type === "notification" && data.notification) {
+        const newNotif: Notification = data.notification;
+        setNotifications((prev) => [newNotif, ...prev]);
+        setUnreadCount((prev) => prev + 1);
         toast.info(newNotif.title, {
           description: newNotif.message,
-          action: {
-            label: "View",
-            onClick: () => console.log("View notification", newNotif.uid),
-          },
         });
       }
-    };
-
-    ws.onclose = () => {
-      console.log("Notification WebSocket closed. Retrying in 5s...");
-      setTimeout(() => {
-        // Simple retry logic could be added here
-      }, 5000);
-    };
-
-    setSocket(ws);
-
-    return () => {
-      ws.close();
-    };
-  }, [user]);
+    },
+  });
 
   const markAsRead = async (uid: string) => {
     try {
       const { api } = await import("@/lib/api-client");
       await api.post("/auth/notifications/", { uid });
-      setNotifications(prev => prev.map(n => n.uid === uid ? { ...n, is_read: true } : n));
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setNotifications((prev) =>
+        prev.map((n) => {
+          if (n.uid !== uid) return n;
+          // Only decrement if it was actually unread.
+          if (!n.is_read) setUnreadCount((c) => Math.max(0, c - 1));
+          return { ...n, is_read: true };
+        }),
+      );
     } catch (err) {
       console.error("Failed to mark notification as read", err);
     }
@@ -101,7 +90,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     try {
       const { api } = await import("@/lib/api-client");
       await api.post("/auth/notifications/", { all: true });
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (err) {
       console.error("Failed to mark all notifications as read", err);
@@ -109,7 +98,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   };
 
   return (
-    <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead, markAllAsRead }}>
+    <NotificationContext.Provider
+      value={{ notifications, unreadCount, markAsRead, markAllAsRead, status }}
+    >
       {children}
     </NotificationContext.Provider>
   );

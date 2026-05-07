@@ -6,12 +6,20 @@ export const walletService = {
     return api.get<WalletInfo>('/wallet/info/');
   },
 
-  fundWallet: async (amount: number): Promise<{checkout_url: string}> => {
-    return api.post<{checkout_url: string}>('/wallet/fund/', { amount });
+  fundWallet: async (amount: number): Promise<{ checkout_url: string; authorization_url?: string; reference?: string }> => {
+    return api.post('/wallet/fund/', { amount });
   },
 
-  withdraw: async (amount: number, bankCode: string, accountNumber: string): Promise<{status: string}> => {
-    return api.post<{status: string}>('/wallet/withdraw/', { amount, bank_code: bankCode, account_number: accountNumber });
+  verifyPayment: async (reference: string): Promise<{ status: string; message?: string }> => {
+    return api.post('/wallet/verify/', { reference });
+  },
+
+  withdraw: async (amount: number, bankCode: string, accountNumber: string): Promise<{ status: string }> => {
+    return api.post<{ status: string }>('/wallet/withdraw/', {
+      amount,
+      bank_code: bankCode,
+      account_number: accountNumber,
+    });
   },
 
   getBanks: async (): Promise<any[]> => {
@@ -19,10 +27,10 @@ export const walletService = {
   },
 
   getTransactions: async (params?: { type?: string; status?: string; start_date?: string; end_date?: string }): Promise<any[]> => {
-    return api.get<any[]>('/wallet/transactions/', params);
+    return api.get<any[]>('/wallet/transactions/', { params: params as any });
   },
 
-  initializePayment: async (params: { amount?: number; booking_uid?: string; order_uid?: string }): Promise<{checkout_url: string}> => {
-    return api.post<{checkout_url: string}>('/wallet/payments/intent/', params);
-  }
+  initializePayment: async (params: { amount?: number; booking_uid?: string; order_uid?: string }): Promise<{ checkout_url: string; authorization_url?: string; reference?: string }> => {
+    return api.post('/wallet/payments/intent/', params);
+  },
 };
