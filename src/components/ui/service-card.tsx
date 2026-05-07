@@ -81,11 +81,15 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  )}
  </div>
  )}
- {service.is_verified && (
- <div className="bg-accent/90 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
- <ShieldCheck className="h-3 w-3" />
- VERIFIED
- </div>
+ {service.is_verified ? (
+  <div className="bg-emerald-500/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
+   <ShieldCheck className="h-3 w-3" />
+   VERIFIED
+  </div>
+ ) : (
+  <div className="bg-red-500/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg animate-pulse">
+   UNVERIFIED (CANNOT BOOK)
+  </div>
  )}
  {service.is_top_rated && (
  <div className="bg-secondary/90 backdrop-blur-md text-primary text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
@@ -128,32 +132,44 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  <div className="mt-auto pt-4 border-t border-gray-100 ">
  {/* Mobile Layout (Always Visible) */}
  <div className="flex lg:hidden flex-col gap-3">
- <div className="flex justify-between items-end">
- <div>
- <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Starting at</p>
- <p className="text-lg font-extrabold text-amber-600 ">₦{(service.price || 0).toLocaleString()}</p>
- </div>
- </div>
- <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center font-bold">
- Book Now
- </div>
+  <div className="flex justify-between items-end">
+   <div>
+    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Starting at</p>
+    <p className="text-lg font-extrabold text-amber-600 ">₦{(service.price || 0).toLocaleString()}</p>
+   </div>
+  </div>
+  {service.is_verified ? (
+   <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center font-bold">
+    Book Now
+   </div>
+  ) : (
+   <div className="w-full h-10 rounded-xl border border-red-200 bg-red-50/50 text-red-500 flex items-center justify-center font-bold text-xs uppercase tracking-wider">
+    Booking Disabled
+   </div>
+  )}
  </div>
 
  {/* Desktop Layout (Hover Animation) */}
  <div className="hidden lg:block h-14 relative overflow-hidden">
- <div className="absolute top-4 left-0 w-full flex items-center justify-between group-hover:-translate-y-full group-hover:opacity-0 transition-all duration-300">
- <div>
- <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Starting at</p>
- <p className="text-lg font-extrabold text-amber-600 ">₦{(service.price || 0).toLocaleString()}</p>
- </div>
- <div className="text-sm font-bold text-primary flex items-center gap-1">
- View <ArrowRight className="h-4 w-4" />
- </div>
- </div>
+  <div className="absolute top-4 left-0 w-full flex items-center justify-between group-hover:-translate-y-full group-hover:opacity-0 transition-all duration-300">
+   <div>
+    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Starting at</p>
+    <p className="text-lg font-extrabold text-amber-600 ">₦{(service.price || 0).toLocaleString()}</p>
+   </div>
+   <div className="text-sm font-bold text-primary flex items-center gap-1">
+    View <ArrowRight className="h-4 w-4" />
+   </div>
+  </div>
 
- <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center font-bold transition-all absolute top-0 left-0 translate-y-full opacity-0 group-hover:translate-y-4 group-hover:opacity-100 duration-300">
- Book Now
- </div>
+  {service.is_verified ? (
+   <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center font-bold transition-all absolute top-0 left-0 translate-y-full opacity-0 group-hover:translate-y-4 group-hover:opacity-100 duration-300">
+    Book Now
+   </div>
+  ) : (
+   <div className="w-full h-10 rounded-xl border border-red-200 bg-red-50/50 text-red-500 flex items-center justify-center font-bold text-xs uppercase tracking-wider transition-all absolute top-0 left-0 translate-y-full opacity-0 group-hover:translate-y-4 group-hover:opacity-100 duration-300">
+    Booking Disabled
+   </div>
+  )}
  </div>
  </div>
  </div>

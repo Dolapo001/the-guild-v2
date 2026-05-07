@@ -5,6 +5,8 @@ import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import {
  ShieldCheck,
  Upload,
@@ -24,46 +26,74 @@ import { motion, AnimatePresence } from "framer-motion";
 type VerificationStatus = "unverified" | "scanning" | "pending" | "verified" | "error";
 
 export default function VerificationPage() {
- const [status, setStatus] = useState<VerificationStatus>("unverified");
- const [cacNumber, setCacNumber] = useState("");
- const [businessName, setBusinessName] = useState("");
- const [isSubmitting, setIsSubmitting] = useState(false);
- const [errorMessage, setErrorMessage] = useState("");
- const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user, updateUser } = useAuth();
+  
+  // Map backend status to frontend view status
+  const getInitialStatus = (): VerificationStatus => {
+    const s = user?.verificationStatus?.toLowerCase() || user?.verification_status?.toLowerCase();
+    if (s === "verified") return "verified";
+    if (s === "pending") return "pending";
+    if (s === "rejected") return "error";
+    return "unverified";
+  };
 
- const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
- if (e.target.files && e.target.files[0]) {
- startScanning();
- }
- };
+  const [status, setStatus] = useState<VerificationStatus>(getInitialStatus());
+  const [cacNumber, setCacNumber] = useState(user?.profile?.cac_number || "");
+  const [businessName, setBusinessName] = useState(user?.profile?.business_name || "");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(user?.verification_status === "REJECTED" ? "Verification was rejected. Please re-submit with correct documents." : "");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
- const startScanning = () => {
- setStatus("scanning");
- setErrorMessage("");
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      startScanning();
+    }
+  };
 
- // Simulate AI OCR Extraction
- setTimeout(() => {
- setBusinessName("Glow Spa Lekki");
- setCacNumber("RC-102938");
- setStatus("unverified");
- // Show success toast simulation (using a simple alert for now or just visual change)
- }, 3000);
- };
+  const startScanning = () => {
+    setStatus("scanning");
+    setErrorMessage("");
 
- const simulateMismatch = () => {
- setStatus("error");
- setErrorMessage("Name on ID does not match CAC Certificate. Please ensure all documents belong to the same entity.");
- };
+    // Simulate AI OCR Extraction for UI feedback, 
+    // but in production this would be an actual API call to a vision service.
+    setTimeout(() => {
+      // If we had no business name, suggest one from extraction
+      if (!businessName) setBusinessName(user?.username || "Extracted Business");
+      setStatus("unverified");
+      toast.success("Document scanned! Please verify the extracted details.");
+    }, 2500);
+  };
 
- const handleSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
- if (!cacNumber) return;
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!cacNumber) {
+      toast.error("CAC Number is required.");
+      return;
+    }
 
- setIsSubmitting(true);
- await new Promise(resolve => setTimeout(resolve, 2000));
- setStatus("pending");
- setIsSubmitting(false);
- };
+    setIsSubmitting(true);
+    const toastId = toast.loading("Submitting verification documents...");
+    
+    try {
+      // In a real flow, we would upload files first and get URLs.
+      // For now, we update the status to PENDING and save the CAC number.
+      await updateUser({
+        verificationStatus: "PENDING" as any,
+        profile: {
+          ...user?.profile,
+          cacNumber: cacNumber,
+          businessName: businessName
+        }
+      } as any);
+      
+      setStatus("pending");
+      toast.success("Verification submitted successfully!", { id: toastId });
+    } catch (err: any) {
+      toast.error(err.message || "Failed to submit verification.", { id: toastId });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
  return (
  <div className="space-y-10 max-w-4xl mx-auto">
@@ -76,14 +106,6 @@ export default function VerificationPage() {
  <h1 className="text-3xl font-extrabold tracking-tight text-primary">Business Verification</h1>
  <p className="text-foreground/50 font-medium">Verify your business to unlock full marketplace access and build trust with clients.</p>
  </div>
- <Button
- variant="outline"
- size="sm"
- onClick={simulateMismatch}
- className="text-red-500 border-red-500/20 hover:bg-red-500/5 font-bold rounded-xl"
- >
- Simulate Mismatch
- </Button>
  </motion.div>
 
  <AnimatePresence mode="wait">
@@ -128,11 +150,6 @@ export default function VerificationPage() {
  onChange={(e) => setBusinessName(e.target.value)}
  className="h-12 rounded-xl bg-white/50 border-glass-border font-bold text-primary focus:ring-primary/20"
  />
- {businessName === "Glow Spa Lekki" && (
- <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-500/10 px-2 py-1 rounded-lg">
- <Sparkles className="h-3 w-3" /> Maestro Extracted
- </div>
- )}
  </div>
  </div>
  <div className="space-y-4">
@@ -147,11 +164,6 @@ export default function VerificationPage() {
  required
  className="h-12 rounded-xl bg-white/50 border-glass-border font-bold text-primary focus:ring-primary/20"
  />
- {cacNumber === "RC-102938" && (
- <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-500/10 px-2 py-1 rounded-lg">
- <Sparkles className="h-3 w-3" /> Maestro Extracted
- </div>
- )}
  </div>
  </div>
  </div>
@@ -250,9 +262,6 @@ export default function VerificationPage() {
  We've received your registration details for <span className="text-primary font-bold">{cacNumber}</span>. You'll receive an email once the process is complete.
  </p>
  </div>
- <Button variant="outline" className="h-12 rounded-xl border-glass-border font-bold text-primary" onClick={() => setStatus("verified")}>
- Simulate Approval (Demo Only)
- </Button>
  </GlassCard>
  </motion.div>
  )}

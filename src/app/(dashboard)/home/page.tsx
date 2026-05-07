@@ -54,6 +54,7 @@ import {
   Cell,
   CartesianGrid
 } from 'recharts';
+import { DashboardSkeleton } from "@/components/dashboard/dashboard-skeleton";
 
 export default function DashboardHome() {
   const { user } = useAuth();
@@ -75,9 +76,7 @@ export default function DashboardHome() {
   const unassignedBookings = bookings.filter(b => b.status === "PENDING" || b.status === "Unassigned");
 
   useEffect(() => {
-    if (user?.role === "ceo" && user?.verificationStatus === "unverified") {
-      router.push("/onboarding/business");
-    }
+    // Redirect removed so unverified businesses can still see their dashboard
 
     const fetchData = async () => {
       try {
@@ -94,13 +93,10 @@ export default function DashboardHome() {
           id: s.uid,
           name: s.username,
           isBusy: false,
-          matchScore: 90
+          // Removed hardcoded matchScore
         })));
-        setRevenueData(rev.length > 0 ? rev.map(r => ({ ...r, projected: r.amount * 1.2 })) : [
-          { month: 'Jan', amount: 0, projected: 1000 },
-          { month: 'Feb', amount: 0, projected: 1200 },
-          { month: 'Mar', amount: 0, projected: 1500 }
-        ]);
+        setRevenueData(rev);
+
       } catch (err) {
         console.error("Failed to fetch dashboard data", err);
       } finally {
@@ -115,8 +111,8 @@ export default function DashboardHome() {
     const fetchRevenue = async () => {
       try {
         const rev = await dashboardService.getRevenue(revenuePeriod, revenueOffset);
-        setRevenueData(rev.length > 0 ? rev.map(r => ({ ...r, projected: r.amount * 1.2 })) : [
-          { month: 'Jan', amount: 0, projected: 1000 }
+        setRevenueData(rev.length > 0 ? rev : [
+          { month: 'No Data', amount: 0 }
         ]);
       } catch (err) {
         console.error("Failed to fetch revenue data", err);
@@ -230,17 +226,12 @@ export default function DashboardHome() {
     },
   ].filter(Boolean) as any[];
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh]">
-      <div className="h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4" />
-      <p className="font-bold text-foreground/40 uppercase tracking-widest">Loading business pulse...</p>
-    </div>
-  );
+  if (loading) return <DashboardSkeleton />;
 
   return (
     <div className="space-y-10 pb-20">
       {/* Verification Status Banners */}
-      {user?.verificationStatus === "pending" && (
+      {(user?.verificationStatus === "pending" || user?.verificationStatus === "PENDING") && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -253,6 +244,26 @@ export default function DashboardHome() {
             </p>
           </div>
           <Badge className="bg-amber-500/20 text-amber-600 border-0 font-black px-4 whitespace-nowrap">PENDING</Badge>
+        </motion.div>
+      )}
+
+      {(user?.verificationStatus === "unverified" || user?.verificationStatus === "UNVERIFIED" || !user?.verificationStatus) && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4"
+        >
+          <div className="flex items-center gap-3">
+            <AlertCircle className="h-5 w-5 text-red-500 shrink-0" />
+            <p className="text-[10px] sm:text-xs font-bold text-red-600 uppercase tracking-tight sm:max-w-md">
+              Action Required: Complete your business verification to unlock full marketplace features and receive bookings.
+            </p>
+          </div>
+          <Link href="/home/profile/verification">
+            <Button className="bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl shadow-lg shadow-red-500/20">
+              Complete Verification <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </Link>
         </motion.div>
       )}
 
@@ -443,15 +454,8 @@ export default function DashboardHome() {
                     dataKey="amount"
                     fill="#2563eb"
                     radius={[6, 6, 0, 0]}
-                    barSize={20}
+                    barSize={40}
                     name="Actual Revenue"
-                  />
-                  <Bar
-                    dataKey="projected"
-                    fill="rgba(37, 99, 235, 0.2)"
-                    radius={[6, 6, 0, 0]}
-                    barSize={20}
-                    name="Projected"
                   />
                 </BarChart>
               </ResponsiveContainer>

@@ -88,7 +88,7 @@ export default function BookingsPage() {
      setLoading(true);
       try {
           const [bookingData, staffData, businessData] = await Promise.all([
-              bookingService.getBookings(),
+              bookingService.getProviderBookings(),
               staffService.getStaffList(),
               maestroService.getMyBusinesses()
           ]);
@@ -108,6 +108,18 @@ export default function BookingsPage() {
   useEffect(() => {
      fetchData();
   }, []);
+
+  const assignStaff = async (uid: string, staffUid: string) => {
+      const toastId = toast.loading("Assigning staff member...");
+      try {
+          const updated = await bookingService.assignStaff(uid, staffUid);
+          setBookings(prev => prev.map(b => b.uid === uid ? updated : b));
+          toast.success("Staff assigned successfully!", { id: toastId });
+      } catch (err: any) {
+          console.error("Staff assignment failed", err);
+          toast.error(err?.message || "Failed to assign staff", { id: toastId });
+      }
+  };
 
   const filteredBookings = useMemo(() => {
    return bookings.filter(b => {
@@ -344,7 +356,7 @@ export default function BookingsPage() {
   {filteredBookings
   .filter((b) => b.status === col.id)
   .map((booking) => (
-  <BookingCard key={booking.uid} booking={booking} moveBooking={moveBooking} />
+  <BookingCard key={booking.uid} booking={booking} moveBooking={moveBooking} realStaff={realStaff} assignStaff={assignStaff} />
   ))}
   </div>
   </div>
@@ -553,14 +565,14 @@ export default function BookingsPage() {
   );
 }
 
-function BookingCard({ booking, moveBooking }: { booking: Booking, moveBooking: (uid: string, status: string) => void }) {
+function BookingCard({ booking, moveBooking, realStaff = [], assignStaff }: { booking: Booking, moveBooking: (uid: string, status: string) => void, realStaff?: ApiUser[], assignStaff?: (uid: string, staffUid: string) => void }) {
  return (
  <GlassCard className="p-5 hover:bg-white/80 transition-all border-white/60 shadow-glass-sm group">
  <div className="flex justify-between items-start mb-4">
-  <Link href={`/bookings/${booking.uid}`} className="flex-1">
-  <p className="font-extrabold text-primary text-sm mb-0.5 group-hover:text-secondary transition-colors">{booking.customer_name || "Customer"}</p>
-  <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-wider">{booking.service_name || booking.service}</p>
-  </Link>
+   <Link href={`/bookings/${booking.uid}`} className="flex-1">
+   <p className="font-extrabold text-primary text-sm mb-0.5 group-hover:text-secondary transition-colors">{booking.customer_name || "Customer"}</p>
+   <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-wider">{booking.service_name || booking.service}</p>
+   </Link>
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-primary/5">
@@ -571,6 +583,17 @@ function BookingCard({ booking, moveBooking }: { booking: Booking, moveBooking: 
  <DropdownMenuItem onClick={() => moveBooking(booking.uid, 'ACCEPTED')} className="rounded-lg text-xs font-bold mb-1">Move to Accepted</DropdownMenuItem>
  <DropdownMenuItem onClick={() => moveBooking(booking.uid, 'IN_PROGRESS')} className="rounded-lg text-xs font-bold mb-1">Move to In Progress</DropdownMenuItem>
  <DropdownMenuItem onClick={() => moveBooking(booking.uid, 'COMPLETED')} className="rounded-lg text-xs font-bold mb-1">Move to Completed</DropdownMenuItem>
+ {realStaff.length > 0 && assignStaff && (
+   <>
+     <div className="h-px bg-glass-border my-1" />
+     <div className="px-2 py-1 text-[8px] font-bold text-foreground/40 uppercase tracking-widest">Assign Staff</div>
+     {realStaff.map(staff => (
+       <DropdownMenuItem key={staff.uid} onClick={() => assignStaff(booking.uid, staff.uid)} className="rounded-lg text-xs font-bold mb-1">
+         {staff.username}
+       </DropdownMenuItem>
+     ))}
+   </>
+ )}
  </DropdownMenuContent>
  </DropdownMenu>
  </div>
@@ -579,6 +602,11 @@ function BookingCard({ booking, moveBooking }: { booking: Booking, moveBooking: 
  <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/50">
  <MapPin className="h-3 w-3" /> {booking.location_name || 'Remote'}
  </div>
+ {booking.staff_name && (
+   <div className="flex items-center gap-2 text-[10px] font-bold text-blue-500">
+     <UserIcon className="h-3 w-3" /> Assigned: {booking.staff_name}
+   </div>
+ )}
  <div className="flex items-center justify-between pt-2 border-t border-primary/5">
  <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary/60">
  <Clock className="h-3 w-3" /> {booking.start_time}

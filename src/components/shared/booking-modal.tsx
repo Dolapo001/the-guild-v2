@@ -22,15 +22,17 @@ import {
  Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Service, MOCK_STAFF } from "@/lib/mock-data";
+import { Service } from "@/types/api";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { bookingService } from "@/services/booking.service";
 
 interface BookingModalProps {
  isOpen: boolean;
  onClose: () => void;
- service: Service;
+ service: any; // Can represent the full business detail with services
  initialStaffId?: string | null;
  mode?: 'book' | 'reschedule';
  initialData?: Partial<BookingState>;
@@ -47,15 +49,22 @@ export interface BookingState {
  specialNote: string;
  assignedStaffId?: string; // For AI assignment
  ticketId?: string;
+ bookingType: 'ONE_TIME' | 'SCHEDULED' | 'RECURRING';
+ recurrenceRule: 'daily' | 'weekly' | 'monthly';
+ recurrenceInterval: number;
+ recurrenceCount: number;
 }
 
-const getRandomStaff = () => {
- return MOCK_STAFF[Math.floor(Math.random() * MOCK_STAFF.length)];
+const getRandomStaff = (staffList: any[]) => {
+  if (!staffList || staffList.length === 0) return null;
+  return staffList[Math.floor(Math.random() * staffList.length)];
 };
 
 export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 'book', initialData }: BookingModalProps) {
  const [step, setStep] = useState<Step>("services");
  const [isLoading, setIsLoading] = useState(false);
+ const [availableSlots, setAvailableSlots] = useState<Array<{ start_time: string, end_time: string, is_available: boolean }>>([]);
+ const [loadingSlots, setLoadingSlots] = useState(false);
 
  const [bookingState, setBookingState] = useState<BookingState>({
  selectedServices: [],
@@ -64,22 +73,30 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  staffId: initialStaffId || 'AUTO',
  customImage: null,
  specialNote: '',
- ticketId: ''
+ ticketId: '',
+ bookingType: 'ONE_TIME',
+ recurrenceRule: 'weekly',
+ recurrenceInterval: 1,
+ recurrenceCount: 4
  });
 
  // Reset state when modal opens
  useEffect(() => {
  if (isOpen) {
  if (mode === 'reschedule' && initialData) {
- setStep("datetime"); // Start at datetime for rescheduling
+ setStep("datetime");
  setBookingState({
  selectedServices: initialData.selectedServices || [],
- date: undefined, // Clear date/time for rescheduling
+ date: undefined,
  timeSlot: null,
  staffId: initialData.staffId || initialStaffId || 'AUTO',
  customImage: initialData.customImage || null,
  specialNote: initialData.specialNote || '',
- ticketId: initialData.ticketId || `#GLV-${Math.floor(Math.random() * 10000)}`
+ ticketId: initialData.ticketId || `#GLV-${Math.floor(Math.random() * 10000)}`,
+ bookingType: initialData.bookingType || 'ONE_TIME',
+ recurrenceRule: initialData.recurrenceRule || 'weekly',
+ recurrenceInterval: initialData.recurrenceInterval || 1,
+ recurrenceCount: initialData.recurrenceCount || 4
  });
  } else {
  setStep("services");
@@ -90,24 +107,51 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  staffId: initialStaffId || 'AUTO',
  customImage: null,
  specialNote: '',
- ticketId: `#GLV-${Math.floor(Math.random() * 10000)}`
+ ticketId: `#GLV-${Math.floor(Math.random() * 10000)}`,
+ bookingType: 'ONE_TIME',
+ recurrenceRule: 'weekly',
+ recurrenceInterval: 1,
+ recurrenceCount: 4
  });
  }
  }
  }, [isOpen, initialStaffId, mode, initialData]);
 
+ // Dynamically fetch slots from actual backend service availability
+ useEffect(() => {
+ if (bookingState.date && service?.services?.length > 0) {
+ const fetchSlots = async () => {
+ setLoadingSlots(true);
+ try {
+ const dateStr = bookingState.date!.toISOString().split('T')[0];
+ const targetService = service.services.find((s: any) => bookingState.selectedServices.includes(s.name)) || service.services[0];
+ const slots = await bookingService.getAvailability(targetService.uid || targetService.id, dateStr);
+ setAvailableSlots(slots);
+ } catch (err) {
+ console.error("Error loading availability slots", err);
+ } finally {
+ setLoadingSlots(false);
+ }
+ };
+ fetchSlots();
+ }
+ }, [bookingState.date, bookingState.selectedServices, service]);
+
  const displayedStaffId = bookingState.staffId === 'AUTO'
  ? bookingState.assignedStaffId
  : bookingState.staffId;
 
- const selectedStaffMember = MOCK_STAFF.find(s => s.id === displayedStaffId);
+ const staffList = service?.staff || [];
+ const selectedStaffMember = staffList.find((s: any) => s.uid === displayedStaffId);
 
- const isCEOSelected = selectedStaffMember?.isOwner;
- const priceMultiplier = isCEOSelected ? 1.5 : 1; // 50% premium for CEO
+ const isCEOSelected = selectedStaffMember?.role === 'ceo';
+ const priceMultiplier = isCEOSelected ? 1.5 : 1;
 
- const totalAmount = service.services
- .filter(s => bookingState.selectedServices.includes(s.name))
- .reduce((acc, s) => acc + (s.price * priceMultiplier), 0);
+ const totalAmount = service?.services
+ ? service.services
+ .filter((s: any) => bookingState.selectedServices.includes(s.name))
+ .reduce((acc: number, s: any) => acc + (Number(s.price) * priceMultiplier), 0) * (bookingState.bookingType === 'RECURRING' ? bookingState.recurrenceCount : 1)
+ : 0;
 
  const escrowFee = totalAmount * 0.02;
  const finalTotal = totalAmount + escrowFee;
@@ -121,7 +165,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  ...prev,
  selectedServices: prev.selectedServices.includes(name)
  ? prev.selectedServices.filter(s => s !== name)
- : [...prev.selectedServices, name]
+ : [name] // Single selection of service for simplicity of schedule lookup
  }));
  };
 
@@ -130,10 +174,9 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  else if (step === "datetime") setStep("customization");
  else if (step === "customization") setStep("staff");
  else if (step === "staff") {
- // AI Assignment Logic
  if (bookingState.staffId === 'AUTO') {
- const randomStaff = getRandomStaff();
- updateState('assignedStaffId', randomStaff.id);
+ const randomStaff = getRandomStaff(staffList);
+ updateState('assignedStaffId', randomStaff?.uid);
  } else {
  updateState('assignedStaffId', undefined);
  }
@@ -149,12 +192,47 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  else if (step === "summary") setStep("staff");
  };
 
- const handlePayment = () => {
+ const convertTo24h = (timeStr: string) => {
+ if (!timeStr) return "09:00";
+ const [time, modifier] = timeStr.split(" ");
+ let [hours, minutes] = time.split(":");
+ if (hours === "12") {
+ hours = "00";
+ }
+ if (modifier === "PM") {
+ hours = String(parseInt(hours, 10) + 12);
+ }
+ return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+ };
+
+ const handlePayment = async () => {
  setIsLoading(true);
- setTimeout(() => {
- setIsLoading(false);
+ try {
+ const targetSvc = service.services.find((s: any) => bookingState.selectedServices.includes(s.name)) || service.services[0];
+ const dateStr = bookingState.date!.toISOString().split('T')[0];
+ const timeStr = convertTo24h(bookingState.timeSlot!);
+
+ const payload = {
+ business: service.uid || service.id,
+ service: targetSvc.uid || targetSvc.id,
+ date: dateStr,
+ start_time: timeStr,
+ staff: bookingState.staffId === 'AUTO' ? undefined : bookingState.staffId,
+ special_note: bookingState.specialNote,
+ booking_type: bookingState.bookingType,
+ recurrence_rule: bookingState.bookingType === 'RECURRING' ? bookingState.recurrenceRule : undefined,
+ recurrence_interval: bookingState.bookingType === 'RECURRING' ? bookingState.recurrenceInterval : undefined,
+ recurrence_count: bookingState.bookingType === 'RECURRING' ? bookingState.recurrenceCount : undefined,
+ };
+
+ const response = await bookingService.createBooking(payload);
+ updateState('ticketId', response.uid || (response as any).id);
  setStep("success");
- }, 2000);
+ } catch (err) {
+ console.error("Failed to make actual booking", err);
+ } finally {
+ setIsLoading(false);
+ }
  };
 
  const steps: { id: Step; title: string }[] = [
@@ -167,20 +245,14 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
 
  const currentStepIndex = steps.findIndex(s => s.id === step);
 
- const initialStaffMember = MOCK_STAFF.find(s => s.id === initialStaffId);
+ const initialStaffMember = staffList.find((s: any) => s.uid === initialStaffId);
 
- // Mock Calendar Days (Next 14 days)
  const today = new Date();
  const calendarDays = Array.from({ length: 14 }, (_, i) => {
  const d = new Date();
  d.setDate(today.getDate() + i);
  return d;
  });
-
- const timeSlots = [
- "09:00 AM", "10:00 AM", "11:00 AM", "12:00 PM",
- "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM"
- ];
 
  return (
  <Dialog open={isOpen} onOpenChange={onClose}>
@@ -192,11 +264,8 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <h2 className="text-xl font-extrabold text-gray-900 ">
  {mode === 'reschedule' ? 'Reschedule Appointment' : 'Book Appointment'}
  </h2>
- <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest">{service.businessName}</p>
+ <p className="text-xs font-bold text-foreground/40 uppercase tracking-widest">{service?.name || 'Appointment'}</p>
  </div>
- {/* Removed manual X button, relying on Dialog primitives or custom close if needed. 
- Since DialogContent usually has a close, we can hide it via CSS or use a custom one.
- Here we use a custom one but ensure it's the only one. */}
  <Button variant="ghost" size="icon" onClick={onClose} className="rounded-xl hover:bg-primary/5">
  <X className="h-5 w-5 text-foreground/40" />
  </Button>
@@ -253,14 +322,14 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <div className="text-center mb-8">
  {initialStaffMember && (
  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold mb-4">
- <Sparkles className="h-3 w-3" /> Booking with {initialStaffMember.name}
+ <Sparkles className="h-3 w-3" /> Booking with {initialStaffMember.username}
  </div>
  )}
  <h3 className="text-2xl font-extrabold text-gray-900 ">Select Services</h3>
- <p className="text-foreground/60 font-medium">Choose the services you&apos;d like to book.</p>
+ <p className="text-foreground/60 font-medium">Choose the service you&apos;d like to book.</p>
  </div>
  <div className="grid gap-3">
- {service.services.map((s) => (
+ {service?.services?.map((s: any) => (
  <div
  key={s.name}
  onClick={() => toggleService(s.name)}
@@ -283,15 +352,12 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <div>
  <span className="font-bold text-gray-900 group-hover:text-primary transition-colors block">{s.name}</span>
  <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest flex items-center gap-1 mt-1">
- <Clock className="h-3 w-3" /> 60 Mins
+ <Clock className="h-3 w-3" /> {s.duration_minutes || 60} Mins
  </span>
  </div>
  </div>
  <div className="text-right">
- <span className="font-extrabold text-primary block">₦{(s.price * priceMultiplier).toLocaleString()}</span>
- {isCEOSelected && (
- <span className="text-[8px] font-bold text-amber-600 uppercase tracking-tighter">Director Rate</span>
- )}
+ <span className="font-extrabold text-primary block">₦{Number(s.price).toLocaleString()}</span>
  </div>
  </div>
  ))}
@@ -303,7 +369,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <div className="space-y-8">
  <div className="text-center mb-6">
  <h3 className="text-2xl font-extrabold text-gray-900 ">Date & Time</h3>
- <p className="text-foreground/60 font-medium">When should we arrive?</p>
+ <p className="text-foreground/60 font-medium">Choose your schedule slot</p>
  </div>
 
  <div className="space-y-4">
@@ -338,22 +404,116 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <Clock className="h-4 w-4 text-primary" />
  <span className="text-xs font-extrabold uppercase tracking-widest text-foreground/60">Select Time</span>
  </div>
+ {loadingSlots ? (
+ <div className="flex items-center justify-center py-8">
+ <Loader2 className="animate-spin h-6 w-6 text-primary" />
+ </div>
+ ) : availableSlots.length > 0 ? (
  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
- {timeSlots.map((time) => (
+ {availableSlots.map((slot) => {
+ const isSelected = bookingState.timeSlot === slot.start_time;
+ return (
  <button
- key={time}
- onClick={() => updateState('timeSlot', time)}
+ key={slot.start_time}
+ disabled={!slot.is_available}
+ onClick={() => updateState('timeSlot', slot.start_time)}
  className={cn(
  "py-2.5 px-2 rounded-xl border-2 text-xs font-bold transition-all",
- bookingState.timeSlot === time
+ isSelected
  ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
- : "bg-white/40 border-transparent hover:border-primary/30 text-foreground/80"
+ : slot.is_available
+ ? "bg-white/40 border-transparent hover:border-primary/30 text-foreground/80"
+ : "bg-gray-100/50 border-transparent text-gray-300 cursor-not-allowed"
  )}
  >
- {time}
+ {slot.start_time}
+ </button>
+ );
+ })}
+ </div>
+ ) : (
+ <p className="text-sm font-bold text-foreground/40 text-center italic py-4">Please select a date first</p>
+ )}
+ </div>
+
+ {/* Recurring Booking Options */}
+ <div className="pt-6 border-t border-glass-border space-y-4">
+ <div className="flex items-center justify-between">
+ <div>
+ <h4 className="text-sm font-bold text-gray-900">Repeat this booking</h4>
+ <p className="text-xs text-foreground/60 font-medium">Book multiple sessions at scheduled intervals</p>
+ </div>
+ <button
+ onClick={() => {
+ const nextType = bookingState.bookingType === 'RECURRING' ? 'ONE_TIME' : 'RECURRING';
+ updateState('bookingType', nextType);
+ }}
+ className={cn(
+ "w-12 h-6 rounded-full p-1 transition-all",
+ bookingState.bookingType === 'RECURRING' ? "bg-primary" : "bg-gray-200"
+ )}
+ >
+ <div className={cn(
+ "h-4 w-4 rounded-full bg-white transition-all shadow-md",
+ bookingState.bookingType === 'RECURRING' ? "translate-x-6" : "translate-x-0"
+ )} />
+ </button>
+ </div>
+
+ {bookingState.bookingType === 'RECURRING' && (
+ <motion.div
+ initial={{ opacity: 0, y: -10 }}
+ animate={{ opacity: 1, y: 0 }}
+ className="space-y-4 bg-primary/[0.02] border border-primary/10 rounded-2xl p-4"
+ >
+ <div className="grid grid-cols-2 gap-4">
+ <div>
+ <label className="text-[10px] font-extrabold uppercase tracking-wider text-foreground/40 block mb-2">Frequency</label>
+ <div className="flex gap-2">
+ {(['daily', 'weekly', 'monthly'] as const).map(freq => (
+ <button
+ key={freq}
+ onClick={() => updateState('recurrenceRule', freq)}
+ className={cn(
+ "flex-1 py-1 px-2 rounded-xl text-xs font-bold border-2 transition-all capitalize",
+ bookingState.recurrenceRule === freq
+ ? "bg-primary border-primary text-white"
+ : "bg-white border-transparent text-foreground/60"
+ )}
+ >
+ {freq}
  </button>
  ))}
  </div>
+ </div>
+
+ <div>
+ <label className="text-[10px] font-extrabold uppercase tracking-wider text-foreground/40 block mb-2">Sessions</label>
+ <div className="flex gap-2">
+ {([2, 4, 8, 12] as const).map(count => (
+ <button
+ key={count}
+ onClick={() => updateState('recurrenceCount', count)}
+ className={cn(
+ "flex-1 py-1 px-2 rounded-xl text-xs font-bold border-2 transition-all",
+ bookingState.recurrenceCount === count
+ ? "bg-primary border-primary text-white"
+ : "bg-white border-transparent text-foreground/60"
+ )}
+ >
+ {count}x
+ </button>
+ ))}
+ </div>
+ </div>
+ </div>
+
+ <p className="text-xs font-bold text-primary flex items-center gap-1">
+ <Sparkles className="h-3.5 w-3.5" />
+ This service will repeat {bookingState.recurrenceRule} for {bookingState.recurrenceCount} sessions.
+ </p>
+ </motion.div>
+ )}
  </div>
  </div>
  )}
@@ -424,29 +584,29 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  </div>
  </div>
 
- {MOCK_STAFF.filter(s => s.availableForBookings || !s.isOwner).map((staff) => (
+ {staffList.map((staff: any) => (
  <div
- key={staff.id}
- onClick={() => updateState('staffId', staff.id)}
+ key={staff.uid}
+ onClick={() => updateState('staffId', staff.uid)}
  className={cn(
  "p-4 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-4 group",
- bookingState.staffId === staff.id
+ bookingState.staffId === staff.uid
  ? 'bg-primary/5 border-primary shadow-sm'
  : 'bg-white/40 border-transparent hover:border-primary/30',
- staff.isOwner && "ring-2 ring-amber-500/30 border-amber-500/30 bg-amber-500/5"
+ staff.role === 'ceo' && "ring-2 ring-amber-500/30 border-amber-500/30 bg-amber-500/5"
  )}
  >
  <Avatar className={cn(
  "h-12 w-12 rounded-xl border-2 shadow-sm",
- staff.isOwner ? "border-amber-500" : "border-white "
+ staff.role === 'ceo' ? "border-amber-500" : "border-white "
  )}>
- <AvatarImage src={staff.image} />
- <AvatarFallback>{staff.name[0]}</AvatarFallback>
+ <AvatarImage src={staff.avatar} />
+ <AvatarFallback>{staff.username[0]}</AvatarFallback>
  </Avatar>
  <div className="flex-1">
  <div className="flex items-center gap-2">
- <p className="font-bold text-gray-900 group-hover:text-primary transition-colors">{staff.name}</p>
- {staff.isOwner && (
+ <p className="font-bold text-gray-900 group-hover:text-primary transition-colors">{staff.username}</p>
+ {staff.role === 'ceo' && (
  <Badge className="bg-amber-500 text-white border-0 text-[8px] font-extrabold px-1.5 py-0">
  ✨ PREMIUM
  </Badge>
@@ -456,15 +616,15 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">{staff.role}</span>
  <div className="flex items-center gap-0.5 text-amber-500">
  <Star className="h-3 w-3 fill-amber-500" />
- <span className="text-[10px] font-bold">{staff.rating}</span>
+ <span className="text-[10px] font-bold">5.0</span>
  </div>
  </div>
  </div>
  <div className={cn(
  "h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all",
- bookingState.staffId === staff.id ? 'bg-primary border-primary' : 'bg-transparent border-gray-300 '
+ bookingState.staffId === staff.uid ? 'bg-primary border-primary' : 'bg-transparent border-gray-300 '
  )}>
- {bookingState.staffId === staff.id && <div className="h-2 w-2 rounded-full bg-white" />}
+ {bookingState.staffId === staff.uid && <div className="h-2 w-2 rounded-full bg-white" />}
  </div>
  </div>
  ))}
@@ -508,7 +668,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-1">Professional</p>
  <div className="flex flex-col">
  <p className="text-sm font-bold text-gray-900 ">
- {selectedStaffMember?.name}
+ {selectedStaffMember?.username || "Auto assigned"}
  </p>
  {bookingState.staffId === 'AUTO' && (
  <span className="text-[10px] font-bold text-amber-500 flex items-center gap-1">
@@ -587,13 +747,13 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  </div>
  <div className="flex justify-between">
  <span className="text-sm text-foreground/60">Staff</span>
- <span className="text-sm font-bold">{selectedStaffMember?.name}</span>
+ <span className="text-sm font-bold">{selectedStaffMember?.username || "Pending Assignment"}</span>
  </div>
  </div>
  </div>
 
  <Button onClick={onClose} className="bg-gray-900 text-white rounded-xl h-12 px-8 font-bold w-full">
- View My Bookings
+ Close
  </Button>
  </div>
  )}
@@ -630,6 +790,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  ) : step === "summary" ? (
  <>
  Pay & Secure Booking <ShieldCheck className="ml-2 h-4 w-4" />
+ Trimmed Booking
  </>
  ) : (
  <>

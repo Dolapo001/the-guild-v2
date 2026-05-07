@@ -20,12 +20,16 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 
 export interface StaffMember {
- id: string;
- name: string;
- role: string;
- rating: number;
- image: string;
- status: string;
+  uid: string;
+  username: string;
+  role: string;
+  avatar: string;
+  profile?: {
+    performance?: {
+      average_rating: number;
+      total_jobs: number;
+    }
+  }
 }
 
 interface StaffProfileModalProps {
@@ -42,7 +46,7 @@ export function StaffProfileModal({ isOpen, onClose, staff, onBookNow }: StaffPr
 
  const handleBookNow = () => {
  if (onBookNow) {
- onBookNow(staff.id);
+ onBookNow(staff.uid);
  }
  };
 
@@ -92,8 +96,8 @@ export function StaffProfileModal({ isOpen, onClose, staff, onBookNow }: StaffPr
  <div className="px-8 pb-6 -mt-12 flex flex-col md:flex-row gap-6 items-start">
  <div className="relative">
  <Avatar className="h-24 w-24 border-4 border-white shadow-xl">
- <AvatarImage src={staff.image} />
- <AvatarFallback>{staff.name[0]}</AvatarFallback>
+ <AvatarImage src={staff.avatar} />
+ <AvatarFallback>{staff.username[0]}</AvatarFallback>
  </Avatar>
  <div className="absolute bottom-0 right-0 bg-green-500 h-6 w-6 rounded-full border-4 border-white flex items-center justify-center">
  <CheckCircle2 className="h-3 w-3 text-white" />
@@ -104,17 +108,17 @@ export function StaffProfileModal({ isOpen, onClose, staff, onBookNow }: StaffPr
  <div className="flex justify-between items-start">
  <div>
  <h2 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
- {staff.name}
+ {staff.username}
  <Badge variant="secondary" className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary ">
  {staff.role}
  </Badge>
  </h2>
  <div className="flex items-center gap-4 mt-2 text-sm font-medium text-foreground/60">
  <span className="flex items-center gap-1 text-amber-500 font-bold">
- <Star className="h-4 w-4 fill-amber-500" /> {staff.rating}
+ <Star className="h-4 w-4 fill-amber-500" /> {staff.profile?.performance?.average_rating || 5.0}
  </span>
  <span className="flex items-center gap-1">
- <Briefcase className="h-4 w-4" /> 140+ Jobs Completed
+ <Briefcase className="h-4 w-4" /> {staff.profile?.performance?.total_jobs || 0}+ Jobs Completed
  </span>
  <span className="flex items-center gap-1 text-green-600 ">
  <ShieldCheck className="h-4 w-4" /> Verified Pro
@@ -206,7 +210,7 @@ export function StaffProfileModal({ isOpen, onClose, staff, onBookNow }: StaffPr
  onClick={handleBookNow}
  className="w-full h-12 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20"
  >
- Book {staff.name}
+ Book {staff.username}
  </Button>
  </div>
 

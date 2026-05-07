@@ -23,11 +23,13 @@ import {
  CalendarCheck,
  Clock,
  CheckCircle2,
- XCircle
+ XCircle,
+ CalendarDays
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 import {
  Dialog,
  DialogContent,
@@ -58,7 +60,8 @@ import { staffService, PerformanceData } from "@/services/staff.service";
 import { User } from "@/types/api";
 
 export default function StaffPage() {
- const [staffList, setStaffList] = useState<User[]>([]);
+ const { user } = useAuth();
+  const [staffList, setStaffList] = useState<User[]>([]);
  const [selectedStaff, setSelectedStaff] = useState<User | null>(null);
  const [performance, setPerformance] = useState<PerformanceData | null>(null);
  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
@@ -70,7 +73,11 @@ export default function StaffPage() {
  const [isAddingRole, setIsAddingRole] = useState(false);
  const [newRoleName, setNewRoleName] = useState("");
  const [activeTab, setActiveTab] = useState<"team" | "invites">("team");
+ const [detailTab, setDetailTab] = useState<"performance" | "schedule">("performance");
  const [invitations, setInvitations] = useState<any[]>([]);
+ const [shifts, setShifts] = useState<any[]>([]);
+ const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
+ const [newShift, setNewShift] = useState({ start_time: "", end_time: "", notes: "" });
  const [performancePeriod, setPerformancePeriod] = useState<"weekly" | "monthly" | "yearly">("monthly");
  const router = useRouter();
 
@@ -140,10 +147,52 @@ export default function StaffPage() {
  useEffect(() => {
     if (selectedStaff && (selectedStaff as any).view_status === 'ACTIVE') {
         fetchPerformance(selectedStaff.uid, performancePeriod);
+        fetchStaffShifts(selectedStaff.uid);
     } else {
         setPerformance(null);
+        setShifts([]);
     }
  }, [selectedStaff, performancePeriod]);
+
+ const fetchStaffShifts = async (uid: string) => {
+    try {
+        const allShifts = await staffService.getShifts();
+        setShifts(allShifts.filter((s: any) => s.staff === uid || s.staff?.uid === uid));
+    } catch (err) {
+        console.error("Failed to fetch shifts", err);
+    }
+ };
+
+ const handleCreateShift = async () => {
+    if (!selectedStaff || !newShift.start_time || !newShift.end_time) return;
+    const toastId = toast.loading("Creating shift...");
+    try {
+        await staffService.createShift({
+            staff: selectedStaff.uid,
+            start_time: newShift.start_time,
+            end_time: newShift.end_time,
+            notes: newShift.notes
+        });
+        toast.success("Shift created successfully", { id: toastId });
+        setIsShiftModalOpen(false);
+        setNewShift({ start_time: "", end_time: "", notes: "" });
+        fetchStaffShifts(selectedStaff.uid);
+    } catch (err: any) {
+        toast.error(err?.message || "Failed to create shift", { id: toastId });
+    }
+ };
+
+ const handleDeleteShift = async (uid: string) => {
+    if (!window.confirm("Are you sure you want to delete this shift?")) return;
+    const toastId = toast.loading("Deleting shift...");
+    try {
+        await staffService.deleteShift(uid);
+        toast.success("Shift deleted", { id: toastId });
+        if (selectedStaff) fetchStaffShifts(selectedStaff.uid);
+    } catch (err: any) {
+        toast.error(err?.message || "Failed to delete shift", { id: toastId });
+    }
+ };
 
   useEffect(() => {
     setSelectedStaff(null); // Clear selection when switching tabs
@@ -175,7 +224,7 @@ export default function StaffPage() {
   }));
 
   const filteredInvites = invitations.filter(i => 
-    i.email.toLowerCase().includes(searchQuery.toLowerCase())
+    i.status === 'PENDING' && i.email.toLowerCase().includes(searchQuery.toLowerCase())
   ).map(i => ({
     uid: i.uid,
     username: i.email,
@@ -204,7 +253,11 @@ export default function StaffPage() {
     <div className={cn("flex items-center gap-3", selectedStaff && "hidden md:flex")}>
      <Dialog open={isInviteModalOpen} onOpenChange={setIsInviteModalOpen}>
       <DialogTrigger asChild>
-       <Button className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-white rounded-xl h-11 px-6 font-bold shadow-lg shadow-primary/20">
+       <Button 
+        disabled={user?.verificationStatus !== 'verified'}
+        title={user?.verificationStatus !== 'verified' ? "You must verify your business before inviting staff." : ""}
+        className="flex-1 md:flex-none bg-primary hover:bg-primary/90 text-white rounded-xl h-11 px-6 font-bold shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed"
+       >
         <Plus className="mr-2 h-4 w-4" /> Invite Staff
        </Button>
       </DialogTrigger>
@@ -301,7 +354,7 @@ export default function StaffPage() {
                     activeTab === "invites" ? "bg-primary text-white shadow-lg" : "text-primary/60 hover:bg-white/40"
                 )}
             >
-                Invites ({invitations.length})
+                Invites ({invitations.filter(i => i.status === 'PENDING').length})
             </button>
         </div>
 
@@ -480,97 +533,221 @@ export default function StaffPage() {
   </div>
   </div>
 
-  {(selectedStaff as any).view_status === 'ACTIVE' && (
-      <div className="space-y-8">
-      <div>
-      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
-      <div className="flex flex-col gap-2">
-          <h3 className="text-[9px] font-black text-foreground/30 uppercase tracking-widest px-1">Revenue Performance (₦)</h3>
-          <div className="flex items-center gap-2">
-              <div className="flex bg-primary/5 p-1 rounded-xl border border-primary/10 w-fit">
-                  {['weekly', 'monthly', 'yearly'].map((p) => (
-                      <button
-                          key={p}
-                          onClick={() => setPerformancePeriod(p as any)}
-                          className={cn(
-                              "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tight transition-all",
-                              performancePeriod === p ? "bg-primary text-white shadow-sm" : "text-primary/40 hover:text-primary"
-                          )}
-                      >
-                          {p.replace('ly', '')}
-                      </button>
-                  ))}
-              </div>
-          </div>
-      </div>
-      {performance?.trend && (
-          <div className="flex items-center gap-1.5 text-green-600 font-bold text-[10px] bg-green-500/5 px-2 py-1 rounded-lg border border-green-500/10 h-fit">
-              <TrendingUp className="h-3 w-3" />
-              <span>{performance.trend.value} {performance.trend.label}</span>
-          </div>
-      )}
-      </div>
-      <div className="h-[300px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={performance?.revenue_chart || []}>
-      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-      <XAxis
-      dataKey="label"
-      axisLine={false}
-      tickLine={false}
-      tick={{ fontSize: 10, fontWeight: 700, opacity: 0.5 }}
-      dy={10}
-      />
-      <YAxis
-      axisLine={false}
-      tickLine={false}
-      tick={{ fontSize: 10, fontWeight: 700, opacity: 0.5 }}
-      tickFormatter={(value) => {
-          if (value >= 1000000) return `₦${(value / 1000000).toFixed(1)}M`;
-          if (value >= 1000) return `₦${(value / 1000).toFixed(0)}k`;
-          return `₦${value}`;
-      }}
-      />
-      <Tooltip
-      cursor={{ fill: 'rgba(var(--primary), 0.05)' }}
-      contentStyle={{
-      borderRadius: '12px',
-      border: 'none',
-      boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
-      backdropFilter: 'blur(8px)'
-      }}
-      formatter={(value: any) => [`₦${Number(value).toLocaleString()}`, 'Revenue']}
-      />
-      <Bar dataKey="amount" radius={[4, 4, 4, 4]} barSize={performancePeriod === 'weekly' ? 40 : 30}>
-      {(performance?.revenue_chart || []).map((entry, index) => (
-      <Cell
-      key={`cell-${index}`}
-      fill={index === (performance?.revenue_chart.length || 0) - 1 ? '#1a237e' : '#1a237e'}
-      fillOpacity={index === (performance?.revenue_chart.length || 0) - 1 ? 1 : 0.2}
-      />
-      ))}
-      </Bar>
-      </BarChart>
-      </ResponsiveContainer>
-      </div>
-      </div>
-    
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {[
-      { label: "Jobs Completed", value: performance?.total_jobs || "0", icon: Users },
-      { label: "Avg. Rating", value: performance?.rating || "0.0", icon: Star },
-      { label: "Retention Rate", value: performance?.completion_rate || "0%", icon: TrendingUp },
-      { label: "Active Hours", value: performance?.active_hours || "0h", icon: CalendarIcon },
-      ].map((stat, i) => (
-      <div key={i} className="p-4 rounded-2xl bg-primary/[0.02] border border-primary/5">
-      <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-1">{stat.label}</p>
-      <p className="text-xl font-extrabold text-primary">{stat.value}</p>
-      </div>
-      ))}
-      </div>
-      </div>
-  )}
+    {(selectedStaff as any).view_status === 'ACTIVE' && (
+        <div className="space-y-8">
+            <div className="flex bg-primary/5 p-1 rounded-xl border border-primary/10 w-fit">
+                <button
+                    onClick={() => setDetailTab("performance")}
+                    className={cn(
+                        "px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                        detailTab === "performance" ? "bg-primary text-white shadow-lg" : "text-primary/40 hover:text-primary"
+                    )}
+                >
+                    Performance
+                </button>
+                <button
+                    onClick={() => setDetailTab("schedule")}
+                    className={cn(
+                        "px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                        detailTab === "schedule" ? "bg-primary text-white shadow-lg" : "text-primary/40 hover:text-primary"
+                    )}
+                >
+                    Shifts & Schedule
+                </button>
+            </div>
+
+            {detailTab === "performance" ? (
+                <div className="space-y-8">
+                    <div>
+                        <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+                            <div className="flex flex-col gap-2">
+                                <h3 className="text-[9px] font-black text-foreground/30 uppercase tracking-widest px-1">Revenue Performance (₦)</h3>
+                                <div className="flex items-center gap-2">
+                                    <div className="flex bg-primary/5 p-1 rounded-xl border border-primary/10 w-fit">
+                                        {['weekly', 'monthly', 'yearly'].map((p) => (
+                                            <button
+                                                key={p}
+                                                onClick={() => setPerformancePeriod(p as any)}
+                                                className={cn(
+                                                    "px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-tight transition-all",
+                                                    performancePeriod === p ? "bg-primary text-white shadow-sm" : "text-primary/40 hover:text-primary"
+                                                )}
+                                            >
+                                                {p.replace('ly', '')}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                            {performance?.trend && (
+                                <div className="flex items-center gap-1.5 text-green-600 font-bold text-[10px] bg-green-500/5 px-2 py-1 rounded-lg border border-green-500/10 h-fit">
+                                    <TrendingUp className="h-3 w-3" />
+                                    <span>{performance.trend.value} {performance.trend.label}</span>
+                                </div>
+                            )}
+                        </div>
+                        <div className="h-[300px] w-full">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={performance?.revenue_chart || []}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                                    <XAxis
+                                        dataKey="label"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fontSize: 10, fontWeight: 700, opacity: 0.5 }}
+                                        dy={10}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fontSize: 10, fontWeight: 700, opacity: 0.5 }}
+                                        tickFormatter={(value) => {
+                                            if (value >= 1000000) return `₦${(value / 1000000).toFixed(1)}M`;
+                                            if (value >= 1000) return `₦${(value / 1000).toFixed(0)}k`;
+                                            return `₦${value}`;
+                                        }}
+                                    />
+                                    <Tooltip
+                                        cursor={{ fill: 'rgba(var(--primary), 0.05)' }}
+                                        contentStyle={{
+                                            borderRadius: '12px',
+                                            border: 'none',
+                                            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                            backdropFilter: 'blur(8px)'
+                                        }}
+                                        formatter={(value: any) => [`₦${Number(value).toLocaleString()}`, 'Revenue']}
+                                    />
+                                    <Bar dataKey="amount" radius={[4, 4, 4, 4]} barSize={performancePeriod === 'weekly' ? 40 : 30}>
+                                        {(performance?.revenue_chart || []).map((entry, index) => (
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={index === (performance?.revenue_chart.length || 0) - 1 ? '#1a237e' : '#1a237e'}
+                                                fillOpacity={index === (performance?.revenue_chart.length || 0) - 1 ? 1 : 0.2}
+                                            />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                  
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[
+                            { label: "Jobs Completed", value: performance?.total_jobs || "0", icon: Users },
+                            { label: "Avg. Rating", value: performance?.rating || "0.0", icon: Star },
+                            { label: "Retention Rate", value: performance?.completion_rate || "0%", icon: TrendingUp },
+                            { label: "Active Hours", value: performance?.active_hours || "0h", icon: CalendarIcon },
+                        ].map((stat, i) => (
+                            <div key={i} className="p-4 rounded-2xl bg-primary/[0.02] border border-primary/5">
+                                <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-1">{stat.label}</p>
+                                <p className="text-xl font-extrabold text-primary">{stat.value}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-[10px] font-black text-foreground/30 uppercase tracking-widest px-1">Scheduled Shifts</h3>
+                        <Button 
+                            onClick={() => setIsShiftModalOpen(true)}
+                            size="sm"
+                            className="h-9 rounded-xl bg-primary text-white font-bold px-4"
+                        >
+                            <Plus className="mr-2 h-4 w-4" /> Add Shift
+                        </Button>
+                    </div>
+
+                    <div className="grid gap-4 sm:grid-cols-2">
+                        {shifts.length > 0 ? shifts.map((shift) => (
+                            <GlassCard key={shift.uid} className="p-4 border-primary/10 bg-primary/[0.02]">
+                                <div className="flex justify-between items-start">
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-2">
+                                            <CalendarDays className="h-4 w-4 text-primary" />
+                                            <p className="font-bold text-primary">
+                                                {new Date(shift.start_time).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                                            </p>
+                                        </div>
+                                        <p className="text-xs font-semibold text-foreground/50">
+                                            {new Date(shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                                            {new Date(shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                        {shift.notes && <p className="text-[10px] text-foreground/40 italic mt-2">"{shift.notes}"</p>}
+                                    </div>
+                                    <Badge className={cn(
+                                        "rounded-lg text-[8px] font-black uppercase tracking-tighter",
+                                        shift.status === 'SCHEDULED' ? "bg-blue-500/10 text-blue-600" : 
+                                        shift.status === 'COMPLETED' ? "bg-green-500/10 text-green-600" : "bg-red-500/10 text-red-600"
+                                    )}>
+                                        {shift.status}
+                                    </Badge>
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                    <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        onClick={() => handleDeleteShift(shift.uid)}
+                                        className="h-8 text-[10px] font-black text-red-500 hover:bg-red-50 rounded-lg uppercase tracking-tight"
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            </GlassCard>
+                        )) : (
+                            <div className="sm:col-span-2 py-12 text-center border-2 border-dashed border-primary/10 rounded-2xl">
+                                <CalendarDays className="h-10 w-10 text-primary/10 mx-auto mb-3" />
+                                <p className="text-sm font-bold text-primary/40">No shifts scheduled</p>
+                                <p className="text-[10px] text-foreground/30 mt-1">Add a work window for this staff member.</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <Dialog open={isShiftModalOpen} onOpenChange={setIsShiftModalOpen}>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle className="text-2xl font-black text-primary">Add Shift</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4 py-4">
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-foreground/30 uppercase tracking-widest">Start Time</label>
+                                    <Input 
+                                        type="datetime-local" 
+                                        className="h-12 rounded-xl"
+                                        value={newShift.start_time}
+                                        onChange={(e) => setNewShift({ ...newShift, start_time: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-foreground/30 uppercase tracking-widest">End Time</label>
+                                    <Input 
+                                        type="datetime-local" 
+                                        className="h-12 rounded-xl"
+                                        value={newShift.end_time}
+                                        onChange={(e) => setNewShift({ ...newShift, end_time: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-foreground/30 uppercase tracking-widest">Notes (Optional)</label>
+                                    <Input 
+                                        placeholder="e.g. Morning Shift" 
+                                        className="h-12 rounded-xl"
+                                        value={newShift.notes}
+                                        onChange={(e) => setNewShift({ ...newShift, notes: e.target.value })}
+                                    />
+                                </div>
+                                <Button className="w-full h-12 rounded-xl bg-primary text-white font-bold mt-4" onClick={handleCreateShift}>
+                                    Schedule Shift
+                                </Button>
+                            </div>
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            )}
+        </div>
+    )}
+
   {(selectedStaff as any).view_status !== 'ACTIVE' && (
       <div className="h-[400px] flex flex-col items-center justify-center text-center space-y-6">
           <div className="h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center">

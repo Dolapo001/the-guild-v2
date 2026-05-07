@@ -53,9 +53,9 @@ export function SidebarContent({ className, onItemClick }: { className?: string;
             { title: "Business Profile", href: "/profile", icon: Settings },
         ],
         customer: [
+            { title: "My Bookings", href: "/customer", icon: Calendar },
             { title: "Explore Services", href: "/search", icon: Search },
             { title: "Marketplace", href: "/marketplace", icon: ShoppingBag },
-            { title: "My Bookings", href: "/customer", icon: Calendar },
             { title: "Favorites", href: "/favorites", icon: Heart },
             { title: "Recent Activities", href: "/customer/activities", icon: History },
             { title: "Wallet", href: "/wallet", icon: Wallet },

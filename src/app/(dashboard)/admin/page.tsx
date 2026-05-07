@@ -33,14 +33,19 @@ export default function AdminDashboard() {
  const [isModalOpen, setIsModalOpen] = useState(false);
  const [loading, setLoading] = useState(true);
  const [isSubmitting, setIsSubmitting] = useState(false);
+ const [stats, setStats] = useState<any>(null);
 
  const fetchQueue = async () => {
     setLoading(true);
     try {
-        const data = await adminService.getVerificationQueue();
-        setQueue(data);
+        const [queueData, statsData] = await Promise.all([
+            adminService.getVerificationQueue(),
+            adminService.getStats()
+        ]);
+        setQueue(queueData);
+        setStats(statsData);
     } catch (err) {
-        console.error("Failed to fetch queue", err);
+        console.error("Failed to fetch admin data", err);
     } finally {
         setLoading(false);
     }
@@ -76,9 +81,9 @@ export default function AdminDashboard() {
   {/* Platform Stats */}
   <div className="grid gap-6 md:grid-cols-4">
   {[
-  { label: "Total Users", value: "12,482", icon: Users, color: "text-primary" },
-  { label: "Verified SMEs", value: "856", icon: ShieldCheck, color: "text-accent" },
-  { label: "Revenue Volume", value: "₦4.2M", icon: TrendingUp, color: "text-secondary" },
+  { label: "Total Users", value: stats?.total_users || "...", icon: Users, color: "text-primary" },
+  { label: "Verified SMEs", value: stats?.verified_businesses || "...", icon: ShieldCheck, color: "text-accent" },
+  { label: "Revenue Volume", value: `₦${(stats?.total_revenue || 0).toLocaleString()}`, icon: TrendingUp, color: "text-secondary" },
   { label: "Pending Verifications", value: queue.length.toString(), icon: FileText, color: "text-amber-500" },
   ].map((stat, i) => (
   <GlassCard key={i} className="p-6 border-white/40">

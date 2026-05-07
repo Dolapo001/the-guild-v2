@@ -68,9 +68,15 @@ export default function ReviewsPage() {
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : "0.0";
 
+  const ratingCounts = [5, 4, 3, 2, 1].map(stars => ({
+    stars,
+    count: reviews.filter(r => r.rating === stars).length,
+    percentage: reviews.length > 0 ? (reviews.filter(r => r.rating === stars).length / reviews.length) * 100 : 0
+  }));
+
  return (
  <div className="space-y-10">
- <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+ <div className="flex flex-col md:flex-row justify-between gap-6">
  <motion.div
  initial={{ opacity: 0, x: -20 }}
  animate={{ opacity: 1, x: 0 }}
@@ -79,14 +85,29 @@ export default function ReviewsPage() {
  <p className="text-foreground/50 font-medium">Monitor and respond to customer experiences.</p>
  </motion.div>
 
- <div className="flex items-center gap-4">
- <GlassCard className="px-6 py-3 border-accent/20 bg-accent/5 flex items-center gap-3">
- <div className="flex items-center gap-1 text-accent">
- <Star className="h-5 w-5 fill-accent" />
- <span className="text-xl font-extrabold">{averageRating}</span>
+ <div className="flex flex-col md:flex-row items-center gap-4">
+ <GlassCard className="px-6 py-4 border-accent/20 bg-accent/5 flex items-center gap-6 w-full md:w-auto">
+ <div className="text-center">
+ <div className="flex items-center justify-center gap-1 text-accent mb-1">
+ <Star className="h-6 w-6 fill-accent" />
+ <span className="text-3xl font-black">{averageRating}</span>
  </div>
- <div className="h-8 w-px bg-accent/20" />
- <p className="text-[10px] font-extrabold text-accent uppercase tracking-widest">Average Rating</p>
+ <p className="text-[10px] font-extrabold text-accent uppercase tracking-widest">{reviews.length} Total Reviews</p>
+ </div>
+ 
+ <div className="h-16 w-px bg-accent/20 hidden md:block" />
+ 
+ <div className="space-y-1">
+  {ratingCounts.map(rc => (
+    <div key={rc.stars} className="flex items-center gap-2 text-[10px] font-bold text-foreground/60">
+      <div className="w-6 text-right">{rc.stars} <Star className="inline h-2 w-2 fill-current -mt-0.5" /></div>
+      <div className="w-24 h-1.5 bg-background rounded-full overflow-hidden">
+        <div className="h-full bg-accent" style={{ width: `${rc.percentage}%` }} />
+      </div>
+      <div className="w-4">{rc.count}</div>
+    </div>
+  ))}
+ </div>
  </GlassCard>
  </div>
  </div>
@@ -150,6 +171,16 @@ export default function ReviewsPage() {
     <p className="text-sm font-medium text-foreground/70 leading-relaxed">
     {review.comment}
     </p>
+
+    {review.images && review.images.length > 0 && (
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {review.images.map((img: any, idx: number) => (
+          <div key={idx} className="relative h-20 w-20 rounded-xl overflow-hidden shrink-0 border border-glass-border shadow-sm">
+            <img src={img.image_url || img.image} alt="Review attachment" className="w-full h-full object-cover" />
+          </div>
+        ))}
+      </div>
+    )}
 
     <div className="pt-4 border-t border-glass-border flex flex-col gap-4">
     {review.reply ? (

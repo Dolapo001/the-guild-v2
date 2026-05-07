@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { useEffect } from "react";
 import { maestroService } from "@/services/maestro.service";
 import { trustService } from "@/services/trust.service";
-import { useRef } from "react";
+import { LocationPicker, LocationData } from "@/components/shared/location-picker";
+import { MapModal } from "@/components/shared/map-modal";
 import {
   User,
   Users,
@@ -39,7 +39,9 @@ export default function BusinessOnboarding() {
   const { updateUser } = useAuth();
   const [step, setStep] = useState(1);
   const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
-  const [cities, setCities] = useState<{id: string, name: string}[]>([]);
+  const [cities, setCities] = useState<{id: string, name: string, latitude: number, longitude: number}[]>([]);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<LocationData | null>(null);
   const [formData, setFormData] = useState({
     businessName: "",
     categories: [] as string[],
@@ -90,12 +92,22 @@ export default function BusinessOnboarding() {
     });
   };
 
-  const handleFinish = async () => {
+  const handleLocationSelect = (loc: LocationData) => {
+    setSelectedLocation(loc);
+    setFormData(prev => ({
+      ...prev,
+      address: loc.address,
+      latitude: loc.lat,
+      longitude: loc.lng,
+    }));
+  };
+
+  const handleFinish = async (isSkip: boolean = false) => {
     try {
       setIsUploading(true);
       
       // 1. Upload Document if present
-      if (formData.cacDocument) {
+      if (formData.cacDocument && !isSkip) {
         try {
           await trustService.uploadDocument('cac', formData.cacDocument);
         } catch (err) {
@@ -104,19 +116,27 @@ export default function BusinessOnboarding() {
       }
 
       // 2. Update Profile
-      await updateUser({
+      const payload: any = {
         isSoloOperator: formData.isSolo,
-        // Pass nested profile data for the CEO role
         profile: {
-          businessName: formData.businessName,
-          categories: formData.categories,
-          tagline: formData.description,
-          address: formData.address,
-          city: formData.city,
+          businessName: formData.businessName || "My Business",
+          categories: formData.categories.length > 0 ? formData.categories : ["Uncategorized"],
+          tagline: formData.description || "A new business on The Guild",
+          address: formData.address || "Lagos, Nigeria",
+          latitude: formData.latitude || 6.5244,
+          longitude: formData.longitude || 3.3792,
+          city: formData.city || "Lagos",
           isMobile: formData.isMobile,
           cacNumber: formData.cacNumber || "PENDING"
         }
-      } as any);
+      };
+      
+      // Only set to pending if they actually completed it, otherwise stay unverified
+      if (!isSkip) {
+        payload.verificationStatus = "pending";
+      }
+
+      await updateUser(payload);
       
       router.push("/home");
     } catch (error) {
@@ -312,27 +332,60 @@ export default function BusinessOnboarding() {
                   <p className="text-slate-500 text-lg font-medium">Where can customers find you?</p>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-5">
+                  {/* Map Location Picker */}
                   <div className="space-y-2">
-                    <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-1">Business Address</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-primary" />
-                      <Input
-                        placeholder="Enter your physical location"
-                        className="h-14 bg-slate-50 border-slate-200 rounded-2xl pl-12 font-bold text-slate-900 placeholder:text-slate-300"
-                        value={formData.address}
-                        onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      />
-                    </div>
+                    <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-1">Business Location</label>
+                    
+                    {/* Selected location preview */}
+                    {selectedLocation ? (
+                      <div className="bg-primary/5 border-2 border-primary/20 rounded-2xl p-4 flex items-start gap-3">
+                        <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-slate-900 leading-snug break-words">{selectedLocation.address}</p>
+                          <p className="text-[10px] text-slate-400 font-medium mt-1">
+                            {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setMapOpen(true)}
+                          className="text-[10px] font-extrabold text-primary uppercase tracking-widest shrink-0 hover:underline"
+                        >
+                          Change
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setMapOpen(true)}
+                        className="w-full h-14 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex items-center gap-3 px-4 text-slate-500 font-bold hover:border-primary/50 hover:bg-primary/5 hover:text-primary transition-all group"
+                      >
+                        <MapPin className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
+                        <span className="text-sm">Pick location on map</span>
+                      </button>
+                    )}
                   </div>
 
+                  {/* City Selector */}
                   <div className="space-y-2">
                     <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest px-1">City</label>
                     <div className="relative">
                       <select
                         className="w-full h-14 bg-slate-50 border border-slate-200 rounded-2xl px-4 text-slate-900 font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer"
                         value={formData.city}
-                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        onChange={(e) => {
+                          const newCityName = e.target.value;
+                          const cityData = cities.find(c => c.name === newCityName);
+                          setFormData(prev => ({ 
+                            ...prev, 
+                            city: newCityName,
+                            // Update default coords if no location selected yet
+                            ...( !selectedLocation ? {
+                              latitude: cityData?.latitude || prev.latitude,
+                              longitude: cityData?.longitude || prev.longitude
+                            } : {})
+                          }));
+                        }}
                       >
                         {cities.map((city) => (
                           <option key={city.id} value={city.name}>{city.name}</option>
@@ -343,6 +396,7 @@ export default function BusinessOnboarding() {
                     </div>
                   </div>
 
+                  {/* Mobile Services Toggle */}
                   <div
                     onClick={() => setFormData({ ...formData, isMobile: !formData.isMobile })}
                     className={cn(
@@ -364,7 +418,7 @@ export default function BusinessOnboarding() {
                     </div>
                     <div className={cn(
                       "h-6 w-6 rounded-lg border-2 flex items-center justify-center transition-all",
-                      formData.isMobile ? "bg-secondary border-secondary" : "border-white/10"
+                      formData.isMobile ? "bg-secondary border-secondary" : "border-slate-300"
                     )}>
                       {formData.isMobile && <Check className="h-4 w-4 text-white" />}
                     </div>
@@ -431,7 +485,7 @@ export default function BusinessOnboarding() {
 
                   <div className="text-center">
                     <button
-                      onClick={handleFinish}
+                      onClick={() => handleFinish(true)}
                       className="text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors underline underline-offset-4"
                     >
                       Skip for now, I'll do it later
@@ -454,11 +508,11 @@ export default function BusinessOnboarding() {
               </Button>
             )}
             <Button
-              onClick={step === 4 ? handleFinish : nextStep}
-              disabled={isUploading}
+              onClick={() => step === 4 ? handleFinish(false) : nextStep()}
+              disabled={isUploading || (step === 3 && !selectedLocation)}
               className={cn(
                 "w-full sm:flex-1 h-14 rounded-2xl bg-primary text-white font-extrabold text-lg shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all order-1 sm:order-2",
-                isUploading && "opacity-70 cursor-not-allowed"
+                (isUploading || (step === 3 && !selectedLocation)) && "opacity-50 cursor-not-allowed"
               )}
             >
               {isUploading ? "Processing..." : (step === 4 ? "Complete Setup" : "Continue")} 
@@ -467,6 +521,23 @@ export default function BusinessOnboarding() {
           </div>
         </GlassCard>
       </div>
+
+      {/* Map Modal */}
+        <MapModal 
+          isOpen={mapOpen}
+          onClose={() => setMapOpen(false)}
+          title="Pin Your Business Location"
+        >
+          <LocationPicker
+            onSelect={handleLocationSelect}
+            onClose={() => setMapOpen(false)}
+            initialLocation={selectedLocation || { 
+              lat: formData.latitude, 
+              lng: formData.longitude, 
+              address: `Centering on ${formData.city}...` 
+            }}
+          />
+        </MapModal>
     </div>
   );
 }

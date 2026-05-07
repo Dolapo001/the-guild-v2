@@ -16,5 +16,13 @@ export const walletService = {
 
   getBanks: async (): Promise<any[]> => {
     return api.get<any[]>('/wallet/banks/');
+  },
+
+  getTransactions: async (params?: { type?: string; status?: string; start_date?: string; end_date?: string }): Promise<any[]> => {
+    return api.get<any[]>('/wallet/transactions/', params);
+  },
+
+  initializePayment: async (params: { amount?: number; booking_uid?: string; order_uid?: string }): Promise<{checkout_url: string}> => {
+    return api.post<{checkout_url: string}>('/wallet/payments/intent/', params);
   }
 };

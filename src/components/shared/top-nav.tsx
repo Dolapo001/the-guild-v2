@@ -136,7 +136,7 @@ export function TopNav() {
   const unreadCount = notifications.filter(n => !n.is_read).length;
 
   const businessLogo = (user as any)?.profile?.business?.logo;
-  const avatarUrl = user?.role === "ceo" && businessLogo ? businessLogo : user?.avatar;
+  const avatarUrl = user?.avatar || (user?.role === "ceo" && businessLogo ? businessLogo : null);
 
   if (!mounted) return null;
 
@@ -278,13 +278,6 @@ export function TopNav() {
                 <span className="text-sm font-bold text-foreground">Profile Settings</span>
               </DropdownMenuItem>
             </Link>
-            <DropdownMenuItem
-              onClick={() => { }}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted cursor-pointer transition-colors"
-            >
-              <RefreshCw className="h-4 w-4 text-foreground/40" />
-              <span className="text-sm font-bold text-foreground">Switch Role (Dev)</span>
-            </DropdownMenuItem>
             <DropdownMenuSeparator className="bg-glass-border" />
             <DropdownMenuItem
               onClick={logout}

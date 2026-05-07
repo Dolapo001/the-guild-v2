@@ -72,7 +72,7 @@ export default function ActivitiesPage() {
  const fetchActivities = async () => {
     setLoading(true);
     try {
-        const bookings = await bookingService.getBookings();
+        const bookings = await bookingService.getMyBookings();
         const mapped: Activity[] = bookings.map(b => ({
             id: b.uid,
             type: 'Service',

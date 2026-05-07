@@ -58,5 +58,17 @@ export const staffService = {
     },
     resendInvitation: async (uid: string): Promise<any> => {
         return api.post(`/core/staff/invitations/${uid}/resend/`, {});
+    },
+    getShifts: async (): Promise<any[]> => {
+        return api.get<any[]>('/bookings/shifts/');
+    },
+    createShift: async (data: { staff: string; start_time: string; end_time: string; notes?: string }): Promise<any> => {
+        return api.post('/bookings/shifts/', data);
+    },
+    updateShift: async (uid: string, data: any): Promise<any> => {
+        return api.patch(`/bookings/shifts/${uid}/`, data);
+    },
+    deleteShift: async (uid: string): Promise<void> => {
+        return api.delete(`/bookings/shifts/${uid}/`);
     }
 };

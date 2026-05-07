@@ -24,7 +24,8 @@ import {
   Briefcase,
   MessageSquare,
   Image as ImageIcon,
-  Loader2
+  Loader2,
+  AlertCircle
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { BookingModal } from "@/components/shared/booking-modal";
@@ -305,11 +306,26 @@ export default function ServiceDetailPage() {
                         ₦{selectedService ? Number(selectedService.price).toLocaleString() : '0'}
                       </span>
                     </div>
+
+                    {!business.is_verified && (
+                      <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold leading-relaxed flex items-start gap-2">
+                        <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 animate-pulse" />
+                        <div>
+                          Booking Disabled: This vendor is currently unverified. Verification is required before they can accept bookings.
+                        </div>
+                      </div>
+                    )}
+
                     <Button
                       onClick={() => setIsBookingModalOpen(true)}
-                      className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-extrabold text-lg shadow-xl shadow-primary/20"
+                      disabled={!business.is_verified}
+                      className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-extrabold text-lg shadow-xl shadow-primary/20 disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none disabled:border-gray-200"
                     >
-                      Proceed to Book <ArrowRight className="ml-2 h-5 w-5" />
+                      {business.is_verified ? (
+                        <>Proceed to Book <ArrowRight className="ml-2 h-5 w-5" /></>
+                      ) : (
+                        "Booking Disabled"
+                      )}
                     </Button>
                     <p className="text-center text-[10px] font-bold text-foreground/30 uppercase tracking-widest mt-6 flex items-center justify-center gap-2">
                       <ShieldCheck className="h-3.5 w-3.5 text-accent" />
@@ -347,9 +363,10 @@ export default function ServiceDetailPage() {
           </div>
           <Button
             onClick={() => setIsBookingModalOpen(true)}
-            className="flex-1 h-12 rounded-xl bg-primary text-white font-bold"
+            disabled={!business.is_verified}
+            className="flex-1 h-12 rounded-xl bg-primary text-white font-bold disabled:bg-gray-100 disabled:text-gray-400"
           >
-            Book Now
+            {business.is_verified ? "Book Now" : "Booking Disabled"}
           </Button>
         </div>
       </div>

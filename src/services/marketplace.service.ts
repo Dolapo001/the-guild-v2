@@ -1,20 +1,111 @@
 import { api } from '../lib/api-client';
 import { Product } from '../types/api';
 
+export interface ServicePackage {
+  uid: string;
+  owner_username: string;
+  name: string;
+  description: string;
+  price: string;
+  city: string;
+  is_active: boolean;
+  services_details: any[];
+}
+
+export interface CartItem {
+  uid: string;
+  product?: Product;
+  package?: ServicePackage;
+  product_details?: Product;
+  package_details?: ServicePackage;
+  quantity: number;
+  price_at_time: string;
+}
+
+export interface Cart {
+  uid: string;
+  user_username: string;
+  city: string | null;
+  items: CartItem[];
+}
+
+export interface Order {
+  uid: string;
+  customer_name: string;
+  status: 'PENDING' | 'PAID' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  total_items_price: string;
+  total_price: string;
+  delivery_address: string;
+  city: string;
+  created_at: string;
+  items: {
+    uid: string;
+    product_details?: Product;
+    package_details?: ServicePackage;
+    quantity: number;
+    price_at_order: string;
+  }[];
+}
+
 export const marketplaceService = {
-  getProducts: async (params?: { category?: string; search?: string }): Promise<Product[]> => {
+  getProducts: async (params?: { city?: string }): Promise<Product[]> => {
     return api.get<Product[]>('/marketplace/products/', { params: params as any });
   },
 
-  createOrder: async (data: {
-    items: { product: string; quantity: number }[];
-    shipping_address: string;
-  }): Promise<any> => {
-    return api.post('/marketplace/orders/', data);
+  getPackages: async (params?: { city?: string }): Promise<ServicePackage[]> => {
+    return api.get<ServicePackage[]>('/marketplace/packages/', { params: params as any });
   },
 
-  setDeliveryFee: async (orderId: string, delivery_fee: number): Promise<any> => {
-    return api.patch(`/marketplace/orders/${orderId}/set-fee/`, { delivery_fee });
+  createPackage: async (data: any): Promise<ServicePackage> => {
+    return api.post<ServicePackage>('/marketplace/packages/', data);
+  },
+
+  getCart: async (): Promise<Cart> => {
+    return api.get<Cart>('/marketplace/cart/');
+  },
+
+  addToCart: async (data: { product_uid?: string; package_uid?: string; quantity?: number }): Promise<CartItem> => {
+    return api.post<CartItem>('/marketplace/cart/add/', data);
+  },
+
+  updateCartItem: async (uid: string, quantity: number): Promise<CartItem | null> => {
+    return api.patch<CartItem | null>(`/marketplace/cart/item/${uid}/`, { quantity });
+  },
+
+  removeCartItem: async (uid: string): Promise<any> => {
+    return api.delete(`/marketplace/cart/item/${uid}/`);
+  },
+
+  checkout: async (data: { delivery_address: string; city: string }): Promise<Order> => {
+    return api.post<Order>('/marketplace/orders/checkout/', data);
+  },
+
+  getMyOrders: async (): Promise<Order[]> => {
+    return api.get<Order[]>('/marketplace/orders/my/');
+  },
+
+  getOrderDetail: async (uid: string): Promise<Order> => {
+    return api.get<Order>(`/marketplace/orders/${uid}/`);
+  },
+
+  getProviderOrders: async (): Promise<Order[]> => {
+    return api.get<Order[]>('/marketplace/orders/manage/');
+  },
+
+  getBusinessOrders: async (): Promise<Order[]> => {
+    return api.get<Order[]>('/marketplace/orders/manage/');
+  },
+
+  setDeliveryFee: async (orderId: string, delivery_fee: number): Promise<Order> => {
+    return api.patch<Order>(`/marketplace/orders/${orderId}/fee/`, { delivery_fee });
+  },
+
+  dispatchOrder: async (orderId: string, data: { rider_name: string; rider_phone: string; logistics_company: string }): Promise<Order> => {
+    return api.post<Order>(`/marketplace/orders/${orderId}/dispatch/`, data);
+  },
+
+  updateOrderStatus: async (orderId: string, status: string): Promise<Order> => {
+    return api.patch<Order>(`/marketplace/orders/${orderId}/status/`, { status });
   },
 
   getInventory: async (): Promise<Product[]> => {
@@ -31,14 +122,6 @@ export const marketplaceService = {
 
   deleteProduct: async (uid: string): Promise<any> => {
     return api.delete(`/marketplace/products/${uid}/`);
-  },
-
-  getBusinessOrders: async (): Promise<any[]> => {
-    return api.get<any[]>('/marketplace/orders/manage/');
-  },
-
-  dispatchOrder: async (orderId: string, riderData: any): Promise<any> => {
-    return api.post(`/marketplace/orders/${orderId}/dispatch/`, riderData);
   },
 
   getLogisticsCompanies: async (): Promise<any[]> => {

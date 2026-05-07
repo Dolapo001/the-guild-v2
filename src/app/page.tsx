@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { AmbientBackground } from "@/components/shared/ambient-background";
@@ -506,7 +508,19 @@ const MaestroShowcase = () => {
 };
 
 export default function LandingPage() {
+ const { user, isLoading } = useAuth();
+ const router = useRouter();
  const [activeTab, setActiveTab] = useState<"customers" | "solo" | "teams">("customers");
+
+ useEffect(() => {
+  if (!isLoading && user) {
+   const path = user.role === "ceo" ? "/home" 
+              : user.role === "staff" ? "/staff-portal" 
+              : user.role === "admin" ? "/admin" 
+              : "/customer";
+   router.replace(path);
+  }
+ }, [user, isLoading, router]);
 
  const tabContent = {
  customers: {

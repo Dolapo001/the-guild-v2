@@ -16,13 +16,14 @@ interface Transaction {
 
 interface WalletContextType {
   balance: number;
+  tipsBalance: number;
   pendingEscrow: number;
   totalRevenue: number;
   growthPercentage: number;
   netProfit: number;
   transactions: Transaction[];
   fundWallet: (amount: number) => Promise<void>;
-  withdraw: (amount: number) => Promise<void>;
+  withdraw: (amount: number, bankCode: string, accountNumber: string) => Promise<void>;
   isObscured: boolean;
   toggleObscure: () => void;
   loading: boolean;
@@ -36,6 +37,7 @@ const WalletContext = createContext<WalletContextType | undefined>(undefined);
 export function WalletProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [balance, setBalance] = useState(0);
+  const [tipsBalance, setTipsBalance] = useState(0);
   const [pendingEscrow, setPendingEscrow] = useState(0);
   const [isObscured, setIsObscured] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -53,6 +55,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     try {
       const data = await walletService.getWalletInfo();
       setBalance(parseFloat(data.balance.toString()));
+      setTipsBalance(data.tips_balance ? parseFloat(data.tips_balance.toString()) : 0);
       setPendingEscrow(parseFloat(data.pending_escrow.toString()));
       setTotalRevenue(data.total_revenue || 0);
       setGrowthPercentage(data.growth_percentage || 0);
@@ -62,8 +65,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         date: t.created_at.split('T')[0],
         description: t.description,
         amount: parseFloat(t.amount.toString()),
-        type: ['DEBIT', 'STAFF_PAYOUT', 'OPERATING_COST'].includes(t.transaction_type) ? 'debit' : 'credit',
-        status: 'Success'
+        type: ['DEBIT', 'STAFF_PAYOUT', 'OPERATING_COST', 'COMMISSION', 'PAYOUT'].includes(t.transaction_type) ? 'debit' : 'credit',
+        status: t.status === 'SUCCESS' ? 'Success' : (t.status === 'PENDING' ? 'Pending' : 'Failed')
       })));
     } catch (err) {
       console.warn("Using empty wallet state due to fetch error", err);
@@ -85,22 +88,23 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       if (response.checkout_url) {
         window.location.href = response.checkout_url;
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Funding failed", err);
-      // Mock update
-      setBalance(prev => prev + amount);
+      toast.error(err?.data?.detail || err?.data?.message || err?.message || "Failed to initialize payment gateway.");
     }
   };
 
-  const withdraw = async (amount: number) => {
+  const withdraw = async (amount: number, bankCode: string, accountNumber: string) => {
     const toastId = toast.loading("Processing withdrawal request...");
     try {
-      await walletService.withdraw(amount, "044", "0011223344");
+      await walletService.withdraw(amount, bankCode, accountNumber);
       toast.success("Withdrawal request submitted successfully!", { id: toastId });
       fetchWallet();
-    } catch (err) {
+    } catch (err: any) {
       console.error("Withdrawal failed", err);
-      toast.error("Withdrawal failed. Please try again.", { id: toastId });
+      const msg = err?.data?.detail || err?.data?.message || err?.message || "Withdrawal failed. Please try again.";
+      toast.error(msg, { id: toastId });
+      throw new Error(msg);
     }
   };
 
@@ -109,6 +113,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   return (
     <WalletContext.Provider value={{
       balance,
+      tipsBalance,
       pendingEscrow,
       totalRevenue,
       growthPercentage,

@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { WalletProvider } from "@/contexts/WalletContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { FavoritesProvider } from "@/contexts/FavoritesContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 import { ThemeProvider } from "@/components/theme-provider";
 import { RoleSwitcher } from "@/components/shared/role-switcher";
 import { Toaster } from "sonner";
@@ -59,8 +60,9 @@ export default function RootLayout({
  <WalletProvider>
  <CartProvider>
  <FavoritesProvider>
- {children}
- <RoleSwitcher />
+  <NotificationProvider>
+   {children}
+  </NotificationProvider>
  <Toaster position="top-right" richColors expand={true} toastOptions={{
     style: {
       background: 'rgba(255, 255, 255, 0.98)',

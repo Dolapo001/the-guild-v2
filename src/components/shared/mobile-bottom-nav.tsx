@@ -141,16 +141,6 @@ export function MobileBottomNav() {
                 </div>
               </Link>
 
-              <button className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors group">
-                <div className="h-12 w-12 rounded-xl bg-accent/20 flex items-center justify-center text-accent">
-                  <RefreshCw className="h-6 w-6" />
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="font-bold text-white">Switch Role</p>
-                  <p className="text-xs text-white/40">Switch between Customer and Pro</p>
-                </div>
-              </button>
-
               <div className="pt-8">
                 <Button
                   onClick={logout}

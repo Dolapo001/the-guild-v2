@@ -54,15 +54,15 @@ export function Topbar() {
  <div className="h-8 w-px bg-glass-border mx-2" />
  <div className="flex items-center gap-3">
  <div className="text-right hidden sm:block">
- <p className="text-sm font-bold text-primary leading-none mb-1">Glow Spa Lekki</p>
+ <p className="text-sm font-bold text-primary leading-none mb-1">{user?.profile?.business?.name || user?.name || user?.username}</p>
  <div className="flex items-center justify-end gap-1 text-[10px] font-bold text-accent uppercase tracking-wider">
  <ShieldCheck className="h-3 w-3" />
  Verified Business
  </div>
  </div>
  <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
- <AvatarImage src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=100&auto=format&fit=crop" alt="Glow Spa" />
- <AvatarFallback className="bg-primary text-white text-xs">GS</AvatarFallback>
+ <AvatarImage src={user?.profile?.business?.image_url || user?.avatar} alt={user?.profile?.business?.name} />
+ <AvatarFallback className="bg-primary text-white text-xs">{(user?.profile?.business?.name || user?.username || "GS").substring(0, 2).toUpperCase()}</AvatarFallback>
  </Avatar>
  </div>
  </div>

@@ -30,24 +30,13 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { BookingModal } from "@/components/shared/booking-modal";
+import { ReviewModal } from "@/components/shared/review-modal";
 import { ServiceCard } from "@/components/ui/service-card";
 import { ProductCard } from "@/components/ui/product-card";
+import { CustomerSkeleton } from "@/components/dashboard/customer-skeleton";
 
-// Mock Recent Orders
-const RECENT_ORDERS = [
- {
- id: "ORD-882",
- name: "Organic Face Oil",
- image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=200&auto=format&fit=crop",
- status: "Out for Delivery"
- },
- {
- id: "ORD-754",
- name: "Shea Butter Tub",
- image: "https://images.unsplash.com/photo-1556228720-1987594a8a63?q=80&w=200&auto=format&fit=crop",
- status: "Delivered"
- }
-];
+// Removed hardcoded RECENT_ORDERS
+
 
 interface ActiveBooking {
   service_name?: string;
@@ -69,8 +58,16 @@ export default function CustomerDashboard() {
   const [activeBooking, setActiveBooking] = useState<Booking | null>(null);
   const [recommendations, setRecommendations] = useState<(Service | Product)[]>([]);
   const [history, setHistory] = useState<Booking[]>([]);
+  const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [cancelConfirmOpen, setCancelConfirmOpen] = useState(false);
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewBooking, setReviewBooking] = useState<{uid: string, name: string} | null>(null);
+
+  const openReviewModal = (uid: string, name: string) => {
+    setReviewBooking({ uid, name });
+    setReviewModalOpen(true);
+  };
   
   const displayName = user?.name ?? user?.username ?? "Customer";
   const [isRescheduleModalOpen, setIsRescheduleModalOpen] = useState(false);
@@ -79,11 +76,13 @@ export default function CustomerDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [bks, recs] = await Promise.all([
+        const [bks, recs, orders] = await Promise.all([
           bookingService.getBookings(),
-          maestroService.getRecommendations()
+          maestroService.getRecommendations(),
+          marketplaceService.getMyOrders()
         ]);
         
+        setRecentOrders(orders);
         // Find first active/meaningful booking
         const active = bks.find(b => ['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'DECLINED_WITH_OPTION'].includes(b.status));
         setActiveBooking(active || null);
@@ -178,7 +177,7 @@ export default function CustomerDashboard() {
   .filter((item: any) => recFilter === 'all' || item.type === recFilter)
   .slice(0, 4);
 
-  if (loading) return <div className="p-8 text-center text-primary font-bold">Loading your dashboard...</div>;
+  if (loading) return <CustomerSkeleton />;
 
  return (
  <div className="space-y-12">
@@ -395,7 +394,7 @@ export default function CustomerDashboard() {
  </div>
  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
  {filteredRecs.length > 0 ? (
- filteredRecs.map((item) => (
+  filteredRecs.map((item: any) => (
  item.type === 'service' ? (
  <ServiceCard key={item.id} service={item as any} tag={(item as any).tag} isMaestroMatch={(item as any).tag?.includes('Maestro Match')} />
  ) : (
@@ -434,12 +433,22 @@ export default function CustomerDashboard() {
    </div>
    <div className="text-right flex flex-col items-end shrink-0">
    <p className="font-black text-primary text-sm sm:text-base">₦{Number(item.total_price).toLocaleString()}</p>
+   <div className="flex items-center gap-3 mt-1">
+   {item.status === 'COMPLETED' && (
+     <button
+     onClick={(e) => { e.preventDefault(); openReviewModal(item.uid, item.service_name); }}
+     className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-widest hover:underline transition-colors flex items-center gap-1"
+     >
+       <Star className="h-3 w-3" /> Review
+     </button>
+   )}
    <Link
    href={`/marketplace`}
-   className="text-[9px] sm:text-[10px] font-black text-accent uppercase tracking-widest mt-1 hover:underline transition-colors"
+   className="text-[9px] sm:text-[10px] font-black text-accent uppercase tracking-widest hover:underline transition-colors"
    >
    Rebook
    </Link>
+   </div>
    </div>
    </GlassCard>
    ))}
@@ -459,20 +468,35 @@ export default function CustomerDashboard() {
  </Link>
  </div>
  <div className="space-y-4">
- {RECENT_ORDERS.map((order) => (
- <Link href={`/marketplace/order/${order.id}`} key={order.id} className="flex items-center gap-3 group cursor-pointer">
- <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-glass-border">
- <Image src={order.image} alt={order.name} fill className="object-cover" />
- </div>
- <div className="flex-1 min-w-0">
- <p className="text-xs font-bold text-primary truncate group-hover:text-accent transition-colors">{order.name}</p>
- <p className="text-[10px] font-mono font-bold text-foreground/40">#{order.id}</p>
- </div>
- <div className="px-2 py-1 rounded-md bg-primary/5 border border-primary/10 text-[9px] font-bold text-primary whitespace-nowrap">
- {order.status}
- </div>
- </Link>
- ))}
+ {recentOrders.length > 0 ? (
+   recentOrders.slice(0, 3).map((order) => {
+     const firstItem = order.items?.[0];
+     const name = firstItem?.product_details?.name || firstItem?.package_details?.name || "Marketplace Order";
+     const image = firstItem?.product_details?.image_url || firstItem?.package_details?.image_url || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=200&auto=format&fit=crop";
+     
+     return (
+       <Link href={`/marketplace/orders`} key={order.uid} className="flex items-center gap-3 group cursor-pointer">
+         <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-glass-border">
+           <Image src={image} alt={name} fill className="object-cover" />
+         </div>
+         <div className="flex-1 min-w-0">
+           <p className="text-xs font-bold text-primary truncate group-hover:text-accent transition-colors">{name}</p>
+           <p className="text-[10px] font-mono font-bold text-foreground/40">#{order.uid.slice(0,8)}</p>
+         </div>
+         <div className={cn(
+           "px-2 py-1 rounded-md border text-[9px] font-bold whitespace-nowrap",
+           order.status === 'DELIVERED' ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" : "bg-primary/5 border-primary/10 text-primary"
+         )}>
+           {order.status}
+         </div>
+       </Link>
+     );
+   })
+ ) : (
+   <div className="py-4 text-center">
+     <p className="text-[10px] font-bold text-foreground/30 italic">No orders yet.</p>
+   </div>
+ )}
  </div>
  </GlassCard>
  </div>
@@ -522,6 +546,16 @@ export default function CustomerDashboard() {
   </div>
  )}
  </AnimatePresence>
+
+ {reviewBooking && (
+   <ReviewModal
+     isOpen={reviewModalOpen}
+     onClose={() => setReviewModalOpen(false)}
+     bookingUid={reviewBooking.uid}
+     serviceName={reviewBooking.name}
+   />
+ )}
+
  </div>
  );
 }

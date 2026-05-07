@@ -43,9 +43,9 @@ export default function JoinPage() {
   useEffect(() => {
     const fetchInvite = async () => {
       try {
-        const response = await api.get<{ data: any }>(`/auth/staff/join/${businessSlug}/${inviteCode}/`);
-        setInvitation(response.data);
-        setFormData(prev => ({ ...prev, email: response.data.email }));
+        const response = await api.get<any>(`/auth/staff/join/${businessSlug}/${inviteCode}/`);
+        setInvitation(response);
+        setFormData(prev => ({ ...prev, email: response.email }));
       } catch (err: any) {
         setError(err?.response?.data?.message || "Invitation not found or expired.");
       } finally {

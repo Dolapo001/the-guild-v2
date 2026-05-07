@@ -79,6 +79,10 @@ export default function SearchPage() {
     verifiedOnly: false,
     radius: 15,
     selectedCategory: null,
+    minRating: null,
+    minPrice: null,
+    maxPrice: null,
+    availabilityOnly: false,
   });
   const [showFilters, setShowFilters] = useState(true);
   const [sortBy, setSortBy] = useState("recommended");
@@ -97,10 +101,15 @@ export default function SearchPage() {
       const { results } = await maestroService.getDiscovery({
         lat: userLocation.lat,
         lng: userLocation.lng,
+        radius: filters.radius,
         category: filters.selectedCategory || undefined,
         search: debouncedQuery || undefined,
+        min_rating: filters.minRating || undefined,
+        min_price: filters.minPrice || undefined,
+        max_price: filters.maxPrice || undefined,
+        availability: filters.availabilityOnly || undefined,
+        sort_by: sortBy,
       });
-      // results from backend are Businesses, we map them to Service interface for frontend
       setServices(results as any);
     } catch (err) {
       console.warn("API discovery failed", err);
@@ -112,43 +121,20 @@ export default function SearchPage() {
 
   useEffect(() => {
     fetchServices();
-  }, [userLocation, filters.selectedCategory, debouncedQuery]);
+  }, [userLocation, filters, debouncedQuery, sortBy]);
 
   const processedServices = useMemo(() => {
     let results = services;
-    
-    // Filter by Verification (if requested)
-    if (filters.verifiedOnly) {
-      results = results.filter(s => s.is_verified === true);
-    }
-
-    // Filter by City (Primary Maestro Filter) unless roaming
-    if (!roamingMode) {
-       results = results.filter(s => (s.city || '').toLowerCase() === userLocation.city.toLowerCase() || !s.city);
-    }
-
-    const mappedResults = results.map(service => ({
-      ...service,
-      distance: calculateDistance(userLocation.lat, userLocation.lng, service.lat || 6.45, service.lng || 3.60)
+    // Map backend attributes correctly to ServiceCard expectations
+    return results.map((s: any) => ({
+      ...s,
+      is_verified: s.is_verified,
+      business_name: s.provider_name || s.business_name,
+      price: s.starting_price || s.price,
+      // Calculate distance on the client if backend distance not supplied
+      distance: s.distance !== undefined ? s.distance : calculateDistance(userLocation.lat, userLocation.lng, s.lat || 6.45, s.lng || 3.60)
     }));
-
-    // Sorting Logic
-    if (sortBy === "recommended") {
-      return [...mappedResults].sort((a, b) => {
-        const scoreA = a.maestro_score || ((1 / ((a as any).distance + 1) * 0.6) + (a.rating / 5 * 0.4));
-        const scoreB = b.maestro_score || ((1 / ((b as any).distance + 1) * 0.6) + (b.rating / 5 * 0.4));
-        return scoreB - scoreA;
-      });
-    } else if (sortBy === "price_asc") {
-      return [...mappedResults].sort((a, b) => (a.price || 0) - (b.price || 0));
-    } else if (sortBy === "price_desc") {
-      return [...mappedResults].sort((a, b) => (b.price || 0) - (a.price || 0));
-    } else if (sortBy === "rating") {
-      return [...mappedResults].sort((a, b) => b.rating - a.rating);
-    }
-
-    return mappedResults;
-  }, [services, searchQuery, filters, sortBy, userLocation, roamingMode]);
+  }, [services, userLocation]);
 
   return (
     <div className="space-y-8 h-full flex flex-col">
@@ -172,7 +158,7 @@ export default function SearchPage() {
               className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary uppercase tracking-widest hover:bg-primary/20 transition-colors"
             >
               <MapPin className="h-3 w-3" />
-              Showing top results near {userLocation.city}
+              Showing all registered businesses in Nigeria
             </button>
           </div>
         </div>
@@ -282,18 +268,20 @@ export default function SearchPage() {
             </div>
           ) : (
             <AnimatePresence mode="popLayout">
-              <div className={`grid grid-cols-1 md:grid-cols-2 ${showFilters ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} gap-6 transition-all duration-300`}>
-                {processedServices.map((service, index) => (
-                  <ServiceCard
-                    key={service.uid}
-                    service={service}
-                    distance={(service as any).distance}
-                    isMaestroMatch={sortBy === "recommended" && index === 0}
-                  />
-                ))}
-              </div>
-              {processedServices.length === 0 && (
+              {processedServices.length > 0 ? (
+                <div key="services-grid" className={`grid grid-cols-1 md:grid-cols-2 ${showFilters ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} gap-6 transition-all duration-300`}>
+                  {processedServices.map((service, index) => (
+                    <ServiceCard
+                      key={service.uid || (service as any).id || `service-${index}`}
+                      service={service}
+                      distance={(service as any).distance}
+                      isMaestroMatch={sortBy === "recommended" && index === 0}
+                    />
+                  ))}
+                </div>
+              ) : (
                 <motion.div
+                  key="empty-state"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex flex-col items-center justify-center py-20 px-6 text-center bg-white/40 rounded-3xl border border-glass-border"
@@ -302,20 +290,22 @@ export default function SearchPage() {
                     <AlertCircle className="h-10 w-10 text-primary" />
                   </div>
                   <h3 className="text-2xl font-extrabold text-gray-900 mb-2">
-                    Maestro couldn't find verified pros in {userLocation.city} yet.
+                    No registered professionals found.
                   </h3>
                   <p className="text-foreground/50 font-medium max-w-md mb-8">
-                    We're expanding rapidly! In the meantime, you can view top-rated professionals across Nigeria.
+                    We couldn't find any professionals matching your search or category selection across the platform. Please try adjusting your search terms!
                   </p>
-                  <Button
-                    onClick={() => {
-                      setRoamingMode(true);
-                      toast.info("Roaming mode enabled: Showing top pros across Nigeria.");
-                    }}
-                    className="h-12 px-8 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20 flex items-center gap-2"
-                  >
-                    Show top-rated pros in Nigeria <ArrowRight className="h-4 w-4" />
-                  </Button>
+                  {!roamingMode && (
+                    <Button
+                      onClick={() => {
+                        setRoamingMode(true);
+                        toast.info("Showing verified top-rated pros across Nigeria.");
+                      }}
+                      className="h-12 px-8 rounded-xl bg-primary text-white font-bold shadow-lg shadow-primary/20 flex items-center gap-2"
+                    >
+                      Show top-rated pros in Nigeria <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

@@ -37,9 +37,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MOCK_STAFF } from "@/lib/mock-data";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { staffService } from "@/services/staff.service";
 
 export default function BusinessProfilePage() {
   const { user, updateUser } = useAuth();
@@ -57,18 +57,22 @@ export default function BusinessProfilePage() {
     toast.success("Dashboard updated! Welcome to Team Mode.");
   };
 
-  const handleRevertToSolo = () => {
-    // Mock check for active staff
-    const activeStaff = MOCK_STAFF.filter(s => s.id !== 's0'); // s0 is the owner
+  const handleRevertToSolo = async () => {
+    try {
+      const activeStaff = await staffService.getStaffList();
 
-    if (activeStaff.length > 0) {
-      setError("You cannot switch to Solo Mode while you have active staff profiles. Please archive them first.");
-      return;
+      if (activeStaff.length > 0) {
+        setError("You cannot switch to Solo Mode while you have active staff profiles. Please archive them first.");
+        return;
+      }
+
+      updateUser({ isSoloOperator: true });
+      setIsRevertModalOpen(false);
+      toast.success("Dashboard updated! Reverted to Solo Mode.");
+    } catch (err) {
+      console.error("Failed to check staff", err);
+      setError("Failed to verify staff status. Please try again.");
     }
-
-    updateUser({ isSoloOperator: true });
-    setIsRevertModalOpen(false);
-    toast.success("Dashboard updated! Reverted to Solo Mode.");
   };
 
   return (
@@ -107,8 +111,10 @@ export default function BusinessProfilePage() {
             <div className="flex flex-col md:flex-row items-start gap-8">
               <div className="relative group">
                 <Avatar className="h-32 w-32 border-4 border-white shadow-2xl">
-                  <AvatarImage src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=200&auto=format&fit=crop" />
-                  <AvatarFallback className="bg-primary text-white text-2xl font-bold">GS</AvatarFallback>
+                  <AvatarImage src={user?.profile?.business?.logo || user?.avatar} />
+                  <AvatarFallback className="bg-primary text-white text-2xl font-bold">
+                    {(user?.profile?.business?.name || user?.username || "GS").substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 {isEditing && (
                   <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
@@ -119,26 +125,26 @@ export default function BusinessProfilePage() {
               <div className="flex-1 space-y-4">
                 <div className="flex items-center gap-4">
                   {isEditing ? (
-                    <Input defaultValue="Glow Spa Lekki" className="text-3xl font-extrabold h-auto py-2 px-4 bg-white/50 border-glass-border rounded-xl text-primary" />
+                    <Input defaultValue={user?.profile?.business?.name || "My Business"} className="text-3xl font-extrabold h-auto py-2 px-4 bg-white/50 border-glass-border rounded-xl text-primary" />
                   ) : (
-                    <h2 className="text-3xl font-extrabold text-primary">Glow Spa Lekki</h2>
+                    <h2 className="text-3xl font-extrabold text-primary">{user?.profile?.business?.name || "My Business"}</h2>
                   )}
                   <Badge className={cn(
                     "px-3 py-1 font-bold flex items-center gap-1.5 border-0 tracking-widest uppercase text-[10px]",
-                    user?.verification_status === 'VERIFIED' ? "bg-accent/10 text-accent" :
-                      user?.verification_status === 'PENDING' ? "bg-amber-500/10 text-amber-600" : "bg-slate-500/10 text-slate-500"
+                    (user?.verification_status === 'VERIFIED' || user?.verificationStatus === 'VERIFIED') ? "bg-accent/10 text-accent" :
+                      (user?.verification_status === 'PENDING' || user?.verificationStatus === 'PENDING') ? "bg-amber-500/10 text-amber-600" : "bg-slate-500/10 text-slate-500"
                   )}>
-                    <ShieldCheck className="h-4 w-4" /> {user?.verification_status || 'NOT VERIFIED'}
+                    <ShieldCheck className="h-4 w-4" /> {user?.verification_status || user?.verificationStatus || 'NOT VERIFIED'}
                   </Badge>
                 </div>
                 {isEditing ? (
                   <textarea
                     className="flex min-h-[120px] w-full rounded-2xl border border-glass-border bg-white/50 px-4 py-3 text-sm font-medium text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 backdrop-blur-sm"
-                    defaultValue="Premium spa services in the heart of Lekki, Lagos. We offer massages, facials, and body treatments using organic products tailored for the Nigerian skin."
+                    defaultValue={user?.profile?.business?.description || "No description provided."}
                   />
                 ) : (
                   <p className="text-foreground/60 font-medium leading-relaxed max-w-2xl">
-                    Premium spa services in the heart of Lekki, Lagos. We offer massages, facials, and body treatments using organic products tailored for the Nigerian skin.
+                    {user?.profile?.business?.description || "No description provided."}
                   </p>
                 )}
               </div>
@@ -150,9 +156,9 @@ export default function BusinessProfilePage() {
                   <MapPin className="h-3.5 w-3.5 text-primary" /> Location
                 </h3>
                 {isEditing ? (
-                  <Input defaultValue="12 Adeola Odeku St, Victoria Island, Lagos" className="h-12 rounded-xl bg-white/50 border-glass-border" />
+                  <Input defaultValue={user?.profile?.business?.location_name || "Lagos, Nigeria"} className="h-12 rounded-xl bg-white/50 border-glass-border" />
                 ) : (
-                  <p className="text-sm font-bold text-primary">12 Adeola Odeku St, Victoria Island, Lagos</p>
+                  <p className="text-sm font-bold text-primary">{user?.profile?.business?.location_name || "Lagos, Nigeria"}</p>
                 )}
               </div>
               <div className="space-y-4">
@@ -160,9 +166,9 @@ export default function BusinessProfilePage() {
                   <Clock className="h-3.5 w-3.5 text-primary" /> Opening Hours
                 </h3>
                 {isEditing ? (
-                  <Input defaultValue="Mon - Sat: 9:00 AM - 8:00 PM" className="h-12 rounded-xl bg-white/50 border-glass-border" />
+                  <Input defaultValue={user?.profile?.business?.operating_hours || "Mon - Sat: 9:00 AM - 8:00 PM"} className="h-12 rounded-xl bg-white/50 border-glass-border" />
                 ) : (
-                  <p className="text-sm font-bold text-primary">Mon - Sat: 9:00 AM - 8:00 PM</p>
+                  <p className="text-sm font-bold text-primary">{user?.profile?.business?.operating_hours || "Mon - Sat: 9:00 AM - 8:00 PM"}</p>
                 )}
               </div>
               <div className="space-y-4">
@@ -170,9 +176,9 @@ export default function BusinessProfilePage() {
                   <Phone className="h-3.5 w-3.5 text-primary" /> Contact
                 </h3>
                 {isEditing ? (
-                  <Input defaultValue="+234 801 234 5678" className="h-12 rounded-xl bg-white/50 border-glass-border" />
+                  <Input defaultValue={user?.profile?.business?.phone || "+234 --- --- ----"} className="h-12 rounded-xl bg-white/50 border-glass-border" />
                 ) : (
-                  <p className="text-sm font-bold text-primary">+234 801 234 5678</p>
+                  <p className="text-sm font-bold text-primary">{user?.profile?.business?.phone || "Not set"}</p>
                 )}
               </div>
               <div className="space-y-4">
@@ -180,9 +186,9 @@ export default function BusinessProfilePage() {
                   <Globe className="h-3.5 w-3.5 text-primary" /> Website
                 </h3>
                 {isEditing ? (
-                  <Input defaultValue="www.glowspa.ng" className="h-12 rounded-xl bg-white/50 border-glass-border" />
+                  <Input defaultValue={user?.profile?.business?.website || "www.example.com"} className="h-12 rounded-xl bg-white/50 border-glass-border" />
                 ) : (
-                  <p className="text-sm font-bold text-primary">www.glowspa.ng</p>
+                  <p className="text-sm font-bold text-primary">{user?.profile?.business?.website || "Not set"}</p>
                 )}
               </div>
             </div>
@@ -313,7 +319,7 @@ export default function BusinessProfilePage() {
           <GlassCard className="border-white/40 shadow-2xl p-8 space-y-8">
             <DialogHeader>
               <DialogTitle className="text-3xl font-extrabold text-primary text-center">
-                Ready to grow, Glow Spa?
+                Ready to grow, {user?.profile?.business?.name || "Partner"}?
               </DialogTitle>
             </DialogHeader>
 

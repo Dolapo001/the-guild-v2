@@ -12,12 +12,30 @@ export const bookingService = {
     reference_image?: string;
     walkin_name?: string;
     walkin_phone?: string;
+    booking_type?: 'ONE_TIME' | 'SCHEDULED' | 'RECURRING';
+    recurrence_rule?: string;
+    recurrence_interval?: number;
+    recurrence_count?: number;
   }): Promise<Booking> => {
     return api.post<Booking>('/bookings/', data);
   },
 
+  getAvailability: async (serviceId: string, date: string): Promise<Array<{ start_time: string; end_time: string; is_available: boolean }>> => {
+    return api.get<Array<{ start_time: string; end_time: string; is_available: boolean }>>('/bookings/availability/', {
+      params: { service_id: serviceId, date }
+    });
+  },
+
   getBookings: async (): Promise<Booking[]> => {
     return api.get<Booking[]>('/bookings/');
+  },
+
+  getMyBookings: async (): Promise<Booking[]> => {
+    return api.get<Booking[]>('/bookings/my/');
+  },
+
+  getProviderBookings: async (): Promise<Booking[]> => {
+    return api.get<Booking[]>('/bookings/provider/');
   },
 
   getBookingDetails: async (id: string): Promise<Booking> => {
@@ -25,11 +43,11 @@ export const bookingService = {
   },
 
   updateBookingStatus: async (id: string, status: string, reason?: string): Promise<Booking> => {
-    return api.patch<Booking>(`/bookings/${id}/`, { status, reason });
+    return api.patch<Booking>(`/bookings/${id}/status/`, { status, reason });
   },
 
   assignStaff: async (id: string, staffUid: string): Promise<Booking> => {
-    return api.patch<Booking>(`/bookings/${id}/`, { staff: staffUid });
+    return api.patch<Booking>(`/bookings/${id}/assign-staff/`, { staff_uid: staffUid });
   },
 
   acceptReplacement: async (id: string, staffUid: string): Promise<Booking> => {

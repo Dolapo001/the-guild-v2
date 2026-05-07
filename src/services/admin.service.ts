@@ -8,5 +8,9 @@ export const adminService = {
 
     verifyUser: async (userUid: string, status: 'VERIFIED' | 'REJECTED'): Promise<any> => {
         return api.post(`/core/admin/verify/${userUid}/`, { status });
+    },
+
+    getStats: async (): Promise<any> => {
+        return api.get('/core/dashboard/stats/');
     }
 };

@@ -98,7 +98,7 @@ export default function VendorOrdersPage() {
     marketplaceService.getLogisticsCompanies()
    ]);
    setLogisticsCompanies(logisticsData);
-   const mappedOrders = ordersData.map(o => ({
+   const mappedOrders = ordersData.map((o: any) => ({
     ...o,
     displayId: o.uid.substring(0, 8).toUpperCase(),
     date: new Date(o.created_at).toLocaleDateString() + ", " + new Date(o.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),

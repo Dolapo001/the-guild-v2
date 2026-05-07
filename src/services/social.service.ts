@@ -27,7 +27,11 @@ export const socialService = {
         return api.post(`/social/reviews/${reviewUid}/reply/`, { reply });
     },
 
-    submitReview: async (bookingUid: string, rating: number, comment: string): Promise<any> => {
-        return api.post('/social/reviews/', { bookingUid, rating, comment });
+    createReview: async (params: { bookingUid: string, rating: number, comment?: string, images?: string[] }): Promise<any> => {
+        return api.post('/social/reviews/', params);
+    },
+
+    moderateReview: async (reviewUid: string, status: 'PENDING' | 'APPROVED' | 'REJECTED'): Promise<any> => {
+        return api.patch(`/social/reviews/${reviewUid}/moderate/`, { status });
     }
 };

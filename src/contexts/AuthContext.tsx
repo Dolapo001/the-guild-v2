@@ -18,9 +18,9 @@ interface AuthContextType {
   error: string | null;
 }
 
-const getRedirectPath = (role: UserRole) => {
-  switch (role) {
-    case "customer": return "/";
+const getRedirectPath = (user: User) => {
+  switch (user.role) {
+    case "customer": return "/customer";
     case "ceo": return "/home";
     case "staff": return "/staff-portal";
     case "admin": return "/admin";
@@ -39,6 +39,36 @@ const normalizeUser = (u: User): User => ({
   name: u.name ?? u.username,
 });
 
+const safeSaveUserToStorage = (userObj: User) => {
+  try {
+    const cleanUser = { ...userObj };
+    if (cleanUser.avatar && cleanUser.avatar.startsWith("data:") && cleanUser.avatar.length > 200000) {
+      cleanUser.avatar = "large_base64_stripped";
+    }
+    if ((cleanUser as any).profile) {
+      const p = { ...(cleanUser as any).profile };
+      if (p.avatar && p.avatar.startsWith("data:") && p.avatar.length > 200000) {
+        p.avatar = "large_base64_stripped";
+      }
+      if (p.portfolio && Array.isArray(p.portfolio)) {
+        p.portfolio = p.portfolio.map((item: any) => {
+          if (item.image && item.image.startsWith("data:") && item.image.length > 100000) {
+            return { ...item, image: "stripped_portfolio_image" };
+          }
+          return item;
+        });
+      }
+      (cleanUser as any).profile = p;
+    }
+    localStorage.setItem("the-guild-user", JSON.stringify(cleanUser));
+  } catch (error) {
+    console.warn("Storage quota exceeded or unavailable. Retaining user in memory only:", error);
+    try {
+      localStorage.removeItem("the-guild-user");
+    } catch {}
+  }
+};
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -48,16 +78,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check for stored user on mount
-    try {
-      const storedUser = localStorage.getItem("the-guild-user");
-      if (storedUser) {
-        setUser(normalizeUser(JSON.parse(storedUser)));
+    // Check for stored user on mount and fetch fresh profile from backend
+    const initAuth = async () => {
+      try {
+        const storedUser = localStorage.getItem("the-guild-user");
+        if (storedUser) {
+          const parsedUser = normalizeUser(JSON.parse(storedUser));
+          setUser(parsedUser);
+          
+          // Fetch fresh profile details from backend
+          const freshUser = await authService.getProfile();
+          if (freshUser) {
+            const normalized = normalizeUser(freshUser);
+            setUser(normalized);
+            safeSaveUserToStorage(normalized);
+          }
+        }
+      } catch (err) {
+        console.warn("Auth initialization failed or user not logged in:", err);
+      } finally {
+        setIsLoading(false);
       }
-    } catch {
-      localStorage.removeItem("the-guild-user");
-    }
-    setIsLoading(false);
+    };
+    initAuth();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -69,8 +112,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const normalizedUser = normalizeUser(response.user);
         setUser(normalizedUser);
         localStorage.setItem("the-guild-token", response.access);
-        localStorage.setItem("the-guild-user", JSON.stringify(normalizedUser));
-        router.push(getRedirectPath(response.user.role));
+        if (response.refresh) {
+          localStorage.setItem("the-guild-refresh", response.refresh);
+        }
+        safeSaveUserToStorage(normalizedUser);
+        router.push(getRedirectPath(normalizedUser));
       }
     } catch (err: any) {
       const message = err?.data?.detail || err?.data?.message || "Login failed. Please check your credentials.";
@@ -90,8 +136,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const normalizedUser = normalizeUser(response.user);
         setUser(normalizedUser);
         localStorage.setItem("the-guild-token", response.access);
-        localStorage.setItem("the-guild-user", JSON.stringify(normalizedUser));
-        router.push(getRedirectPath(response.user.role));
+        if (response.refresh) {
+          localStorage.setItem("the-guild-refresh", response.refresh);
+        }
+        safeSaveUserToStorage(normalizedUser);
+        
+        // New CEOs go to onboarding, others use standard redirect
+        if (normalizedUser.role === "ceo") {
+          router.push("/onboarding/business");
+        } else {
+          router.push(getRedirectPath(normalizedUser));
+        }
       }
     } catch (err: any) {
       const message = err?.data?.detail || err?.data?.message || "Registration failed. Please try again.";
@@ -121,9 +176,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         const normalized = normalizeUser(updatedUser);
         setUser(normalized);
-        localStorage.setItem("the-guild-user", JSON.stringify(normalized));
+        safeSaveUserToStorage(normalized);
         toast.success(`Welcome to the ${role} dashboard!`, { id: toastId });
-        router.push(getRedirectPath(normalized.role));
+        router.push(getRedirectPath(normalized));
       } catch (error) {
         console.error("Failed to update role:", error);
         toast.error("Failed to switch roles.", { id: toastId });
@@ -140,7 +195,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         const normalized = normalizeUser(updatedUser);
         setUser(normalized);
-        localStorage.setItem("the-guild-user", JSON.stringify(normalized));
+        safeSaveUserToStorage(normalized);
       } catch (error) {
         console.error("Failed to update verification status:", error);
       }
@@ -157,7 +212,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         const normalized = normalizeUser(updatedUser);
         setUser(normalized);
-        localStorage.setItem("the-guild-user", JSON.stringify(normalized));
+        safeSaveUserToStorage(normalized);
         toast.success("Profile updated successfully!", { id: toastId });
       } catch (error) {
         console.error("Failed to update user:", error);

@@ -34,5 +34,9 @@ export const authService = {
 
   updateProfile: async (data: Partial<User>): Promise<User> => {
     return api.patch<User>('/auth/profile/', data);
+  },
+
+  validateInvitation: async (email: string, code: string): Promise<any> => {
+    return api.get<any>(`/auth/invitations/validate/?email=${encodeURIComponent(email)}&code=${encodeURIComponent(code)}`);
   }
 };
