@@ -35,6 +35,7 @@ import {
   Save,
   Edit2,
   ChevronRight,
+  Trash2,
   Search,
   AlertCircle,
   Rocket,
@@ -58,6 +59,16 @@ import { staffService } from "@/services/staff.service";
 import { walletService } from "@/services/wallet.service";
 import { maestroService } from "@/services/maestro.service";
 import Link from "next/link";
+
+const getImageUrl = (url: string | null | undefined) => {
+  if (!url) return "";
+  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:")) {
+    return url;
+  }
+  const baseUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1").replace("/api/v1", "");
+  return `${baseUrl}${url}`;
+};
+
 import { toast } from "sonner";
 
 // --- Sub-components ---
@@ -844,6 +855,67 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
   });
   const [newPortfolio, setNewPortfolio] = useState({ title: "", description: "", image: null as File | null });
   const [portfolioPreview, setPortfolioPreview] = useState<string | null>(null);
+  const [editingPortfolio, setEditingPortfolio] = useState<any | null>(null);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+
+  const handleLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const bizUid = (user as any).businesses?.[0]?.uid || (user as any).profile?.business?.uid;
+    if (!bizUid) {
+      toast.error("No business found associated with your CEO profile.");
+      return;
+    }
+
+    const toastId = toast.loading("Uploading business logo...");
+    setIsUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append('logo', file);
+
+      const res = await maestroService.uploadBusinessAssets(bizUid, formData);
+      if (res && res.logo) {
+        setProfileData((prev: any) => ({ ...prev, logo: res.logo }));
+        toast.success("Logo uploaded successfully!", { id: toastId });
+      }
+    } catch (err: any) {
+      console.error("Failed to upload logo:", err);
+      toast.error(err?.message || "Error uploading logo.", { id: toastId });
+    } finally {
+      setIsUploadingLogo(false);
+    }
+  };
+
+  const handleBannerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const bizUid = (user as any).businesses?.[0]?.uid || (user as any).profile?.business?.uid;
+    if (!bizUid) {
+      toast.error("No business found associated with your CEO profile.");
+      return;
+    }
+
+    const toastId = toast.loading("Uploading business banner...");
+    setIsUploadingBanner(true);
+    try {
+      const formData = new FormData();
+      formData.append('banner', file);
+
+      const res = await maestroService.uploadBusinessAssets(bizUid, formData);
+      if (res && res.banner) {
+        setProfileData((prev: any) => ({ ...prev, banner: res.banner }));
+        toast.success("Banner uploaded successfully!", { id: toastId });
+      }
+    } catch (err: any) {
+      console.error("Failed to upload banner:", err);
+      toast.error(err?.message || "Error uploading banner.", { id: toastId });
+    } finally {
+      setIsUploadingBanner(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -954,6 +1026,60 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
     }
   };
 
+  const handleSavePortfolio = async () => {
+    if (!editingPortfolio) return;
+    const toastId = toast.loading("Updating portfolio work...");
+    setIsAdding(true);
+    try {
+      let updatedEntry;
+      if (newPortfolio.image) {
+        const formData = new FormData();
+        formData.append('title', newPortfolio.title);
+        formData.append('description', newPortfolio.description);
+        formData.append('image', newPortfolio.image);
+        updatedEntry = await maestroService.updatePortfolioEntry(editingPortfolio.uid, formData);
+      } else {
+        const payload = {
+          title: newPortfolio.title,
+          description: newPortfolio.description
+        };
+        updatedEntry = await maestroService.updatePortfolioEntry(editingPortfolio.uid, payload);
+      }
+
+      setProfileData({
+        ...profileData,
+        portfolio: profileData.portfolio.map((p: any) => p.uid === editingPortfolio.uid ? updatedEntry : p)
+      });
+      setIsPortfolioModalOpen(false);
+      setEditingPortfolio(null);
+      toast.success("Portfolio work updated successfully!", { id: toastId });
+    } catch (err: any) {
+      console.error("Failed to update portfolio:", err);
+      toast.error(err?.message || "Failed to update portfolio work.", { id: toastId });
+    } finally {
+      setIsAdding(false);
+    }
+  };
+
+  const handleDeletePortfolio = async () => {
+    if (!editingPortfolio) return;
+    if (!confirm("Are you sure you want to remove this work from your portfolio?")) return;
+    const toastId = toast.loading("Removing portfolio work...");
+    try {
+      await maestroService.deletePortfolioEntry(editingPortfolio.uid);
+      setProfileData({
+        ...profileData,
+        portfolio: profileData.portfolio.filter((p: any) => p.uid !== editingPortfolio.uid)
+      });
+      setIsPortfolioModalOpen(false);
+      setEditingPortfolio(null);
+      toast.success("Portfolio item removed successfully!", { id: toastId });
+    } catch (err: any) {
+      console.error("Failed to delete portfolio entry:", err);
+      toast.error(err?.message || "Failed to remove portfolio entry.", { id: toastId });
+    }
+  };
+
   const handleScaleUp = () => {
     updateUser({ isSoloOperator: false });
     setIsScaleModalOpen(false);
@@ -997,45 +1123,69 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
       {/* Header Section: Banner + Logo */}
       <div className="relative h-48 md:h-80 w-full rounded-[1.5rem] md:rounded-[2.5rem] bg-slate-100 group shadow-premium">
         <div className="absolute inset-0 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden z-0">
-          <Image
-            src={profileData.banner || "https://images.unsplash.com/photo-1519415510236-85591bf59386?q=80&w=1200&auto=format&fit=crop"}
-            alt="Banner"
-            fill
-            className="object-cover"
-          />
+          {isUploadingBanner ? (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+              <Loader2 className="h-12 w-12 text-white animate-spin" />
+            </div>
+          ) : (
+            <img
+              src={getImageUrl(profileData.banner) || "https://images.unsplash.com/photo-1519415510236-85591bf59386?q=80&w=1200&auto=format&fit=crop"}
+              alt="Banner"
+              className="object-cover w-full h-full"
+            />
+          )}
           <div className="absolute inset-0 bg-black/30 group-hover:bg-black/20 transition-all duration-500" />
         </div>
         
-        {isEditing && (
+        {isEditing && !isUploadingBanner && (
           <div className="absolute top-4 right-4 md:top-6 md:right-6 z-20">
             <Button 
               variant="secondary" 
               className="rounded-full bg-white/90 backdrop-blur-md text-primary font-bold shadow-xl scale-75 md:scale-100"
-              onClick={() => toast.info("Feature coming soon: Dynamic Banner Upload.")}
+              onClick={() => document.getElementById("banner-upload-input")?.click()}
             >
               <ImageIcon className="h-4 w-4 mr-2" /> Change Banner
             </Button>
           </div>
         )}
+        <input
+          id="banner-upload-input"
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleBannerChange}
+        />
 
         <div className="absolute -bottom-1 left-0 right-0 md:left-12 md:right-auto flex flex-col md:flex-row items-center md:items-end gap-4 md:gap-10 z-10 pointer-events-none">
           <div className="relative translate-y-1/2 pointer-events-auto">
             <div className="h-32 w-32 md:h-44 md:w-44 rounded-[1.5rem] md:rounded-[2.5rem] bg-white p-2 md:p-4 border-[4px] md:border-[6px] border-white shadow-2xl relative overflow-hidden group/logo">
-              <Image
-                src={profileData.logo || "/placeholder-logo.png"}
-                alt="Logo"
-                fill
-                className="object-contain p-2 md:p-4"
-              />
-              {isEditing && (
+              {isUploadingLogo ? (
+                <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                  <Loader2 className="h-8 w-8 text-primary animate-spin" />
+                </div>
+              ) : (
+                <img
+                  src={getImageUrl(profileData.logo) || "/placeholder-logo.png"}
+                  alt="Logo"
+                  className="object-contain w-full h-full p-2 md:p-4"
+                />
+              )}
+              {isEditing && !isUploadingLogo && (
                 <button 
-                  onClick={() => toast.info("Feature coming soon: Dynamic Logo Upload.")}
+                  onClick={() => document.getElementById("logo-upload-input")?.click()}
                   className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover/logo:opacity-100 transition-opacity cursor-pointer border-none outline-none w-full h-full"
                 >
                   <Camera className="h-5 w-5 md:h-8 md:w-8 text-white" />
                 </button>
               )}
             </div>
+            <input
+              id="logo-upload-input"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleLogoChange}
+            />
           </div>
           <div className="pb-4 md:pb-8 pointer-events-auto text-center md:text-left px-4 md:px-0">
             <motion.h2 
@@ -1154,7 +1304,12 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                       size="sm" 
                       className="h-7 text-[10px] font-black text-primary uppercase"
                       disabled={user?.verificationStatus !== 'verified'}
-                      onClick={() => setIsPortfolioModalOpen(true)}
+                      onClick={() => {
+                        setEditingPortfolio(null);
+                        setNewPortfolio({ title: "", description: "", image: null });
+                        setPortfolioPreview(null);
+                        setIsPortfolioModalOpen(true);
+                      }}
                     >
                       <ImageIcon className="h-3 w-3 mr-1" /> Manage
                     </Button>
@@ -1164,9 +1319,22 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                   {profileData.portfolio?.length > 0 ? (
                     profileData.portfolio.slice(0, 4).map((entry: any) => (
                       <div key={entry.uid} className="relative aspect-square rounded-xl overflow-hidden group/item">
-                        <Image src={entry.image} alt={entry.title || "Portfolio Work"} fill className="object-cover" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center">
-                          <Edit2 className="h-4 w-4 text-white" />
+                        <img 
+                          src={getImageUrl(entry.image)} 
+                          alt={entry.description || entry.title || "Portfolio Work"} 
+                          title={entry.title || entry.description} 
+                          className="object-cover w-full h-full" 
+                        />
+                        <div 
+                          onClick={() => {
+                            setEditingPortfolio(entry);
+                            setNewPortfolio({ title: entry.title || "", description: entry.description || "", image: null });
+                            setPortfolioPreview(getImageUrl(entry.image));
+                            setIsPortfolioModalOpen(true);
+                          }}
+                          className="absolute inset-0 bg-black/40 opacity-0 group-hover/item:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
+                        >
+                          <Edit2 className="h-5 w-5 text-white" />
                         </div>
                       </div>
                     ))
@@ -1177,7 +1345,12 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                         variant="ghost" 
                         size="sm" 
                         className="mt-2 text-[10px] font-black text-secondary uppercase"
-                        onClick={() => setIsPortfolioModalOpen(true)}
+                        onClick={() => {
+                          setEditingPortfolio(null);
+                          setNewPortfolio({ title: "", description: "", image: null });
+                          setPortfolioPreview(null);
+                          setIsPortfolioModalOpen(true);
+                        }}
                       >
                         <Camera className="h-3 w-3 mr-1" /> Upload Work
                       </Button>
@@ -1399,33 +1572,36 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
               <CreditCard className="h-5 w-5 text-accent/40" />
             </div>
             
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 grid-cols-1">
               <div className="space-y-3">
-                <FormLabel>Payout Destination</FormLabel>
+                <FormLabel>Bank Name</FormLabel>
                 {isEditing ? (
                   <div className="relative group">
-                    <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/30 group-focus-within:text-accent transition-colors" />
+                    <Building2 className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/30 group-focus-within:text-accent transition-colors z-10" />
                     <select
                       value={profileData.bankName}
                       onChange={(e) => setProfileData({ ...profileData, bankName: e.target.value })}
-                      className="w-full h-16 rounded-[2rem] bg-white/40 border-glass-border pl-14 pr-5 text-sm font-black text-foreground focus:border-accent focus:ring-0 outline-none transition-all appearance-none"
+                      className="w-full h-16 rounded-[1.5rem] bg-white border border-glass-border pl-14 pr-10 text-sm font-bold text-slate-800 focus:border-accent focus:ring-0 outline-none transition-all appearance-none cursor-pointer"
                     >
-                      <option value="" disabled>Select Bank...</option>
+                      <option value="" disabled className="text-slate-400 bg-white">Select Bank...</option>
                       {banks.map(bank => (
-                        <option key={bank.uid} value={bank.name}>{bank.name}</option>
+                        <option key={bank.uid || bank.id || bank.name} value={bank.name} className="text-slate-800 bg-white">
+                          {bank.name}
+                        </option>
                       ))}
                     </select>
+                    <ChevronRight className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/30 rotate-90 pointer-events-none" />
                   </div>
                 ) : (
-                  <div className="flex items-center gap-4 px-6 py-4 bg-accent/5 rounded-3xl border border-accent/10">
-                    <Building2 className="h-6 w-6 text-accent" />
-                    <p className="text-sm font-black text-foreground">{profileData.bankName || "No Bank Linked"}</p>
+                  <div className="flex items-center gap-4 px-6 py-5 bg-accent/5 rounded-[1.5rem] border border-accent/10">
+                    <Building2 className="h-6 w-6 text-accent shrink-0" />
+                    <p className="text-base font-black text-foreground">{profileData.bankName || "No Bank Linked"}</p>
                   </div>
                 )}
               </div>
 
               <div className="space-y-3">
-                <FormLabel>Unified Account Number</FormLabel>
+                <FormLabel>Account Number</FormLabel>
                 {isEditing ? (
                   <div className="relative group">
                     <CreditCard className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-foreground/30 group-focus-within:text-accent transition-colors" />
@@ -1433,17 +1609,17 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                       value={profileData.accountNumber}
                       maxLength={10}
                       onChange={(e) => handleAccountNumberChange(e.target.value)}
-                      className="pl-14 h-16 rounded-[2rem] bg-white/40 border-glass-border focus:border-accent font-black text-lg"
+                      className="pl-14 h-16 rounded-[1.5rem] bg-white border border-glass-border focus:border-accent font-black text-xl tracking-widest text-slate-800"
                     />
                     {isFetchingAccount && (
                       <Loader2 className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-accent animate-spin" />
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-4 px-6 py-4 bg-accent/5 rounded-3xl border border-accent/10">
-                    <CreditCard className="h-6 w-6 text-accent" />
-                    <p className="text-sm font-mono font-black tracking-widest text-foreground">
-                      {profileData.accountNumber ? `**** **** ${profileData.accountNumber.slice(-4)}` : "Not Provided"}
+                  <div className="flex items-center gap-4 px-6 py-5 bg-accent/5 rounded-[1.5rem] border border-accent/10">
+                    <CreditCard className="h-6 w-6 text-accent shrink-0" />
+                    <p className="text-lg font-mono font-black tracking-wider text-foreground">
+                      {profileData.accountNumber || "Not Provided"}
                     </p>
                   </div>
                 )}
@@ -1451,16 +1627,19 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
 
               {profileData.accountName && (
                 <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
+                  initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="p-6 rounded-3xl bg-accent text-white shadow-2xl shadow-accent/20"
+                  className="p-6 rounded-[1.5rem] bg-primary text-white shadow-xl flex items-center justify-between gap-6"
                 >
-                  <FormLabel className="text-white/60 mb-2">Verified Merchant Entity</FormLabel>
-                  <p className="text-lg font-black uppercase tracking-tight">{profileData.accountName}</p>
-                  <div className="flex justify-between items-center mt-4">
-                    <Badge className="bg-white/20 text-white font-black text-[9px] uppercase px-3 py-1 border-0">CAC Linked</Badge>
-                    <CheckCircle2 className="h-8 w-8 text-white" />
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">Verified Merchant Entity</p>
+                    <p className="text-lg font-black uppercase tracking-tight">{profileData.accountName}</p>
+                    <div className="flex gap-2 mt-2">
+                      <Badge className="bg-white/20 text-white font-black text-[9px] uppercase px-3 py-1 border-0">CAC Linked</Badge>
+                      <Badge className="bg-white/10 text-white font-black text-[9px] uppercase px-3 py-1 border-0">Escrow Ready</Badge>
+                    </div>
                   </div>
+                  <CheckCircle2 className="h-10 w-10 text-white shrink-0" />
                 </motion.div>
               )}
             </div>
@@ -1703,12 +1882,14 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
         </DialogContent>
       </Dialog>
 
-      {/* Add Portfolio Modal */}
+      {/* Add / Edit Portfolio Modal */}
       <Dialog open={isPortfolioModalOpen} onOpenChange={setIsPortfolioModalOpen}>
         <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border-0 bg-transparent shadow-none">
           <GlassCard className="border-white/40 shadow-2xl p-8 space-y-6">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-extrabold text-primary">Add Portfolio Work</DialogTitle>
+              <DialogTitle className="text-2xl font-extrabold text-primary">
+                {editingPortfolio ? "Edit Portfolio Work" : "Add Portfolio Work"}
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div 
@@ -1716,7 +1897,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                 onClick={() => document.getElementById('portfolio-upload')?.click()}
               >
                 {portfolioPreview ? (
-                  <Image src={portfolioPreview} alt="Preview" fill className="object-cover" />
+                  <img src={portfolioPreview} alt="Preview" className="object-cover w-full h-full" />
                 ) : (
                   <>
                     <Camera className="h-10 w-10 text-primary/30 group-hover:scale-110 transition-transform" />
@@ -1738,7 +1919,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                 />
               </div>
               <div className="space-y-2">
-                <FormLabel>Work Title</FormLabel>
+                <FormLabel>Work Title / Caption</FormLabel>
                 <Input 
                   placeholder="e.g. Wedding Catering"
                   value={newPortfolio.title}
@@ -1746,13 +1927,42 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                   className="h-12 rounded-xl bg-white/40 border-glass-border"
                 />
               </div>
-              <Button 
-                onClick={handleAddPortfolio}
-                disabled={isAdding}
-                className="w-full h-14 bg-primary text-white font-bold rounded-2xl shadow-lg mt-4"
-              >
-                {isAdding ? <Loader2 className="h-5 w-5 animate-spin" /> : "Publish Work"}
-              </Button>
+              <div className="space-y-2">
+                <FormLabel>Alt Text / Description</FormLabel>
+                <textarea
+                  placeholder="Describe your work (acts as image alt text for SEO)"
+                  value={newPortfolio.description}
+                  onChange={(e) => setNewPortfolio({...newPortfolio, description: e.target.value})}
+                  className="w-full h-24 p-3 rounded-xl bg-white/40 border border-glass-border text-sm resize-none focus:outline-none focus:ring-1 focus:ring-primary/20"
+                />
+              </div>
+              {editingPortfolio ? (
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <Button 
+                    variant="destructive"
+                    onClick={handleDeletePortfolio}
+                    disabled={isAdding}
+                    className="h-14 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <Trash2 className="h-5 w-5" /> Delete
+                  </Button>
+                  <Button 
+                    onClick={handleSavePortfolio}
+                    disabled={isAdding}
+                    className="h-14 bg-primary text-white font-bold rounded-2xl shadow-lg flex items-center justify-center gap-2"
+                  >
+                    {isAdding ? <Loader2 className="h-5 w-5 animate-spin" /> : "Save Changes"}
+                  </Button>
+                </div>
+              ) : (
+                <Button 
+                  onClick={handleAddPortfolio}
+                  disabled={isAdding || !newPortfolio.image}
+                  className="w-full h-14 bg-primary text-white font-bold rounded-2xl shadow-lg mt-4"
+                >
+                  {isAdding ? <Loader2 className="h-5 w-5 animate-spin" /> : "Publish Work"}
+                </Button>
+              )}
             </div>
           </GlassCard>
         </DialogContent>
@@ -1874,25 +2084,43 @@ export default function ProfilePage() {
     setIsSaving(true);
     try {
       // Map to backend structure
-      const updateData = {
+      const updateData: any = {
         name: profileData.name,
-        email: profileData.email,
-        avatar: profileData.avatar,
-        profile: {
-          ...profileData,
-          // Sync camelCase to Backend snake_case/expected keys
-          businessName: profileData.businessName,
-          cacNumber: profileData.cacNumber,
+      };
+
+      // Only attach avatar if it's a newly uploaded base64 data URI
+      if (profileData.avatar && typeof profileData.avatar === 'string' && profileData.avatar.startsWith('data:')) {
+        updateData.avatar = profileData.avatar;
+      }
+
+      // Prepare profile payload securely
+      const cleanProfile = { ...profileData };
+      
+      // Clean up string images from profile to avoid key crashes
+      if (cleanProfile.avatar && !cleanProfile.avatar.startsWith('data:')) {
+        delete cleanProfile.avatar;
+      }
+      if (cleanProfile.logo && !cleanProfile.logo.startsWith('data:')) {
+        delete cleanProfile.logo;
+      }
+      if (cleanProfile.banner && !cleanProfile.banner.startsWith('data:')) {
+        delete cleanProfile.banner;
+      }
+
+      updateData.profile = {
+        ...cleanProfile,
+        // Sync camelCase to Backend snake_case/expected keys
+        businessName: profileData.businessName,
+        cacNumber: profileData.cacNumber,
+        bankName: profileData.bankName,
+        accountNumber: profileData.accountNumber,
+        accountName: profileData.accountName,
+        schedule: profileData.schedule,
+        jobTitle: profileData.jobTitle,
+        bank_details: {
           bankName: profileData.bankName,
           accountNumber: profileData.accountNumber,
-          accountName: profileData.accountName,
-          schedule: profileData.schedule,
-          jobTitle: profileData.jobTitle,
-          bank_details: {
-            bankName: profileData.bankName,
-            accountNumber: profileData.accountNumber,
-            accountName: profileData.accountName
-          }
+          accountName: profileData.accountName
         }
       };
       

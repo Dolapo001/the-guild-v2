@@ -34,8 +34,17 @@ export const maestroService = {
   addPortfolioEntry: async (businessUid: string, data: FormData) =>
     api.post(`/maestro/business/${businessUid}/portfolio/`, data),
 
+  updatePortfolioEntry: async (entryUid: string, data: any) =>
+    api.patch(`/maestro/portfolio/${entryUid}/`, data),
+
+  deletePortfolioEntry: async (entryUid: string) =>
+    api.delete(`/maestro/portfolio/${entryUid}/`),
+
   submitVerification: async (businessUid: string, data: FormData) =>
     api.post(`/maestro/business/${businessUid}/verify-submit/`, data),
+
+  uploadBusinessAssets: async (businessUid: string, data: FormData) =>
+    api.post<{ logo?: string; banner?: string }>(`/maestro/portal/business/${businessUid}/upload-assets/`, data),
 
   chatbot: async (message: string) => api.post<{ response: string }>('/maestro/chatbot/', { message }),
 };

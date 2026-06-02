@@ -536,7 +536,7 @@ export default function InventoryPage() {
         {isAddModalOpen && (
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
             <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-0 bg-transparent shadow-none">
-              <GlassCard className="border-white/40 shadow-2xl p-8 space-y-6 bg-white/95 backdrop-blur-2xl">
+              <GlassCard className="border-white/40 shadow-2xl p-8 space-y-6 bg-white/95 backdrop-blur-2xl max-h-[90vh] md:max-h-[85vh] overflow-y-auto scrollbar-thin">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-extrabold text-primary">
                     {editingProduct ? "Modify Product Listing" : "Add Marketplace Product"}
@@ -673,7 +673,7 @@ export default function InventoryPage() {
         {isPackageModalOpen && (
           <Dialog open={isPackageModalOpen} onOpenChange={setIsPackageModalOpen}>
             <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-0 bg-transparent shadow-none">
-              <GlassCard className="border-white/40 shadow-2xl p-8 space-y-6 bg-white/95 backdrop-blur-2xl">
+              <GlassCard className="border-white/40 shadow-2xl p-8 space-y-6 bg-white/95 backdrop-blur-2xl max-h-[90vh] md:max-h-[85vh] overflow-y-auto scrollbar-thin">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-extrabold text-primary">Bundle Service Package</DialogTitle>
                 </DialogHeader>
