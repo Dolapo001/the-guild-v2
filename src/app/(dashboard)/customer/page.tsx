@@ -394,11 +394,11 @@ export default function CustomerDashboard() {
  </div>
  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
  {filteredRecs.length > 0 ? (
-  filteredRecs.map((item: any) => (
+  filteredRecs.map((item: any, index: number) => (
  item.type === 'service' ? (
- <ServiceCard key={item.id} service={item as any} tag={(item as any).tag} isMaestroMatch={(item as any).tag?.includes('Maestro Match')} />
+ <ServiceCard key={item.uid || item.id || index} service={item as any} tag={(item as any).tag} isMaestroMatch={(item as any).tag?.includes('Maestro Match')} />
  ) : (
- <ProductCard key={item.id} product={item as any} isMaestroMatch={(item as any).tag?.includes('Maestro Match')} />
+ <ProductCard key={item.uid || item.id || index} product={item as any} isMaestroMatch={(item as any).tag?.includes('Maestro Match')} />
  )
  ))
  ) : (
