@@ -188,7 +188,7 @@ export default function DashboardHome() {
   const dashboardStats = [
     {
       title: "Total Revenue",
-      value: `₦ ${(statsData?.total_revenue ?? 0).toLocaleString()}`,
+      value: `₦ ${(statsData?.totalRevenue ?? 0).toLocaleString()}`,
       change: statsData?.trends?.revenue ?? "0%",
       trend: getTrendDirection(statsData?.trends?.revenue),
       icon: CreditCard,
@@ -197,7 +197,7 @@ export default function DashboardHome() {
     },
     {
       title: "Active Bookings",
-      value: (statsData?.active_bookings ?? 0).toString(),
+      value: (statsData?.activeBookings ?? 0).toString(),
       change: statsData?.trends?.bookings ?? "0",
       trend: getTrendDirection(statsData?.trends?.bookings),
       icon: Calendar,
@@ -206,7 +206,7 @@ export default function DashboardHome() {
     },
     !user?.isSoloOperator && {
       title: "Staff Active",
-      value: (statsData?.staff_active ?? 0).toString(),
+      value: (statsData?.staffActive ?? 0).toString(),
       change: statsData?.trends?.staff ?? "0",
       trend: getTrendDirection(statsData?.trends?.staff),
       icon: Users,
@@ -216,8 +216,8 @@ export default function DashboardHome() {
     {
       title: user?.role === 'admin' ? "Pending Verifications" : "Satisfaction Rating",
       value: user?.role === 'admin' 
-        ? (statsData?.pending_verifications ?? 0).toString() 
-        : (statsData?.average_rating ?? 0.0).toFixed(1),
+        ? (statsData?.pendingVerifications ?? 0).toString() 
+        : (statsData?.averageRating ?? 0.0).toFixed(1),
       change: statsData?.trends?.rating ?? "0",
       trend: getTrendDirection(statsData?.trends?.rating),
       icon: user?.role === 'admin' ? AlertCircle : Star,
@@ -548,16 +548,16 @@ export default function DashboardHome() {
             >
               <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                 <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-primary/5 flex items-center justify-center font-black text-primary group-hover:bg-primary group-hover:text-white transition-all uppercase shrink-0 text-sm">
-                  {(booking.customer_name || booking.customer || "?")[0]}
+                  {(booking.customerName || booking.customer || "?")[0]}
                 </div>
                 <div className="min-w-0">
-                  <p className="font-bold text-primary truncate text-sm sm:text-base">{booking.customer_name || "Customer"}</p>
-                  <p className="text-[10px] sm:text-xs font-medium text-foreground/40 truncate">{booking.service_name || booking.service} • {booking.start_time}</p>
+                  <p className="font-bold text-primary truncate text-sm sm:text-base">{booking.customerName || "Customer"}</p>
+                  <p className="text-[10px] sm:text-xs font-medium text-foreground/40 truncate">{booking.serviceName || booking.service} • {booking.startTime}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 sm:gap-4 shrink-0">
                 <div className="text-right hidden xs:block">
-                  <p className="text-xs font-bold text-primary">₦{(Number(booking.total_price) || 0).toLocaleString()}</p>
+                  <p className="text-xs font-bold text-primary">₦{(Number(booking.totalPrice) || 0).toLocaleString()}</p>
                   <div className="flex items-center justify-end gap-1.5 mt-0.5">
                     <span className={cn(
                       "h-1.5 w-1.5 rounded-full",
@@ -590,8 +590,8 @@ export default function DashboardHome() {
               <div className="space-y-6">
                 <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
                   <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-1">Booking Details</p>
-                  <p className="font-bold text-primary">{selectedBooking.service_name}</p>
-                  <p className="text-sm font-medium text-foreground/50">{selectedBooking.customer_name} • {selectedBooking.start_time || 'No time'}</p>
+                  <p className="font-bold text-primary">{selectedBooking.serviceName}</p>
+                  <p className="text-sm font-medium text-foreground/50">{selectedBooking.customerName} • {selectedBooking.startTime || 'No time'}</p>
                 </div>
 
                 <div className="space-y-4">

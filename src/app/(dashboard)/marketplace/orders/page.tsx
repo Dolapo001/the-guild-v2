@@ -66,7 +66,7 @@ export default function OrdersPage() {
     const matchesTab = activeTab === 'All' || order.status === activeTab;
     const matchesSearch = order.uid.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           order.items.some(item => {
-                            const name = item.product_details?.name || item.package_details?.name || "";
+                            const name = item.productDetails?.name || item.packageDetails?.name || "";
                             return name.toLowerCase().includes(searchTerm.toLowerCase());
                           });
     return matchesTab && matchesSearch;
@@ -153,8 +153,8 @@ export default function OrdersPage() {
                         {/* Thumbnails */}
                         <div className="flex -space-x-4">
                           {order.items.slice(0, 3).map((item, idx) => {
-                            const detail = (item.product_details || item.package_details) as any;
-                            const image = detail?.image_url || "/placeholder-product.png";
+                            const detail = (item.productDetails || item.packageDetails) as any;
+                            const image = detail?.imageUrl || "/placeholder-product.png";
                             return (
                               <div
                                 key={idx}
@@ -179,9 +179,9 @@ export default function OrdersPage() {
                             <span className="text-xs font-bold text-foreground/40">City: {order.city}</span>
                           </div>
                           <h3 className="font-extrabold text-gray-900 line-clamp-1">
-                            {order.items.map(item => item.product_details?.name || item.package_details?.name || "Service Package").join(", ")}
+                            {order.items.map(item => item.productDetails?.name || item.packageDetails?.name || "Service Package").join(", ")}
                           </h3>
-                          <p className="text-lg font-black text-primary">₦{Number(order.total_price).toLocaleString()}</p>
+                          <p className="text-lg font-black text-primary">₦{Number(order.totalPrice).toLocaleString()}</p>
                         </div>
 
                         {/* Status & Actions */}

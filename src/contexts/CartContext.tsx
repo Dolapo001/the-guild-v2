@@ -45,15 +45,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const data = await marketplaceService.getCart();
       setCartCity(data.city);
       setCart(data.items.map(item => {
-        const detail = (item.product_details || item.package_details) as any;
+        const detail = (item.productDetails || item.packageDetails) as any;
         return {
           id: item.uid,
-          product_uid: item.product_details?.uid,
-          package_uid: item.package_details?.uid,
+          product_uid: item.productDetails?.uid,
+          package_uid: item.packageDetails?.uid,
           name: detail?.name || "Unknown Item",
           price: Number(detail?.price) || 0,
           quantity: item.quantity,
-          image: detail?.image_url || "/placeholder-product.png",
+          image: detail?.imageUrl || "/placeholder-product.png",
           category: detail?.category || "Marketplace",
           city: detail?.city || "Lagos"
         };

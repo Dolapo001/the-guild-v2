@@ -128,9 +128,9 @@ export default function SearchPage() {
     // Map backend attributes correctly to ServiceCard expectations
     return results.map((s: any) => ({
       ...s,
-      is_verified: s.is_verified,
-      business_name: s.provider_name || s.business_name,
-      price: s.starting_price || s.price,
+      isVerified: s.isVerified,
+      businessName: s.providerName || s.businessName,
+      price: s.startingPrice || s.price,
       // Calculate distance on the client if backend distance not supplied
       distance: s.distance !== undefined ? s.distance : calculateDistance(userLocation.lat, userLocation.lng, s.lat || 6.45, s.lng || 3.60)
     }));

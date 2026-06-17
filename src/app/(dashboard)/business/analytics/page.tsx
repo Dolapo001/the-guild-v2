@@ -96,28 +96,28 @@ export default function BusinessAnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="Total Revenue" 
-          value={`₦${revenueData?.summary.total_revenue?.toLocaleString() || 0}`} 
+          value={`₦${revenueData?.summary.totalRevenue?.toLocaleString() || 0}`} 
           icon={<DollarSign className="h-5 w-5" />}
           trend="+12.5%"
           isUp={true}
         />
         <StatCard 
           title="Total Bookings" 
-          value={bookingsData?.summary.total_bookings || 0} 
+          value={bookingsData?.summary.totalBookings || 0} 
           icon={<Calendar className="h-5 w-5" />}
           trend="+8.2%"
           isUp={true}
         />
         <StatCard 
           title="Repeat Customers" 
-          value={customersData?.summary.repeat_customers || 0} 
+          value={customersData?.summary.repeatCustomers || 0} 
           icon={<Users className="h-5 w-5" />}
           trend="-2.4%"
           isUp={false}
         />
         <StatCard 
           title="Success Rate" 
-          value={`${Math.round(((bookingsData?.summary.completed_bookings || 0) / (bookingsData?.summary.total_bookings || 1)) * 100)}%`} 
+          value={`${Math.round(((bookingsData?.summary.completedBookings || 0) / (bookingsData?.summary.totalBookings || 1)) * 100)}%`} 
           icon={<TrendingUp className="h-5 w-5" />}
           trend="+5.1%"
           isUp={true}
@@ -184,7 +184,7 @@ export default function BusinessAnalyticsPage() {
           </div>
           <div className="h-[300px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={peakData?.peak_hours || []}>
+              <BarChart data={peakData?.peakHours || []}>
                 <XAxis dataKey="hour" axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 10, fill: '#94a3b8'}} />
                 <Tooltip cursor={{fill: 'rgba(139, 92, 246, 0.05)'}} />
@@ -205,8 +205,8 @@ export default function BusinessAnalyticsPage() {
               <PieChart>
                 <Pie
                   data={[
-                    { name: "New", value: (customersData?.summary.unique_customers || 0) - (customersData?.summary.repeat_customers || 0) },
-                    { name: "Returning", value: customersData?.summary.repeat_customers || 0 }
+                    { name: "New", value: (customersData?.summary.uniqueCustomers || 0) - (customersData?.summary.repeatCustomers || 0) },
+                    { name: "Returning", value: customersData?.summary.repeatCustomers || 0 }
                   ]}
                   innerRadius={60}
                   outerRadius={80}

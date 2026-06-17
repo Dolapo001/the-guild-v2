@@ -101,7 +101,7 @@ export default function CheckoutPage() {
     try {
       // Create order atomically on backend
       const order = await marketplaceService.checkout({
-        delivery_address: `${deliveryDetails.address}. Note: ${deliveryDetails.instructions}. Contact: ${deliveryDetails.name} (${deliveryDetails.phone})`,
+        deliveryAddress: `${deliveryDetails.address}. Note: ${deliveryDetails.instructions}. Contact: ${deliveryDetails.name} (${deliveryDetails.phone})`,
         city: deliveryDetails.city
       });
 

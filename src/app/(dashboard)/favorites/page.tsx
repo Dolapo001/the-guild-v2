@@ -31,7 +31,7 @@ export default function FavoritesPage() {
  const favoriteProducts = favorites.filter(f => f.type === 'product');
 
  const filteredBusinesses = favoriteBusinesses.filter(f =>
-    (f.data?.business_name || f.data?.name || '').toLowerCase().includes(searchTerm.toLowerCase())
+    (f.data?.businessName || f.data?.name || '').toLowerCase().includes(searchTerm.toLowerCase())
  );
 
  const filteredProducts = favoriteProducts.filter(f =>

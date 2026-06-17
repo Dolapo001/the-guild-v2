@@ -30,7 +30,7 @@ export default function VerificationPage() {
   
   // Map backend status to frontend view status
   const getInitialStatus = (): VerificationStatus => {
-    const s = user?.verificationStatus?.toLowerCase() || user?.verification_status?.toLowerCase();
+    const s = user?.verificationStatus?.toLowerCase() || user?.verificationStatus?.toLowerCase();
     if (s === "verified") return "verified";
     if (s === "pending") return "pending";
     if (s === "rejected") return "error";
@@ -38,10 +38,10 @@ export default function VerificationPage() {
   };
 
   const [status, setStatus] = useState<VerificationStatus>(getInitialStatus());
-  const [cacNumber, setCacNumber] = useState(user?.profile?.cac_number || "");
-  const [businessName, setBusinessName] = useState(user?.profile?.business_name || "");
+  const [cacNumber, setCacNumber] = useState(user?.profile?.cacNumber || "");
+  const [businessName, setBusinessName] = useState(user?.profile?.businessName || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(user?.verification_status === "REJECTED" ? "Verification was rejected. Please re-submit with correct documents." : "");
+  const [errorMessage, setErrorMessage] = useState(user?.verificationStatus === "REJECTED" ? "Verification was rejected. Please re-submit with correct documents." : "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,11 +1,11 @@
 import { api } from '../lib/api-client';
 
 export interface DashboardStats {
-    total_revenue: number;
-    active_bookings: number;
-    staff_active: number;
-    pending_verifications: number;
-    average_rating: number;
+    totalRevenue: number;
+    activeBookings: number;
+    staffActive: number;
+    pendingVerifications: number;
+    averageRating: number;
     trends: {
         revenue: string;
         bookings: string;

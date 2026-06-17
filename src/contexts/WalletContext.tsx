@@ -55,17 +55,17 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     try {
       const data = await walletService.getWalletInfo();
       setBalance(parseFloat(data.balance.toString()));
-      setTipsBalance(data.tips_balance ? parseFloat(data.tips_balance.toString()) : 0);
-      setPendingEscrow(parseFloat(data.pending_escrow.toString()));
-      setTotalRevenue(data.total_revenue || 0);
-      setGrowthPercentage(data.growth_percentage || 0);
-      setNetProfit(data.net_profit || 0);
+      setTipsBalance(data.tipsBalance ? parseFloat(data.tipsBalance.toString()) : 0);
+      setPendingEscrow(parseFloat(data.pendingEscrow.toString()));
+      setTotalRevenue(data.totalRevenue || 0);
+      setGrowthPercentage(data.growthPercentage || 0);
+      setNetProfit(data.netProfit || 0);
       setTransactions((data.transactions || []).map((t: any) => ({
         id: t.uid,
-        date: t.created_at.split('T')[0],
+        date: t.createdAt.split('T')[0],
         description: t.description,
         amount: parseFloat(t.amount.toString()),
-        type: ['DEBIT', 'STAFF_PAYOUT', 'OPERATING_COST', 'COMMISSION', 'PAYOUT'].includes(t.transaction_type) ? 'debit' : 'credit',
+        type: ['DEBIT', 'STAFF_PAYOUT', 'OPERATING_COST', 'COMMISSION', 'PAYOUT'].includes(t.transactionType) ? 'debit' : 'credit',
         status: t.status === 'SUCCESS' ? 'Success' : (t.status === 'PENDING' ? 'Pending' : 'Failed')
       })));
     } catch (err) {
@@ -85,8 +85,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const fundWallet = async (amount: number) => {
     try {
       const response = await walletService.fundWallet(amount);
-      if (response.checkout_url) {
-        window.location.href = response.checkout_url;
+      if (response.checkoutUrl) {
+        window.location.href = response.checkoutUrl;
       }
     } catch (err: any) {
       console.error("Funding failed", err);

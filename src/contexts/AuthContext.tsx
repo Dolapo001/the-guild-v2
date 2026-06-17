@@ -28,14 +28,9 @@ const getRedirectPath = (user: User) => {
   }
 };
 
-/** Normalize API user response to include both snake_case and camelCase alias fields */
+/** Backend sends camelCase directly now; the only convenience is a display `name`. */
 const normalizeUser = (u: User): User => ({
   ...u,
-  // Sync camelCase aliases from snake_case fields and vice versa
-  verification_status: u.verification_status ?? (u.verificationStatus as any),
-  verificationStatus: (u.verificationStatus ?? u.verification_status) as any,
-  is_solo_operator: u.is_solo_operator ?? u.isSoloOperator,
-  isSoloOperator: u.isSoloOperator ?? u.is_solo_operator,
   name: u.name ?? u.username,
 });
 
@@ -189,9 +184,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const setVerificationStatus = async (status: VerificationStatus) => {
     if (user) {
       try {
-        const updatedUser = await authService.updateProfile({ verification_status: status } as any).catch(err => {
+        const updatedUser = await authService.updateProfile({ verificationStatus: status } as any).catch(err => {
           console.warn("Backend update failed, updating locally only:", err);
-          return { ...user, verification_status: status, verificationStatus: status };
+          return { ...user, verificationStatus: status };
         });
         const normalized = normalizeUser(updatedUser);
         setUser(normalized);

@@ -26,7 +26,7 @@ export const bookingService = {
   createBooking: async (data: any): Promise<Booking> => api.post<Booking>('/bookings/', data),
 
   getAvailability: async (serviceId: string, date: string) =>
-    api.get<Array<{ start_time: string; end_time: string; is_available: boolean }>>(
+    api.get<Array<{ startTime: string; endTime: string; isAvailable: boolean }>>(
       '/bookings/availability/', { params: { service_id: serviceId, date } },
     ),
 
@@ -45,10 +45,10 @@ export const bookingService = {
     api.patch<Booking>(`/bookings/${id}/status/`, { status, reason }),
 
   assignStaff: async (id: string, staffUid: string) =>
-    api.patch<Booking>(`/bookings/${id}/assign-staff/`, { staff_uid: staffUid }),
+    api.patch<Booking>(`/bookings/${id}/assign-staff/`, { staffUid: staffUid }),
 
   acceptReplacement: async (id: string, staffUid: string) =>
-    api.post<Booking>(`/bookings/${id}/accept-replacement/`, { staff_uid: staffUid }),
+    api.post<Booking>(`/bookings/${id}/accept-replacement/`, { staffUid: staffUid }),
 
   updateSopChecklist: async (bookingId: string, checklist: any) =>
     api.patch(`/bookings/${bookingId}/sop-checklist/`, { checklist }),
@@ -76,8 +76,8 @@ export interface Shift {
   uid: string;
   staff: string;
   business: string;
-  start_time: string;
-  end_time: string;
+  startTime: string;
+  endTime: string;
   status: 'SCHEDULED' | 'COMPLETED' | 'MISSED';
   notes?: string;
 }

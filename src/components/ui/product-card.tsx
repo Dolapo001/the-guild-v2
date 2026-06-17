@@ -15,7 +15,7 @@ interface ProductCardProps {
   name: string;
   category: string;
   image?: string;
-  image_url?: string;
+  imageUrl?: string;
   rating?: number;
   price: number;
   tag?: string;
@@ -39,7 +39,7 @@ export function ProductCard({ product, isMaestroMatch, onAddToCart }: ProductCar
   }
  };
 
- const image = product.image_url || product.image || "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=200&auto=format&fit=crop";
+ const image = product.imageUrl || product.image || "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=200&auto=format&fit=crop";
 
  return (
  <motion.div

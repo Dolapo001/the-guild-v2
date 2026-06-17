@@ -26,8 +26,8 @@ export interface StaffMember {
   avatar: string;
   profile?: {
     performance?: {
-      average_rating: number;
-      total_jobs: number;
+      averageRating: number;
+      totalJobs: number;
     }
   }
 }
@@ -115,10 +115,10 @@ export function StaffProfileModal({ isOpen, onClose, staff, onBookNow }: StaffPr
  </h2>
  <div className="flex items-center gap-4 mt-2 text-sm font-medium text-foreground/60">
  <span className="flex items-center gap-1 text-amber-500 font-bold">
- <Star className="h-4 w-4 fill-amber-500" /> {staff.profile?.performance?.average_rating || 5.0}
+ <Star className="h-4 w-4 fill-amber-500" /> {staff.profile?.performance?.averageRating || 5.0}
  </span>
  <span className="flex items-center gap-1">
- <Briefcase className="h-4 w-4" /> {staff.profile?.performance?.total_jobs || 0}+ Jobs Completed
+ <Briefcase className="h-4 w-4" /> {staff.profile?.performance?.totalJobs || 0}+ Jobs Completed
  </span>
  <span className="flex items-center gap-1 text-green-600 ">
  <ShieldCheck className="h-4 w-4" /> Verified Pro

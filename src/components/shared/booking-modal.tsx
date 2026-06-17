@@ -63,7 +63,7 @@ const getRandomStaff = (staffList: any[]) => {
 export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 'book', initialData }: BookingModalProps) {
  const [step, setStep] = useState<Step>("services");
  const [isLoading, setIsLoading] = useState(false);
- const [availableSlots, setAvailableSlots] = useState<Array<{ start_time: string, end_time: string, is_available: boolean }>>([]);
+ const [availableSlots, setAvailableSlots] = useState<Array<{ startTime: string, endTime: string, isAvailable: boolean }>>([]);
  const [loadingSlots, setLoadingSlots] = useState(false);
 
  const [bookingState, setBookingState] = useState<BookingState>({
@@ -216,9 +216,9 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  business: service.uid || service.id,
  service: targetSvc.uid || targetSvc.id,
  date: dateStr,
- start_time: timeStr,
+ startTime: timeStr,
  staff: bookingState.staffId === 'AUTO' ? undefined : bookingState.staffId,
- special_note: bookingState.specialNote,
+ specialNote: bookingState.specialNote,
  booking_type: bookingState.bookingType,
  recurrence_rule: bookingState.bookingType === 'RECURRING' ? bookingState.recurrenceRule : undefined,
  recurrence_interval: bookingState.bookingType === 'RECURRING' ? bookingState.recurrenceInterval : undefined,
@@ -352,7 +352,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <div>
  <span className="font-bold text-gray-900 group-hover:text-primary transition-colors block">{s.name}</span>
  <span className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest flex items-center gap-1 mt-1">
- <Clock className="h-3 w-3" /> {s.duration_minutes || 60} Mins
+ <Clock className="h-3 w-3" /> {s.durationMinutes || 60} Mins
  </span>
  </div>
  </div>
@@ -411,22 +411,22 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  ) : availableSlots.length > 0 ? (
  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
  {availableSlots.map((slot) => {
- const isSelected = bookingState.timeSlot === slot.start_time;
+ const isSelected = bookingState.timeSlot === slot.startTime;
  return (
  <button
- key={slot.start_time}
- disabled={!slot.is_available}
- onClick={() => updateState('timeSlot', slot.start_time)}
+ key={slot.startTime}
+ disabled={!slot.isAvailable}
+ onClick={() => updateState('timeSlot', slot.startTime)}
  className={cn(
  "py-2.5 px-2 rounded-xl border-2 text-xs font-bold transition-all",
  isSelected
  ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
- : slot.is_available
+ : slot.isAvailable
  ? "bg-white/40 border-transparent hover:border-primary/30 text-foreground/80"
  : "bg-gray-100/50 border-transparent text-gray-300 cursor-not-allowed"
  )}
  >
- {slot.start_time}
+ {slot.startTime}
  </button>
  );
  })}

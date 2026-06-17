@@ -112,23 +112,23 @@ export default function StaffPortal() {
         
         const mappedTasks = schedule.map((b: any) => ({
           id: b.uid,
-          customer: b.customer_details?.name || b.customer_name || b.walkin_name || 'Guest',
-          customerAvatar: b.customer_details?.avatar || '',
-          service: b.service_name || b.service?.name || 'Premium Treatment',
-          time: b.start_time,
-          endTime: b.end_time,
+          customer: b.customerDetails?.name || b.customerName || b.walkinName || 'Guest',
+          customerAvatar: b.customerDetails?.avatar || '',
+          service: b.serviceName || b.service?.name || 'Premium Treatment',
+          time: b.startTime,
+          endTime: b.endTime,
           status: b.status.toLowerCase().replace('_', '-'),
-          location: b.business?.location_name || "Wellness Suite",
-          price: b.total_price,
-          duration: `${b.service?.duration_minutes || 60} Mins`,
-          sop_checklist: b.sop_checklist || [],
+          location: b.business?.locationName || "Wellness Suite",
+          price: b.totalPrice,
+          duration: `${b.service?.durationMinutes || 60} Mins`,
+          sopChecklist: b.sopChecklist || [],
           date: b.date,
-          customerNote: b.special_note || "No specific notes provided.",
-          referenceImage: b.reference_image || "https://images.unsplash.com/photo-1544161515-4ae6ce6ea858?q=80&w=400&auto=format&fit=crop",
+          customerNote: b.specialNote || "No specific notes provided.",
+          referenceImage: b.referenceImage || "https://images.unsplash.com/photo-1544161515-4ae6ce6ea858?q=80&w=400&auto=format&fit=crop",
           contact: { 
-            phone: b.customer_details?.phone || "08012345678", 
-            email: b.customer_details?.email || "customer@example.com", 
-            whatsapp: b.customer_details?.phone || "2348012345678" 
+            phone: b.customerDetails?.phone || "08012345678", 
+            email: b.customerDetails?.email || "customer@example.com", 
+            whatsapp: b.customerDetails?.phone || "2348012345678" 
           }
         }));
         
@@ -143,18 +143,18 @@ export default function StaffPortal() {
           if (activeJobRes) {
             const currentActiveTask = {
               id: activeJobRes.uid,
-              customer: activeJobRes.customer?.name || activeJobRes.walkin_name || 'Guest',
+              customer: activeJobRes.customer?.name || activeJobRes.walkinName || 'Guest',
               service: activeJobRes.service?.name,
-              time: activeJobRes.start_time,
-              endTime: activeJobRes.end_time,
+              time: activeJobRes.startTime,
+              endTime: activeJobRes.endTime,
               status: activeJobRes.status.toLowerCase().replace('_', '-'),
-              location: activeJobRes.business?.location_name,
-              price: activeJobRes.total_price,
-              duration: `${activeJobRes.service?.duration_minutes || 60} Mins`,
-              sop_checklist: activeJobRes.sop_checklist || [],
+              location: activeJobRes.business?.locationName,
+              price: activeJobRes.totalPrice,
+              duration: `${activeJobRes.service?.durationMinutes || 60} Mins`,
+              sopChecklist: activeJobRes.sopChecklist || [],
               date: activeJobRes.date,
-              customerNote: activeJobRes.special_note || "No specific notes provided.",
-              referenceImage: activeJobRes.reference_image || "https://images.unsplash.com/photo-1544161515-4ae6ce6ea858?q=80&w=400&auto=format&fit=crop",
+              customerNote: activeJobRes.specialNote || "No specific notes provided.",
+              referenceImage: activeJobRes.referenceImage || "https://images.unsplash.com/photo-1544161515-4ae6ce6ea858?q=80&w=400&auto=format&fit=crop",
               contact: { phone: activeJobRes.customer?.phone || "08012345678", email: activeJobRes.customer?.email || "customer@example.com", whatsapp: activeJobRes.customer?.phone || "2348012345678" }
             };
             setSelectedDate(activeJobRes.date);
@@ -365,7 +365,7 @@ export default function StaffPortal() {
    >
    <div>
    <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-800">Staff Portal</h1>
-   <p className="text-slate-600 font-semibold text-sm sm:text-base">Hello, {user?.name || user?.first_name || user?.username?.split('@')[0] || "Pro"}.</p>
+   <p className="text-slate-600 font-semibold text-sm sm:text-base">Hello, {user?.name || user?.firstName || user?.username?.split('@')[0] || "Pro"}.</p>
    </div>
 
    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
@@ -391,7 +391,7 @@ export default function StaffPortal() {
    </div>
    <div className="flex items-center justify-center gap-2 bg-accent/20 text-accent px-4 py-2 sm:px-5 sm:py-2.5 rounded-2xl border border-accent/20 shadow-lg shadow-accent/5">
    <Star className="h-4 w-4 sm:h-5 w-5 fill-accent" />
-   <span className="font-black text-sm sm:text-lg">{(user as any)?.profile?.average_rating || "0.0"}</span>
+   <span className="font-black text-sm sm:text-lg">{(user as any)?.profile?.averageRating || "0.0"}</span>
    </div>
    </div>
    </motion.div>
@@ -416,13 +416,13 @@ export default function StaffPortal() {
    {request.uid[0]}
    </div>
    <div className="min-w-0">
-   <p className="font-black text-slate-800 dark:text-white text-base sm:text-lg truncate">{request.customer_name || 'Guest'}</p>
-   <p className="text-[10px] font-bold text-gray-500 truncate">{request.service_name}</p>
+   <p className="font-black text-slate-800 dark:text-white text-base sm:text-lg truncate">{request.customerName || 'Guest'}</p>
+   <p className="text-[10px] font-bold text-gray-500 truncate">{request.serviceName}</p>
    </div>
    </div>
    <div className="text-right shrink-0">
-   <p className="text-base sm:text-lg font-black text-slate-800 dark:text-white">₦{Number(request.total_price).toLocaleString()}</p>
-   <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{request.start_time}</p>
+   <p className="text-base sm:text-lg font-black text-slate-800 dark:text-white">₦{Number(request.totalPrice).toLocaleString()}</p>
+   <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{request.startTime}</p>
    </div>
    </div>
    <div className="flex gap-2">
@@ -510,7 +510,7 @@ export default function StaffPortal() {
      const hasJobs = !!jobData;
      const isSelected = selectedDate === dateStr;
      const isToday = new Date().toISOString().split('T')[0] === dateStr;
-     const dayShifts = shifts.filter(s => s.start_time.startsWith(dateStr));
+     const dayShifts = shifts.filter(s => s.startTime.startsWith(dateStr));
      const hasShift = dayShifts.length > 0;
 
      return (
@@ -567,7 +567,7 @@ export default function StaffPortal() {
   </h3>
   
   {(() => {
-    const selectedDayShifts = shifts.filter(s => s.start_time.startsWith(selectedDate));
+    const selectedDayShifts = shifts.filter(s => s.startTime.startsWith(selectedDate));
     return selectedDayShifts.length > 0 ? (
       <div className="space-y-3 mb-6">
         <h4 className="text-[9px] font-bold text-blue-500 uppercase tracking-widest px-1">Assigned Shifts</h4>
@@ -578,7 +578,7 @@ export default function StaffPortal() {
             </div>
             <div>
               <p className="text-sm font-black text-blue-900">
-                {new Date(shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {new Date(shift.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(shift.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
               {shift.notes && <p className="text-[10px] font-semibold text-blue-600/70">{shift.notes}</p>}
             </div>

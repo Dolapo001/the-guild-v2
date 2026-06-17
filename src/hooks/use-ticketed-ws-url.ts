@@ -30,7 +30,7 @@ export function useTicketedWsUrl(path: string | null): string | null {
         return;
       }
       try {
-        const res = await api.post<{ token: string; expires_in: number }>(
+        const res = await api.post<{ token: string; expiresIn: number }>(
           "/auth/ws/ticket/",
           {},
         );
@@ -38,7 +38,7 @@ export function useTicketedWsUrl(path: string | null): string | null {
         const base = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:8000";
         setUrl(`${base}${path}?ticket=${encodeURIComponent(res.token)}`);
         // Refresh ~10s before expiry.
-        const refreshIn = Math.max(10_000, (res.expires_in - 10) * 1000);
+        const refreshIn = Math.max(10_000, (res.expiresIn - 10) * 1000);
         timer = setTimeout(refresh, refreshIn);
       } catch {
         if (cancelled) return;

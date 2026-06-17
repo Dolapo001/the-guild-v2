@@ -66,15 +66,15 @@ export default function ActiveJobPage() {
         const booking = await bookingService.getActiveJob();
         if (booking) {
             setActiveBooking(booking);
-            setChecklist(Array.isArray(booking.sop_checklist) ? booking.sop_checklist : [
+            setChecklist(Array.isArray(booking.sopChecklist) ? booking.sopChecklist : [
                 { id: 1, text: "Client Checked In", completed: true },
                 { id: 2, text: "Consultation Done", completed: true },
                 { id: 3, text: "Service Completed", completed: false },
                 { id: 4, text: "Workspace Cleaned", completed: false },
             ]);
             setJobStatus('running');
-            // Starting elapsed time based on booking.updated_at
-            const startStr = booking.updated_at || new Date().toISOString();
+            // Starting elapsed time based on booking.updatedAt
+            const startStr = booking.updatedAt || new Date().toISOString();
             const diff = Math.floor((new Date().getTime() - new Date(startStr).getTime()) / 1000);
             setElapsedTime(Math.max(0, diff));
         } else {
@@ -129,7 +129,7 @@ export default function ActiveJobPage() {
      if (!activeBooking.uid.startsWith('mock-')) {
          await bookingService.updateBookingStatus(activeBooking.uid, 'IN_PROGRESS', item.name);
      }
-     setActiveBooking(prev => prev ? { ...prev, total_price: (prev.total_price || 0) + item.price } : null);
+     setActiveBooking(prev => prev ? { ...prev, totalPrice: (prev.totalPrice || 0) + item.price } : null);
      toast.success(`Successfully added ${item.name}!`);
    } catch (err) {
      console.error("Add extra failed", err);
@@ -229,7 +229,7 @@ export default function ActiveJobPage() {
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16 border-2 border-primary shadow-lg">
-              <AvatarImage src={activeBooking.customer_avatar || ""} />
+              <AvatarImage src={activeBooking.customerAvatar || ""} />
               <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">{activeBooking.customer[0]}</AvatarFallback>
             </Avatar>
             <div>
@@ -451,7 +451,7 @@ export default function ActiveJobPage() {
                   <div className="px-6 pb-6 pt-0">
                     <div className="p-5 rounded-2xl bg-amber-50 border border-amber-200/80">
                       <p className="text-sm font-semibold text-amber-800 leading-relaxed">
-                        {activeBooking.special_note || "No client notes for this booking."}
+                        {activeBooking.specialNote || "No client notes for this booking."}
                       </p>
                     </div>
                   </div>
@@ -480,7 +480,7 @@ export default function ActiveJobPage() {
 
             <div className="flex justify-between items-center px-2">
               <span className="text-lg font-black text-slate-700">Total Earnings</span>
-              <span className="text-3xl font-black text-primary">₦{(activeBooking.total_price || 0).toLocaleString()}</span>
+              <span className="text-3xl font-black text-primary">₦{(activeBooking.totalPrice || 0).toLocaleString()}</span>
             </div>
           </div>
 

@@ -73,7 +73,7 @@ export default function JoinPage() {
 
       // Explicitly accept invitation
       await api.post(`/auth/staff/join/${businessSlug}/${inviteCode}/`);
-      toast.success(`Successfully joined ${invitation?.business_name}!`);
+      toast.success(`Successfully joined ${invitation?.businessName}!`);
       setSuccess(true);
       setTimeout(() => router.push("/home"), 3000);
     } catch (err: any) {
@@ -119,7 +119,7 @@ export default function JoinPage() {
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Aboard!</h1>
           <p className="text-gray-500 mb-8 font-medium">
-            You have successfully joined <span className="text-primary font-bold">{invitation?.business_name}</span> as a {invitation?.job_title}.
+            You have successfully joined <span className="text-primary font-bold">{invitation?.businessName}</span> as a {invitation?.jobTitle}.
           </p>
           <p className="text-xs text-gray-400">Redirecting to your dashboard...</p>
         </GlassCard>
@@ -134,9 +134,9 @@ export default function JoinPage() {
           <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-white shadow-xl mb-6 overflow-hidden">
             <Building2 className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-extrabold text-primary tracking-tight">Join {invitation?.business_name}</h1>
+          <h1 className="text-3xl font-extrabold text-primary tracking-tight">Join {invitation?.businessName}</h1>
           <p className="text-foreground/60 font-medium mt-2">
-            You've been invited to join the team as a <span className="text-primary font-bold">{invitation?.job_title}</span>.
+            You've been invited to join the team as a <span className="text-primary font-bold">{invitation?.jobTitle}</span>.
           </p>
         </div>
 

@@ -76,10 +76,10 @@ export default function ActivitiesPage() {
         const mapped: Activity[] = bookings.map(b => ({
             id: b.uid,
             type: 'Service',
-            title: b.service_details?.name || 'Service',
+            title: b.serviceDetails?.name || 'Service',
             subtitle: b.business?.name || 'Business',
             date: b.date,
-            amount: `₦${Number(b.total_price).toLocaleString()}`,
+            amount: `₦${Number(b.totalPrice).toLocaleString()}`,
             status: b.status.replace('_', ' ').toLowerCase().split(' ').map(s => s.charAt(0).toUpperCase() + s.substring(1)).join(' ') as any,
             hasReview: !!b.review
         }));

@@ -268,7 +268,7 @@ export default function MarketplacePage() {
         /* Products Grid */
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredProds.map((product) => {
-            const hasStock = product.stock_count > 0;
+            const hasStock = product.stockCount > 0;
             return (
               <motion.div
                 key={product.uid}
@@ -278,7 +278,7 @@ export default function MarketplacePage() {
               >
                 <div className="relative aspect-square w-full bg-gray-100 overflow-hidden">
                   <Image
-                    src={product.image_url || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=300&auto=format&fit=crop"}
+                    src={product.imageUrl || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=300&auto=format&fit=crop"}
                     alt={product.name}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -296,7 +296,7 @@ export default function MarketplacePage() {
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                   <div>
                     <h3 className="font-extrabold text-gray-900 leading-snug line-clamp-2">{product.name}</h3>
-                    <p className="text-[10px] font-bold text-foreground/40 uppercase mt-1">Provider: {(product as any).business_name || "CEO"}</p>
+                    <p className="text-[10px] font-bold text-foreground/40 uppercase mt-1">Provider: {(product as any).businessName || "CEO"}</p>
                   </div>
 
                   <div className="flex items-center justify-between pt-2 border-t border-gray-50">
@@ -307,7 +307,7 @@ export default function MarketplacePage() {
                     <div className="text-right">
                       <p className="text-[10px] font-bold text-foreground/40 uppercase">Stock</p>
                       <p className={`text-xs font-bold ${hasStock ? "text-green-600" : "text-red-500"}`}>
-                        {hasStock ? `${product.stock_count} units` : "Out of stock"}
+                        {hasStock ? `${product.stockCount} units` : "Out of stock"}
                       </p>
                     </div>
                   </div>
@@ -361,11 +361,11 @@ export default function MarketplacePage() {
                 <p className="text-xs text-foreground/60 leading-relaxed line-clamp-3">{pkg.description || "No description loaded."}</p>
               </div>
 
-              {pkg.services_details && pkg.services_details.length > 0 && (
+              {pkg.servicesDetails && pkg.servicesDetails.length > 0 && (
                 <div className="space-y-1.5 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
                   <p className="text-[8px] font-bold text-foreground/40 uppercase tracking-widest">Included Services</p>
                   <ul className="space-y-1">
-                    {pkg.services_details.map((service: any, idx) => (
+                    {pkg.servicesDetails.map((service: any, idx) => (
                       <li key={idx} className="text-[10px] font-bold text-foreground/70 flex items-center gap-1.5">
                         <span className="h-1 w-1 bg-primary rounded-full" />
                         {service.name} (₦{Number(service.price).toLocaleString()})
@@ -431,7 +431,7 @@ export default function MarketplacePage() {
               {selectedItem.type === "product" && (
                 <div className="relative aspect-video w-full rounded-2xl overflow-hidden bg-gray-100">
                   <Image
-                    src={selectedItem.data.image_url || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=300&auto=format&fit=crop"}
+                    src={selectedItem.data.imageUrl || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=300&auto=format&fit=crop"}
                     alt={selectedItem.data.name}
                     fill
                     className="object-cover"
@@ -450,13 +450,13 @@ export default function MarketplacePage() {
                 <div className="grid grid-cols-2 gap-4 py-3 bg-gray-50 rounded-2xl p-4 border border-gray-100 text-xs font-bold">
                   <div>
                     <span className="text-foreground/40 block uppercase text-[9px]">Inventory Status</span>
-                    <span className={selectedItem.data.stock_count > 0 ? "text-green-600" : "text-red-500"}>
-                      {selectedItem.data.stock_count > 0 ? `${selectedItem.data.stock_count} Units Available` : "Sold Out"}
+                    <span className={selectedItem.data.stockCount > 0 ? "text-green-600" : "text-red-500"}>
+                      {selectedItem.data.stockCount > 0 ? `${selectedItem.data.stockCount} Units Available` : "Sold Out"}
                     </span>
                   </div>
                   <div>
                     <span className="text-foreground/40 block uppercase text-[9px]">Provider Business</span>
-                    <span className="text-primary">{selectedItem.data.business_name || "CEO Operator"}</span>
+                    <span className="text-primary">{selectedItem.data.businessName || "CEO Operator"}</span>
                   </div>
                 </div>
               )}
@@ -472,7 +472,7 @@ export default function MarketplacePage() {
                     Cancel
                   </Button>
                   <Button
-                    disabled={selectedItem.type === "product" && selectedItem.data.stock_count <= 0}
+                    disabled={selectedItem.type === "product" && selectedItem.data.stockCount <= 0}
                     onClick={() => {
                       handleAddToCart(selectedItem.data, selectedItem.type === "package");
                       setSelectedItem(null);

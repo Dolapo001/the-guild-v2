@@ -7,7 +7,7 @@ export interface VerificationDocument {
   status: 'pending' | 'processing' | 'verified' | 'rejected';
   extracted_rc_number?: string;
   confidence_score: number;
-  created_at: string;
+  createdAt: string;
 }
 
 export const trustService = {

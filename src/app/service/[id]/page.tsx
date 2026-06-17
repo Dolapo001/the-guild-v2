@@ -84,7 +84,7 @@ export default function ServiceDetailPage() {
     setTimeout(() => setPreSelectedStaffId(null), 300);
   };
 
-  const businessImage = business.image_url || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800&auto=format&fit=crop";
+  const businessImage = business.imageUrl || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800&auto=format&fit=crop";
 
   return (
     <div className="min-h-screen bg-background bg-mesh-gradient pb-24">
@@ -122,7 +122,7 @@ export default function ServiceDetailPage() {
               <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent" />
               <div className="absolute bottom-8 left-8 right-8">
                 <div className="flex flex-wrap gap-3 mb-4">
-                  {business.is_verified && (
+                  {business.isVerified && (
                     <Badge className="bg-accent text-white border-0 px-3 py-1 font-bold flex items-center gap-1.5">
                       <ShieldCheck className="h-4 w-4" /> CAC VERIFIED
                     </Badge>
@@ -133,7 +133,7 @@ export default function ServiceDetailPage() {
                 </div>
                 <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-2">{business.name}</h1>
                 <p className="text-white/80 font-medium flex items-center gap-2">
-                  <MapPin className="h-4 w-4" /> {business.location_name}
+                  <MapPin className="h-4 w-4" /> {business.locationName}
                 </p>
               </div>
             </div>
@@ -181,7 +181,7 @@ export default function ServiceDetailPage() {
                           <div>
                             <h4 className="font-bold text-primary mb-1">{s.name}</h4>
                             <p className="text-xs text-foreground/40 font-bold flex items-center gap-1">
-                              <Clock className="h-3 w-3" /> {s.duration_minutes || 60} mins
+                              <Clock className="h-3 w-3" /> {s.durationMinutes || 60} mins
                             </p>
                           </div>
                           <div className="text-right">
@@ -217,7 +217,7 @@ export default function ServiceDetailPage() {
                           <AvatarImage src={staff.avatar} />
                           <AvatarFallback>{staff.username[0]}</AvatarFallback>
                         </Avatar>
-                        {staff.verification_status === 'VERIFIED' && (
+                        {staff.verificationStatus === 'VERIFIED' && (
                           <div className="absolute -bottom-1 -right-1 bg-green-500 h-5 w-5 rounded-full border-2 border-white flex items-center justify-center">
                             <CheckCircle2 className="h-3 w-3 text-white" />
                           </div>
@@ -307,7 +307,7 @@ export default function ServiceDetailPage() {
                       </span>
                     </div>
 
-                    {!business.is_verified && (
+                    {!business.isVerified && (
                       <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold leading-relaxed flex items-start gap-2">
                         <AlertCircle className="h-4 w-4 shrink-0 mt-0.5 animate-pulse" />
                         <div>
@@ -318,10 +318,10 @@ export default function ServiceDetailPage() {
 
                     <Button
                       onClick={() => setIsBookingModalOpen(true)}
-                      disabled={!business.is_verified}
+                      disabled={!business.isVerified}
                       className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-white font-extrabold text-lg shadow-xl shadow-primary/20 disabled:bg-gray-100 disabled:text-gray-400 disabled:shadow-none disabled:border-gray-200"
                     >
-                      {business.is_verified ? (
+                      {business.isVerified ? (
                         <>Proceed to Book <ArrowRight className="ml-2 h-5 w-5" /></>
                       ) : (
                         "Booking Disabled"
@@ -363,10 +363,10 @@ export default function ServiceDetailPage() {
           </div>
           <Button
             onClick={() => setIsBookingModalOpen(true)}
-            disabled={!business.is_verified}
+            disabled={!business.isVerified}
             className="flex-1 h-12 rounded-xl bg-primary text-white font-bold disabled:bg-gray-100 disabled:text-gray-400"
           >
-            {business.is_verified ? "Book Now" : "Booking Disabled"}
+            {business.isVerified ? "Book Now" : "Booking Disabled"}
           </Button>
         </div>
       </div>

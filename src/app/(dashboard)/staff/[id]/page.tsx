@@ -55,10 +55,10 @@ export default function StaffDetailPage() {
     
     const [showEditModal, setShowEditModal] = useState(false);
     const [editForm, setEditForm] = useState({
-        first_name: "",
-        last_name: "",
+        firstName: "",
+        lastName: "",
         email: "",
-        job_title: ""
+        jobTitle: ""
     });
     const [updating, setUpdating] = useState(false);
 
@@ -109,7 +109,7 @@ export default function StaffDetailPage() {
         const toastId = toast.loading("Saving internal note...");
         setSavingNote(true);
         try {
-            const updatedStaff = await staffService.updateStaff(staff.uid, { internal_notes: noteDraft });
+            const updatedStaff = await staffService.updateStaff(staff.uid, { internalNotes: noteDraft });
             setStaff(updatedStaff);
             setIsEditingNote(false);
             toast.success("Internal note saved.", { id: toastId });
@@ -122,17 +122,17 @@ export default function StaffDetailPage() {
     };
 
     const startEditingNote = () => {
-        setNoteDraft(staff?.staff_profile?.internal_notes || "");
+        setNoteDraft(staff?.staffProfile?.internalNotes || "");
         setIsEditingNote(true);
     };
 
     const handleEditProfile = () => {
         if (!staff) return;
         setEditForm({
-            first_name: staff.first_name || "",
-            last_name: staff.last_name || "",
+            firstName: staff.firstName || "",
+            lastName: staff.lastName || "",
             email: staff.email || "",
-            job_title: staff.staff_profile?.job_title || ""
+            jobTitle: staff.staffProfile?.jobTitle || ""
         });
         setShowEditModal(true);
     };
@@ -196,7 +196,7 @@ export default function StaffDetailPage() {
                         onClick={() => toast.info("Messaging coming soon!")}
                         className="bg-primary hover:bg-primary/90 text-white font-black px-6 rounded-xl shadow-lg shadow-primary/20"
                     >
-                        <MessageCircle className="mr-2 h-4 w-4" /> Message {staff.first_name || staff.username}
+                        <MessageCircle className="mr-2 h-4 w-4" /> Message {staff.firstName || staff.username}
                     </Button>
                     <Button 
                         variant="destructive"
@@ -215,15 +215,15 @@ export default function StaffDetailPage() {
                     <div className="relative inline-block mx-auto mb-6">
                         <Avatar className="h-40 w-40 rounded-[2.5rem] border-4 border-white shadow-2xl">
                             <AvatarImage src={staff.avatar} />
-                            <AvatarFallback className="text-4xl">{(staff.first_name || staff.username)[0]}</AvatarFallback>
+                            <AvatarFallback className="text-4xl">{(staff.firstName || staff.username)[0]}</AvatarFallback>
                         </Avatar>
                         <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-green-500 rounded-2xl border-4 border-white flex items-center justify-center text-white">
                             <ShieldCheck className="h-5 w-5" />
                         </div>
                     </div>
                     
-                    <h1 className="text-2xl font-black text-primary mb-1">{staff.first_name ? `${staff.first_name} ${staff.last_name || ''}` : staff.username}</h1>
-                    <p className="text-foreground/40 font-bold uppercase tracking-widest text-[10px] mb-6">{staff.staff_profile?.job_title || 'Service Professional'}</p>
+                    <h1 className="text-2xl font-black text-primary mb-1">{staff.firstName ? `${staff.firstName} ${staff.lastName || ''}` : staff.username}</h1>
+                    <p className="text-foreground/40 font-bold uppercase tracking-widest text-[10px] mb-6">{staff.staffProfile?.jobTitle || 'Service Professional'}</p>
                     
                     <div className="flex items-center justify-center gap-6 mb-8">
                         <div>
@@ -236,7 +236,7 @@ export default function StaffDetailPage() {
                         </div>
                         <div className="w-px h-10 bg-glass-border" />
                         <div>
-                            <p className="text-lg font-black text-primary">{performance?.total_jobs || '0'}</p>
+                            <p className="text-lg font-black text-primary">{performance?.totalJobs || '0'}</p>
                             <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest mt-0.5">Jobs Done</p>
                         </div>
                     </div>
@@ -264,7 +264,7 @@ export default function StaffDetailPage() {
                                 </div>
                                 <h3 className="font-bold text-primary">Success Rate</h3>
                             </div>
-                            <p className="text-4xl font-black text-primary">{performance?.completion_rate || '100%'}</p>
+                            <p className="text-4xl font-black text-primary">{performance?.completionRate || '100%'}</p>
                             <p className="text-xs font-bold text-foreground/40 mt-1">Based on last 30 days</p>
                         </GlassCard>
                         <GlassCard className="p-6 border-white/40 bg-secondary/5 border-secondary/10">
@@ -286,15 +286,15 @@ export default function StaffDetailPage() {
                         </div>
                         <div className="h-[250px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={performance?.revenue_chart || []}>
+                                <BarChart data={performance?.revenueChart || []}>
                                     <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700, opacity: 0.5 }} />
                                     <Tooltip 
                                         cursor={{ fill: 'rgba(var(--primary), 0.05)' }}
                                         contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                                     />
                                     <Bar dataKey="amount" radius={[4, 4, 4, 4]} barSize={30}>
-                                        {(performance?.revenue_chart || []).map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={index === (performance?.revenue_chart.length || 0) - 1 ? 'rgb(var(--primary))' : 'rgba(var(--primary), 0.2)'} />
+                                        {(performance?.revenueChart || []).map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={index === (performance?.revenueChart.length || 0) - 1 ? 'rgb(var(--primary))' : 'rgba(var(--primary), 0.2)'} />
                                         ))}
                                     </Bar>
                                 </BarChart>
@@ -318,16 +318,16 @@ export default function StaffDetailPage() {
                                 >
                                     <div className="flex items-center gap-4">
                                         <div className="h-12 w-12 rounded-xl bg-primary/5 flex items-center justify-center font-bold text-primary group-hover:bg-primary group-hover:text-white transition-all uppercase">
-                                            {(booking.customer_name || 'C')[0]}
+                                            {(booking.customerName || 'C')[0]}
                                         </div>
                                         <div>
-                                            <p className="text-sm font-black text-primary group-hover:text-primary/80">{booking.service_name || booking.service}</p>
-                                            <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest mt-0.5">{booking.date} • {booking.customer_name}</p>
+                                            <p className="text-sm font-black text-primary group-hover:text-primary/80">{booking.serviceName || booking.service}</p>
+                                            <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest mt-0.5">{booking.date} • {booking.customerName}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-6">
                                         <div className="text-right">
-                                            <p className="text-xs font-black text-primary">₦{(Number(booking.total_price) || 0).toLocaleString()}</p>
+                                            <p className="text-xs font-black text-primary">₦{(Number(booking.totalPrice) || 0).toLocaleString()}</p>
                                             <Badge className={cn(
                                                 "mt-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-tighter border-0",
                                                 booking.status === 'COMPLETED' ? "bg-accent/10 text-accent" : 
@@ -383,13 +383,13 @@ export default function StaffDetailPage() {
                         ) : (
                             <>
                                 <div className="p-4 rounded-xl bg-amber-500/5 border border-amber-500/10 text-amber-900/60 text-xs font-semibold leading-relaxed italic min-h-[80px]">
-                                    {staff.staff_profile?.internal_notes || "No internal notes have been added yet for this staff member."}
+                                    {staff.staffProfile?.internalNotes || "No internal notes have been added yet for this staff member."}
                                 </div>
                                 <Button 
                                     onClick={startEditingNote}
                                     className="w-full mt-6 bg-primary/5 hover:bg-primary text-primary hover:text-white font-bold border-0 h-11 transition-all rounded-xl shadow-sm"
                                 >
-                                    {staff.staff_profile?.internal_notes ? "Edit Note" : "Add Note"}
+                                    {staff.staffProfile?.internalNotes ? "Edit Note" : "Add Note"}
                                 </Button>
                             </>
                         )}
@@ -412,16 +412,16 @@ export default function StaffDetailPage() {
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-primary uppercase tracking-widest ml-1">First Name</label>
                                 <Input 
-                                    value={editForm.first_name}
-                                    onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })}
+                                    value={editForm.firstName}
+                                    onChange={(e) => setEditForm({ ...editForm, firstName: e.target.value })}
                                     className="h-12 bg-white/50 border-glass-border rounded-xl font-bold"
                                 />
                             </div>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-black text-primary uppercase tracking-widest ml-1">Last Name</label>
                                 <Input 
-                                    value={editForm.last_name}
-                                    onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })}
+                                    value={editForm.lastName}
+                                    onChange={(e) => setEditForm({ ...editForm, lastName: e.target.value })}
                                     className="h-12 bg-white/50 border-glass-border rounded-xl font-bold"
                                 />
                             </div>
@@ -440,8 +440,8 @@ export default function StaffDetailPage() {
                         <div className="space-y-2">
                             <label className="text-[10px] font-black text-primary uppercase tracking-widest ml-1">Job Title</label>
                             <Input 
-                                value={editForm.job_title}
-                                onChange={(e) => setEditForm({ ...editForm, job_title: e.target.value })}
+                                value={editForm.jobTitle}
+                                onChange={(e) => setEditForm({ ...editForm, jobTitle: e.target.value })}
                                 className="h-12 bg-white/50 border-glass-border rounded-xl font-bold"
                             />
                         </div>

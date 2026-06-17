@@ -699,7 +699,7 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
                 {reviews.map((rev: any, index: number) => (
                   <div key={index} className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-2 hover:border-primary/10 transition-colors">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-black text-slate-800">{rev.customer_name || "Verified Client"}</span>
+                      <span className="text-xs font-black text-slate-800">{rev.customerName || "Verified Client"}</span>
                       <div className="flex gap-0.5">
                         {[...Array(rev.rating || 5)].map((_, i) => (
                           <Star key={i} className="h-3 w-3 fill-amber-500 text-amber-500" />
@@ -847,11 +847,11 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
   const [newService, setNewService] = useState({ 
     name: "", 
     price: "", 
-    duration_minutes: 60, 
+    durationMinutes: 60, 
     description: "", 
     category: "", 
     subcategory: "",
-    is_available: true
+    isAvailable: true
   });
   const [newPortfolio, setNewPortfolio] = useState({ title: "", description: "", image: null as File | null });
   const [portfolioPreview, setPortfolioPreview] = useState<string | null>(null);
@@ -974,7 +974,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
       }
       setIsServiceModalOpen(false);
       setEditingService(null);
-      setNewService({ name: "", price: "", duration_minutes: 60, description: "", category: "", subcategory: "", is_available: true });
+      setNewService({ name: "", price: "", durationMinutes: 60, description: "", category: "", subcategory: "", isAvailable: true });
     } catch (err: any) {
       console.error("Failed to save service:", err);
       toast.error(err?.message || "Error saving service. Please check your inputs.", { id: toastId });
@@ -1223,7 +1223,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                     className="h-7 text-[10px] font-black text-primary uppercase bg-primary/5 px-3 rounded-full hover:bg-primary/10 transition-all"
                     onClick={() => {
                       setEditingService(null);
-                      setNewService({ name: "", price: "", duration_minutes: 60, description: "", category: "", subcategory: "", is_available: true });
+                      setNewService({ name: "", price: "", durationMinutes: 60, description: "", category: "", subcategory: "", isAvailable: true });
                       setIsServiceModalOpen(true);
                     }}
                   >
@@ -1246,7 +1246,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                                   {s.subcategory}
                                 </Badge>
                               )}
-                              <span className="text-[10px] font-bold text-foreground/40">{s.duration_minutes} MINS</span>
+                              <span className="text-[10px] font-bold text-foreground/40">{s.durationMinutes} MINS</span>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -1256,11 +1256,11 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                                 setNewService({
                                   name: s.name,
                                   price: String(s.price),
-                                  duration_minutes: s.duration_minutes || 60,
+                                  durationMinutes: s.durationMinutes || 60,
                                   description: s.description || "",
                                   category: s.category || "",
                                   subcategory: s.subcategory || "",
-                                  is_available: s.is_available ?? true
+                                  isAvailable: s.isAvailable ?? true
                                 });
                                 setIsServiceModalOpen(true);
                               }}
@@ -1279,8 +1279,8 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                         <div className="flex items-center justify-between border-t border-glass-border/30 pt-2 mt-1">
                           <p className="text-xs font-semibold text-foreground/60 italic pr-4 line-clamp-1">{s.description || "No description set"}</p>
                           <div className="flex items-center gap-3 shrink-0">
-                            <Badge className={cn("border-0 text-[8px] font-black px-2 py-0.5 uppercase", s.is_available ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800")}>
-                              {s.is_available ? "Available" : "Unavailable"}
+                            <Badge className={cn("border-0 text-[8px] font-black px-2 py-0.5 uppercase", s.isAvailable ? "bg-emerald-100 text-emerald-800" : "bg-red-100 text-red-800")}>
+                              {s.isAvailable ? "Available" : "Unavailable"}
                             </Badge>
                             <p className="text-sm font-black text-primary">₦{Number(s.price).toLocaleString()}</p>
                           </div>
@@ -1845,8 +1845,8 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                   <FormLabel>Duration (Mins)</FormLabel>
                   <Input 
                     type="number"
-                    value={newService.duration_minutes}
-                    onChange={(e) => setNewService({...newService, duration_minutes: parseInt(e.target.value) || 0})}
+                    value={newService.durationMinutes}
+                    onChange={(e) => setNewService({...newService, durationMinutes: parseInt(e.target.value) || 0})}
                     className="h-12 rounded-xl bg-white/40 border-glass-border focus:border-primary/50"
                   />
                 </div>
@@ -1865,8 +1865,8 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
               <div className="pt-2">
                 <CustomSwitch
                   label="Service Available Now"
-                  checked={newService.is_available}
-                  onChange={(val) => setNewService({...newService, is_available: val})}
+                  checked={newService.isAvailable}
+                  onChange={(val) => setNewService({...newService, isAvailable: val})}
                 />
               </div>
 
@@ -2039,27 +2039,27 @@ export default function ProfilePage() {
           address: data.address || "",
           completion: data.completion || 0,
           // Staff fields
-          jobTitle: profile.jobTitle || profile.job_title || "",
+          jobTitle: profile.jobTitle || profile.jobTitle || "",
           experience: profile.experience || "",
           bio: profile.bio || "",
           skills: profile.skills || [],
           acceptInstant: profile.acceptInstant ?? true,
           maestroAutoAssign: profile.maestroAutoAssign ?? true,
           // Business fields
-          businessName: profile.business?.name || profile.business_name || profile.businessName || "",
+          businessName: profile.business?.name || profile.businessName || profile.businessName || "",
           tagline: profile.business?.description || profile.tagline || "",
           website: profile.website || "",
           cacNumber: profile.cac_number || profile.cacNumber || "",
           category: profile.business?.category || profile.category || "",
           serviceTags: profile.serviceTags || [],
-          bankName: profile.bank_details?.bankName || profile.bank_details?.bank_name || profile.bankName || "",
-          accountNumber: profile.bank_details?.accountNumber || profile.bank_details?.account_number || profile.accountNumber || "",
-          accountName: profile.bank_details?.accountName || profile.bank_details?.account_name || profile.accountName || "",
+          bankName: profile.bankDetails?.bankName || profile.bankDetails?.bankName || profile.bankName || "",
+          accountNumber: profile.bankDetails?.accountNumber || profile.bankDetails?.accountNumber || profile.accountNumber || "",
+          accountName: profile.bankDetails?.accountName || profile.bankDetails?.accountName || profile.accountName || "",
           banner: profile.business?.banner || profile.banner || "",
           logo: profile.business?.logo || profile.logo || data.avatar || "",
           services: profile.business?.services || profile.services || [],
           portfolio: profile.business?.portfolio || profile.portfolio || [],
-          schedule: profile.business?.operating_hours || profile.schedule || [
+          schedule: profile.business?.operatingHours || profile.schedule || [
             { day: 'Monday', open: '09:00', close: '18:00', isClosed: false },
             { day: 'Tuesday', open: '09:00', close: '18:00', isClosed: false },
             { day: 'Wednesday', open: '09:00', close: '18:00', isClosed: false },
@@ -2117,7 +2117,7 @@ export default function ProfilePage() {
         accountName: profileData.accountName,
         schedule: profileData.schedule,
         jobTitle: profileData.jobTitle,
-        bank_details: {
+        bankDetails: {
           bankName: profileData.bankName,
           accountNumber: profileData.accountNumber,
           accountName: profileData.accountName

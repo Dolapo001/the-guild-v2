@@ -9,15 +9,15 @@ export interface ServicePackage {
   price: string;
   city: string;
   is_active: boolean;
-  services_details: any[];
+  servicesDetails: any[];
 }
 
 export interface CartItem {
   uid: string;
   product?: Product;
   package?: ServicePackage;
-  product_details?: Product;
-  package_details?: ServicePackage;
+  productDetails?: Product;
+  packageDetails?: ServicePackage;
   quantity: number;
   price_at_time: string;
 }
@@ -31,19 +31,19 @@ export interface Cart {
 
 export interface Order {
   uid: string;
-  customer_name: string;
+  customerName: string;
   status: 'PENDING' | 'PAID' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
-  total_items_price: string;
-  total_price: string;
-  delivery_address: string;
+  totalItemsPrice: string;
+  totalPrice: string;
+  deliveryAddress: string;
   city: string;
-  created_at: string;
+  createdAt: string;
   items: {
     uid: string;
-    product_details?: Product;
-    package_details?: ServicePackage;
+    productDetails?: Product;
+    packageDetails?: ServicePackage;
     quantity: number;
-    price_at_order: string;
+    priceAtOrder: string;
   }[];
 }
 
@@ -76,7 +76,7 @@ export const marketplaceService = {
     return api.delete(`/marketplace/cart/item/${uid}/`);
   },
 
-  checkout: async (data: { delivery_address: string; city: string }): Promise<Order> => {
+  checkout: async (data: { deliveryAddress: string; city: string }): Promise<Order> => {
     return api.post<Order>('/marketplace/orders/checkout/', data);
   },
 
@@ -96,8 +96,8 @@ export const marketplaceService = {
     return api.get<Order[]>('/marketplace/orders/manage/');
   },
 
-  setDeliveryFee: async (orderId: string, delivery_fee: number): Promise<Order> => {
-    return api.patch<Order>(`/marketplace/orders/${orderId}/fee/`, { delivery_fee });
+  setDeliveryFee: async (orderId: string, deliveryFee: number): Promise<Order> => {
+    return api.patch<Order>(`/marketplace/orders/${orderId}/fee/`, { deliveryFee });
   },
 
   dispatchOrder: async (orderId: string, data: { rider_name: string; rider_phone: string; logistics_company: string }): Promise<Order> => {

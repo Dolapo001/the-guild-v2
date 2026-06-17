@@ -131,10 +131,10 @@ export default function BusinessProfilePage() {
                   )}
                   <Badge className={cn(
                     "px-3 py-1 font-bold flex items-center gap-1.5 border-0 tracking-widest uppercase text-[10px]",
-                    (user?.verification_status === 'VERIFIED' || user?.verificationStatus === 'VERIFIED') ? "bg-accent/10 text-accent" :
-                      (user?.verification_status === 'PENDING' || user?.verificationStatus === 'PENDING') ? "bg-amber-500/10 text-amber-600" : "bg-slate-500/10 text-slate-500"
+                    String(user?.verificationStatus).toLowerCase() === 'verified' ? "bg-accent/10 text-accent" :
+                      String(user?.verificationStatus).toLowerCase() === 'pending' ? "bg-amber-500/10 text-amber-600" : "bg-slate-500/10 text-slate-500"
                   )}>
-                    <ShieldCheck className="h-4 w-4" /> {user?.verification_status || user?.verificationStatus || 'NOT VERIFIED'}
+                    <ShieldCheck className="h-4 w-4" /> {user?.verificationStatus || 'NOT VERIFIED'}
                   </Badge>
                 </div>
                 {isEditing ? (
@@ -156,9 +156,9 @@ export default function BusinessProfilePage() {
                   <MapPin className="h-3.5 w-3.5 text-primary" /> Location
                 </h3>
                 {isEditing ? (
-                  <Input defaultValue={user?.profile?.business?.location_name || "Lagos, Nigeria"} className="h-12 rounded-xl bg-white/50 border-glass-border" />
+                  <Input defaultValue={user?.profile?.business?.locationName || "Lagos, Nigeria"} className="h-12 rounded-xl bg-white/50 border-glass-border" />
                 ) : (
-                  <p className="text-sm font-bold text-primary">{user?.profile?.business?.location_name || "Lagos, Nigeria"}</p>
+                  <p className="text-sm font-bold text-primary">{user?.profile?.business?.locationName || "Lagos, Nigeria"}</p>
                 )}
               </div>
               <div className="space-y-4">
@@ -166,9 +166,9 @@ export default function BusinessProfilePage() {
                   <Clock className="h-3.5 w-3.5 text-primary" /> Opening Hours
                 </h3>
                 {isEditing ? (
-                  <Input defaultValue={user?.profile?.business?.operating_hours || "Mon - Sat: 9:00 AM - 8:00 PM"} className="h-12 rounded-xl bg-white/50 border-glass-border" />
+                  <Input defaultValue={user?.profile?.business?.operatingHours || "Mon - Sat: 9:00 AM - 8:00 PM"} className="h-12 rounded-xl bg-white/50 border-glass-border" />
                 ) : (
-                  <p className="text-sm font-bold text-primary">{user?.profile?.business?.operating_hours || "Mon - Sat: 9:00 AM - 8:00 PM"}</p>
+                  <p className="text-sm font-bold text-primary">{user?.profile?.business?.operatingHours || "Mon - Sat: 9:00 AM - 8:00 PM"}</p>
                 )}
               </div>
               <div className="space-y-4">
@@ -270,9 +270,9 @@ export default function BusinessProfilePage() {
             </h3>
             <div className="space-y-6">
               {[
-                { label: "CAC Registration", status: user?.verification_status === 'VERIFIED' ? "Verified" : user?.verification_status === 'PENDING' ? "Pending" : "Not Verified" },
-                { label: "Identity Check", status: user?.verification_status === 'VERIFIED' ? "Verified" : "Pending" },
-                { label: "Address Check", status: user?.verification_status === 'VERIFIED' ? "Verified" : "Pending" },
+                { label: "CAC Registration", status: user?.verificationStatus === 'VERIFIED' ? "Verified" : user?.verificationStatus === 'PENDING' ? "Pending" : "Not Verified" },
+                { label: "Identity Check", status: user?.verificationStatus === 'VERIFIED' ? "Verified" : "Pending" },
+                { label: "Address Check", status: user?.verificationStatus === 'VERIFIED' ? "Verified" : "Pending" },
               ].map((item, i) => (
                 <div key={i} className="flex items-center justify-between">
                   <span className="text-sm font-bold text-foreground/50">{item.label}</span>

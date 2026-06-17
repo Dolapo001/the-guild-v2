@@ -37,7 +37,7 @@ async function reverseGeocode(lat: number, lng: number): Promise<string> {
       { headers: { "Accept-Language": "en" } }
     );
     const data = await res.json();
-    return data.display_name ?? `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    return data.displayName ?? `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
   } catch {
     return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
   }
@@ -53,7 +53,7 @@ async function searchLocation(query: string): Promise<{ lat: number; lng: number
     return data.map((item: any) => ({
       lat: parseFloat(item.lat),
       lng: parseFloat(item.lon),
-      label: item.display_name,
+      label: item.displayName,
     }));
   } catch {
     return [];

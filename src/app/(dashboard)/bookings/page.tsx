@@ -125,8 +125,8 @@ export default function BookingsPage() {
    return bookings.filter(b => {
    const matchesDate = viewMode === 'month' ? true : b.date === dateString;
    const matchesStaff = staffFilter === 'all' ? true : b.staff === staffFilter;
-   const customerName = b.customer_name || b.customer || "";
-   const serviceName = b.service_name || b.service || "";
+   const customerName = b.customerName || b.customer || "";
+   const serviceName = b.serviceName || b.service || "";
    const matchesSearch = String(customerName).toLowerCase().includes(searchQuery.toLowerCase()) ||
    String(serviceName).toLowerCase().includes(searchQuery.toLowerCase());
    return matchesDate && matchesStaff && matchesSearch;
@@ -158,11 +158,11 @@ export default function BookingsPage() {
             business: selectedBusinessUid,
             service: selectedServiceUid,
             date: bookingDate,
-            start_time: bookingTime,
+            startTime: bookingTime,
             staff: selectedStaffUid || undefined,
-            walkin_name: walkinName,
-            walkin_phone: walkinPhone,
-            special_note: "Manual Walk-in Booking"
+            walkinName: walkinName,
+            walkinPhone: walkinPhone,
+            specialNote: "Manual Walk-in Booking"
         });
         setBookings(prev => [newBooking, ...prev]);
         setIsNewBookingOpen(false);
@@ -384,16 +384,16 @@ export default function BookingsPage() {
   <tbody>
   {filteredBookings.map((booking) => (
   <tr key={booking.uid} className="border-b border-glass-border hover:bg-white/40 transition-colors">
-  <td className="p-4 text-sm font-bold text-primary/60">{booking.start_time}</td>
+  <td className="p-4 text-sm font-bold text-primary/60">{booking.startTime}</td>
   <td className="p-4">
    <div className="flex items-center gap-3">
    <div className="h-8 w-8 rounded-lg bg-primary/5 flex items-center justify-center font-bold text-primary text-xs uppercase">
-   {(booking.customer_name || booking.customer || "?")[0]}
+   {(booking.customerName || booking.customer || "?")[0]}
    </div>
-   <p className="text-sm font-bold text-primary">{booking.customer_name || "Customer"}</p>
+   <p className="text-sm font-bold text-primary">{booking.customerName || "Customer"}</p>
    </div>
   </td>
-  <td className="p-4 text-sm font-medium text-foreground/60">{booking.service_name || booking.service}</td>
+  <td className="p-4 text-sm font-medium text-foreground/60">{booking.serviceName || booking.service}</td>
   <td className="p-4">
   <Badge className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider border-0 ${booking.status === 'COMPLETED' ? 'bg-accent/10 text-accent' :
   booking.status === 'IN_PROGRESS' ? 'bg-primary/10 text-primary' :
@@ -403,7 +403,7 @@ export default function BookingsPage() {
   {booking.status}
   </Badge>
   </td>
-  <td className="p-4 text-sm font-extrabold text-primary">₦{(booking.total_price || 0).toLocaleString()}</td>
+  <td className="p-4 text-sm font-extrabold text-primary">₦{(booking.totalPrice || 0).toLocaleString()}</td>
   <td className="p-4 text-right">
   <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" asChild>
      <Link href={`/bookings/${booking.uid}`}><MoreHorizontal className="h-4 w-4 text-foreground/40" /></Link>
@@ -570,8 +570,8 @@ function BookingCard({ booking, moveBooking, realStaff = [], assignStaff }: { bo
  <GlassCard className="p-5 hover:bg-white/80 transition-all border-white/60 shadow-glass-sm group">
  <div className="flex justify-between items-start mb-4">
    <Link href={`/bookings/${booking.uid}`} className="flex-1">
-   <p className="font-extrabold text-primary text-sm mb-0.5 group-hover:text-secondary transition-colors">{booking.customer_name || "Customer"}</p>
-   <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-wider">{booking.service_name || booking.service}</p>
+   <p className="font-extrabold text-primary text-sm mb-0.5 group-hover:text-secondary transition-colors">{booking.customerName || "Customer"}</p>
+   <p className="text-[10px] font-bold text-foreground/40 uppercase tracking-wider">{booking.serviceName || booking.service}</p>
    </Link>
  <DropdownMenu>
  <DropdownMenuTrigger asChild>
@@ -600,18 +600,18 @@ function BookingCard({ booking, moveBooking, realStaff = [], assignStaff }: { bo
 
  <div className="space-y-3">
  <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/50">
- <MapPin className="h-3 w-3" /> {booking.location_name || 'Remote'}
+ <MapPin className="h-3 w-3" /> {booking.locationName || 'Remote'}
  </div>
- {booking.staff_name && (
+ {booking.staffName && (
    <div className="flex items-center gap-2 text-[10px] font-bold text-blue-500">
-     <UserIcon className="h-3 w-3" /> Assigned: {booking.staff_name}
+     <UserIcon className="h-3 w-3" /> Assigned: {booking.staffName}
    </div>
  )}
  <div className="flex items-center justify-between pt-2 border-t border-primary/5">
  <div className="flex items-center gap-1.5 text-[10px] font-bold text-primary/60">
- <Clock className="h-3 w-3" /> {booking.start_time}
+ <Clock className="h-3 w-3" /> {booking.startTime}
  </div>
- <span className="text-xs font-extrabold text-primary">₦{(Number(booking.total_price) || 0).toLocaleString()}</span>
+ <span className="text-xs font-extrabold text-primary">₦{(Number(booking.totalPrice) || 0).toLocaleString()}</span>
  </div>
  </div>
  </GlassCard>
@@ -688,12 +688,12 @@ function MonthView({ bookings, selectedDate, onDateClick, isSolo }: { bookings: 
     )}
   >
     <div className="flex items-center justify-between gap-1">
-        <span className="truncate opacity-90">{b.service_name || b.service}</span>
+        <span className="truncate opacity-90">{b.serviceName || b.service}</span>
     </div>
     {!isSolo && (
       <div className="flex items-center gap-1 mt-0.5 opacity-70">
           <UserIcon className="h-2 w-2" />
-          <span className="truncate">{b.staff_name || 'Unassigned'}</span>
+          <span className="truncate">{b.staffName || 'Unassigned'}</span>
       </div>
     )}
   </div>

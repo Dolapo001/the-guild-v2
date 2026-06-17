@@ -2,11 +2,11 @@ import { api } from '../lib/api-client';
 import { User } from '../types/api';
 
 export interface PerformanceData {
-    revenue_chart: { label: string; amount: number }[];
+    revenueChart: { label: string; amount: number }[];
     rating: number;
-    completion_rate: string;
-    total_jobs: number;
-    active_hours?: string;
+    completionRate: string;
+    totalJobs: number;
+    activeHours?: string;
     trend?: {
         value: string;
         label: string;
@@ -62,7 +62,7 @@ export const staffService = {
     getShifts: async (): Promise<any[]> => {
         return api.get<any[]>('/bookings/shifts/');
     },
-    createShift: async (data: { staff: string; start_time: string; end_time: string; notes?: string }): Promise<any> => {
+    createShift: async (data: { staff: string; startTime: string; endTime: string; notes?: string }): Promise<any> => {
         return api.post('/bookings/shifts/', data);
     },
     updateShift: async (uid: string, data: any): Promise<any> => {

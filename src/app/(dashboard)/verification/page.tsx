@@ -43,7 +43,7 @@ export default function VerificationPage() {
         const businesses = await maestroService.getMyBusinesses();
         if (businesses && businesses.length > 0) {
           setBusiness(businesses[0]);
-          setCacNumber(businesses[0].cac_number || "");
+          setCacNumber(businesses[0].cacNumber || "");
         }
       } catch (err) {
         console.error("Failed to fetch business:", err);

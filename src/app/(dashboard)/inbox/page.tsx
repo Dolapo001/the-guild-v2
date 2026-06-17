@@ -99,7 +99,7 @@ export default function InboxPage() {
   const filteredConversations = conversations.filter(c => {
     const participant = getOtherParticipant(c);
     const participantName = participant?.username ?? "";
-    const lastMsgText = c.last_message?.text ?? "";
+    const lastMsgText = c.lastMessage?.text ?? "";
     const matchesSearch = participantName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       lastMsgText.toLowerCase().includes(searchQuery.toLowerCase());
     
@@ -119,7 +119,7 @@ export default function InboxPage() {
     if (!messageInput.trim() || !selectedChatId) return;
     try {
       const newMessage = await inboxService.sendMessage(selectedChatId, messageInput);
-      setMessages(prev => [...prev, { ...newMessage, is_self: true }]);
+      setMessages(prev => [...prev, { ...newMessage, isSelf: true }]);
       setMessageInput("");
     } catch (err) {
       console.error("Failed to send message", err);
@@ -219,16 +219,16 @@ export default function InboxPage() {
                     <div className="flex justify-between items-start">
                       <h4 className="font-black text-primary truncate text-sm">{participant.username}</h4>
                       <span className="text-[10px] font-black text-primary/40">
-                        {chat.last_message_at ? new Date(chat.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                        {chat.lastMessageAt ? new Date(chat.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                       </span>
                     </div>
                     <p className="text-xs truncate text-primary/60 font-bold">
-                      {chat.last_message?.text || "No messages yet"}
+                      {chat.lastMessage?.text || "No messages yet"}
                     </p>
                     <div className="flex items-center gap-2 pt-1">
-                      {chat.job_context && (
+                      {chat.jobContext && (
                         <span className="text-[9px] font-extrabold text-primary uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-md border border-primary/20">
-                          {chat.job_context.id.substring(0, 8)}
+                          {chat.jobContext.id.substring(0, 8)}
                         </span>
                       )}
                       <span className={cn(
@@ -298,15 +298,15 @@ export default function InboxPage() {
                 </div>
 
                 {/* Job Context Strip */}
-                {selectedChat.job_context && (
+                {selectedChat.jobContext && (
                   <div className="px-6 py-3 bg-primary/5 border-b border-white/10 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center">
                         <Info className="h-4 w-4 text-primary" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-black text-primary uppercase tracking-widest">Regarding Job #{selectedChat.job_context.id.substring(0,8)}</p>
-                        <p className="text-xs font-black text-primary">{selectedChat.job_context.title} • {selectedChat.job_context.time}</p>
+                        <p className="text-[10px] font-black text-primary uppercase tracking-widest">Regarding Job #{selectedChat.jobContext.id.substring(0,8)}</p>
+                        <p className="text-xs font-black text-primary">{selectedChat.jobContext.title} • {selectedChat.jobContext.time}</p>
                       </div>
                     </div>
                     <Button variant="outline" size="sm" className="h-8 rounded-lg border-primary/20 text-primary text-[10px] font-extrabold uppercase tracking-widest hover:bg-primary/10">
@@ -322,12 +322,12 @@ export default function InboxPage() {
                       key={msg.uid}
                       className={cn(
                         "flex flex-col max-w-[80%]",
-                        msg.sender === user?.uid || msg.is_self ? "ml-auto items-end" : "items-start"
+                        msg.sender === user?.uid || msg.isSelf ? "ml-auto items-end" : "items-start"
                       )}
                     >
                       <div className={cn(
                         "p-4 rounded-2xl text-sm font-medium shadow-lg",
-                        msg.sender === user?.uid || msg.is_self
+                        msg.sender === user?.uid || msg.isSelf
                           ? "bg-gradient-to-br from-primary to-primary-dark text-white rounded-tr-none"
                           : "bg-white/10 border border-white/10 text-white rounded-tl-none backdrop-blur-md"
                       )}>
@@ -335,10 +335,10 @@ export default function InboxPage() {
                       </div>
                       <div className="flex items-center gap-1.5 mt-1 px-1">
                         <span className="text-[10px] font-bold text-gray-500">
-                           {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
-                        {(msg.sender === user?.uid || msg.is_self) && (
-                          msg.is_read ? <CheckCheck className="h-3 w-3 text-primary" /> : <Check className="h-3 w-3 text-gray-500" />
+                        {(msg.sender === user?.uid || msg.isSelf) && (
+                          msg.isRead ? <CheckCheck className="h-3 w-3 text-primary" /> : <Check className="h-3 w-3 text-gray-500" />
                         )}
                       </div>
                     </div>

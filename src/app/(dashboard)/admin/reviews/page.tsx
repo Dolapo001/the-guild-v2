@@ -12,13 +12,13 @@ import { api } from "@/lib/api-client";
 
 interface Review {
  uid: string;
- customer_name: string;
+ customerName: string;
  rating: number;
  comment: string;
  status: string;
- created_at: string;
- service_name?: string;
- images?: {uid: string, image_url: string}[];
+ createdAt: string;
+ serviceName?: string;
+ images?: {uid: string, imageUrl: string}[];
 }
 
 export default function AdminReviewsPage() {
@@ -85,7 +85,7 @@ export default function AdminReviewsPage() {
          </tr>
        ) : reviews.map((item) => (
        <tr key={item.uid} className="hover:bg-primary/[0.02] transition-colors">
-        <td className="px-6 py-4 font-bold text-primary">{item.customer_name}</td>
+        <td className="px-6 py-4 font-bold text-primary">{item.customerName}</td>
         <td className="px-6 py-4 font-bold text-accent">{item.rating} / 5</td>
         <td className="px-6 py-4 text-sm font-medium text-foreground/70 max-w-xs truncate">{item.comment}</td>
         <td className="px-6 py-4">

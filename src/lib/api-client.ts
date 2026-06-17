@@ -139,30 +139,22 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
     }
 
     const responseData = await response.json();
-    
-    // Normalize response data recursively if it's an object or array
+
+    // The backend now emits camelCase on the wire (DRF CamelCaseJSONRenderer),
+    // so NO snake_case↔camelCase translation happens here anymore. The only
+    // remaining transform is two display-field ALIASES (`image`/`location`),
+    // provided so generic cards can read a single field regardless of source.
     const normalize = (obj: any): any => {
       if (!obj || typeof obj !== 'object') return obj;
-      
-      if (Array.isArray(obj)) {
-        return obj.map(normalize);
-      }
+      if (Array.isArray(obj)) return obj.map(normalize);
 
       const result: any = { ...obj };
-      
-      // Critical Guild-specific Mappings
-      if ('verification_status' in result) result.verificationStatus = result.verification_status;
-      if ('verificationStatus' in result) result.verification_status = result.verificationStatus;
-      if ('is_solo_operator' in result) result.isSoloOperator = result.is_solo_operator;
-      if ('isSoloOperator' in result) result.is_solo_operator = result.isSoloOperator;
-      if ('image_url' in result) result.image = result.image_url;
-      if ('location_name' in result) result.location = result.location_name;
+      if ('imageUrl' in result && !('image' in result)) result.image = result.imageUrl;
+      if ('locationName' in result && !('location' in result)) result.location = result.locationName;
 
-      // Recurse through all keys
-      Object.keys(result).forEach(key => {
+      Object.keys(result).forEach((key) => {
         result[key] = normalize(result[key]);
       });
-
       return result;
     };
 

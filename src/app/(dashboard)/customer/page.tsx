@@ -39,13 +39,13 @@ import { CustomerSkeleton } from "@/components/dashboard/customer-skeleton";
 
 
 interface ActiveBooking {
-  service_name?: string;
-  customer_name?: string;
-  business_name?: string;
-  staff_name?: string;
+  serviceName?: string;
+  customerName?: string;
+  businessName?: string;
+  staffName?: string;
   time?: string;
-  service_details?: any;
-  replacement_proposal?: {
+  serviceDetails?: any;
+  replacementProposal?: {
     name: string;
     rating: string;
     image: string;
@@ -108,7 +108,7 @@ export default function CustomerDashboard() {
 
   const handleGetDirections = () => {
     if (!activeBooking) return;
-    const destination = encodeURIComponent(activeBooking.location || (activeBooking as any).business_name || '');
+    const destination = encodeURIComponent(activeBooking.location || (activeBooking as any).businessName || '');
     const url = `https://www.google.com/maps/dir/?api=1&origin=Current+Location&destination=${destination}`;
     window.open(url, '_blank');
   };
@@ -153,7 +153,7 @@ export default function CustomerDashboard() {
 
   const getGoogleCalendarUrl = (booking: Booking) => {
     const dateStr = booking.date;
-    const timePart = booking.start_time;
+    const timePart = booking.startTime;
 
     const now = new Date();
     const dateVal = dateStr.toLowerCase() === 'today'
@@ -168,9 +168,9 @@ export default function CustomerDashboard() {
 
     const params = new URLSearchParams({
       action: 'TEMPLATE',
-      text: `${booking.service_name} - ${(booking as any).business_name}`,
+      text: `${booking.serviceName} - ${(booking as any).businessName}`,
       dates: `${formatISO(validStart)}/${formatISO(end)}`,
-      details: `Booking Reference: #${booking.uid.slice(0, 8)}. Staff: ${booking.staff_name || 'TBD'}. Booking with The Guild`,
+      details: `Booking Reference: #${booking.uid.slice(0, 8)}. Staff: ${booking.staffName || 'TBD'}. Booking with The Guild`,
       location: booking.location || ''
     });
 
@@ -212,7 +212,7 @@ export default function CustomerDashboard() {
                   >
                     <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0" />
                     <p className="text-xs sm:text-sm font-bold text-amber-700 ">
-                      Appointment Update: {activeBooking.staff_name} is unavailable, but we found a match!
+                      Appointment Update: {activeBooking.staffName} is unavailable, but we found a match!
                     </p>
                   </motion.div>
                 )}
@@ -220,8 +220,8 @@ export default function CustomerDashboard() {
                 <div className="relative z-10 flex flex-col lg:flex-row justify-between gap-6">
                   <div className="space-y-6 flex-1 min-w-0">
                     <div>
-                      <h4 className="text-xl sm:text-3xl font-black text-primary truncate">{activeBooking.service_name}</h4>
-                      <p className="text-xs sm:text-sm font-bold text-foreground/60">{(activeBooking as any).business_name}</p>
+                      <h4 className="text-xl sm:text-3xl font-black text-primary truncate">{activeBooking.serviceName}</h4>
+                      <p className="text-xs sm:text-sm font-bold text-foreground/60">{(activeBooking as any).businessName}</p>
                     </div>
 
                     <div className="flex flex-wrap gap-x-6 gap-y-3">
@@ -229,28 +229,28 @@ export default function CustomerDashboard() {
                         <Calendar className="h-4 w-4" /> {activeBooking.date}
                       </div>
                       <div className="flex items-center gap-2 text-[10px] sm:text-xs font-bold text-primary/70">
-                        <Clock className="h-4 w-4" /> {activeBooking.start_time}
+                        <Clock className="h-4 w-4" /> {activeBooking.startTime}
                       </div>
                       <div className="flex items-center gap-2 text-[10px] sm:text-xs font-bold text-primary/70">
                         <MapPin className="h-4 w-4" /> {activeBooking.location || 'Location Pending'}
                       </div>
                     </div>
 
-                    {activeBooking.status === "DECLINED_WITH_OPTION" && activeBooking.replacement_proposal ? (
+                    {activeBooking.status === "DECLINED_WITH_OPTION" && activeBooking.replacementProposal ? (
                       <div className="space-y-6">
                         <div className="p-4 sm:p-5 rounded-2xl bg-white/40 border border-white/20 backdrop-blur-xl shadow-lg">
                           <p className="text-xs sm:text-sm font-bold text-foreground/80 mb-4">
-                            Found <span className="text-primary font-black">{activeBooking.replacement_proposal.name}</span> available for you.
+                            Found <span className="text-primary font-black">{activeBooking.replacementProposal.name}</span> available for you.
                           </p>
                           <div className="flex items-center gap-4">
                             <div className="relative h-12 w-12 sm:h-14 sm:w-14 rounded-full overflow-hidden border-2 border-primary shadow-lg shrink-0">
-                              <Image src={activeBooking.replacement_proposal.image} alt={activeBooking.replacement_proposal.name} fill className="object-cover" />
+                              <Image src={activeBooking.replacementProposal.image} alt={activeBooking.replacementProposal.name} fill className="object-cover" />
                             </div>
                             <div className="min-w-0">
-                              <p className="font-black text-foreground text-base sm:text-lg truncate">{activeBooking.replacement_proposal.name}</p>
+                              <p className="font-black text-foreground text-base sm:text-lg truncate">{activeBooking.replacementProposal.name}</p>
                               <div className="flex items-center gap-2 mt-0.5">
                                 <span className="text-[10px] font-bold text-amber-500 flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded-full">
-                                  <Star className="h-3 w-3 fill-amber-500" /> {activeBooking.replacement_proposal.rating}
+                                  <Star className="h-3 w-3 fill-amber-500" /> {activeBooking.replacementProposal.rating}
                                 </span>
                                 <span className="text-[10px] font-black text-primary uppercase tracking-widest bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20 hidden sm:inline-block">
                                   Verified Pro
@@ -285,13 +285,13 @@ export default function CustomerDashboard() {
                     ) : (
                       <div className="space-y-6">
                         <div className="bg-white/10 border border-white/10 backdrop-blur-md rounded-xl p-3 flex items-center gap-3">
-                          {activeBooking.staff_name ? (
+                          {activeBooking.staffName ? (
                             <div className="flex items-center gap-3 w-full">
                               <div className="h-8 w-8 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0">
                                 <User className="h-4 w-4 text-blue-400" />
                               </div>
                               <p className="text-xs sm:text-sm text-foreground/60 min-w-0 truncate">
-                                Confirmed with <span className="text-primary font-bold">{activeBooking.staff_name}</span>
+                                Confirmed with <span className="text-primary font-bold">{activeBooking.staffName}</span>
                               </p>
                             </div>
                           ) : (
@@ -431,16 +431,16 @@ export default function CustomerDashboard() {
                       <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-primary/40" />
                     </div>
                     <div className="min-w-0">
-                      <p className="font-bold text-primary text-sm sm:text-base truncate">{item.service_name}</p>
-                      <p className="text-[10px] sm:text-xs font-medium text-foreground/40 truncate">{(item as any).business_name} • {item.date}</p>
+                      <p className="font-bold text-primary text-sm sm:text-base truncate">{item.serviceName}</p>
+                      <p className="text-[10px] sm:text-xs font-medium text-foreground/40 truncate">{(item as any).businessName} • {item.date}</p>
                     </div>
                   </div>
                   <div className="text-right flex flex-col items-end shrink-0">
-                    <p className="font-black text-primary text-sm sm:text-base">₦{Number(item.total_price).toLocaleString()}</p>
+                    <p className="font-black text-primary text-sm sm:text-base">₦{Number(item.totalPrice).toLocaleString()}</p>
                     <div className="flex items-center gap-3 mt-1">
                       {item.status === 'COMPLETED' && (
                         <button
-                          onClick={(e) => { e.preventDefault(); openReviewModal(item.uid, item.service_name); }}
+                          onClick={(e) => { e.preventDefault(); openReviewModal(item.uid, item.serviceName); }}
                           className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-widest hover:underline transition-colors flex items-center gap-1"
                         >
                           <Star className="h-3 w-3" /> Review
@@ -475,8 +475,8 @@ export default function CustomerDashboard() {
               {recentOrders.length > 0 ? (
                 recentOrders.slice(0, 3).map((order) => {
                   const firstItem = order.items?.[0];
-                  const name = firstItem?.product_details?.name || firstItem?.package_details?.name || "Marketplace Order";
-                  const image = firstItem?.product_details?.image_url || firstItem?.package_details?.image_url || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=200&auto=format&fit=crop";
+                  const name = firstItem?.productDetails?.name || firstItem?.packageDetails?.name || "Marketplace Order";
+                  const image = firstItem?.productDetails?.imageUrl || firstItem?.packageDetails?.imageUrl || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=200&auto=format&fit=crop";
 
                   return (
                     <Link href={`/marketplace/orders`} key={order.uid} className="flex items-center gap-3 group cursor-pointer">
@@ -513,7 +513,7 @@ export default function CustomerDashboard() {
         service={null as any}
         mode="reschedule"
         initialData={{
-          selectedServices: [activeBooking?.service_name || ""],
+          selectedServices: [activeBooking?.serviceName || ""],
           staffId: 'AUTO',
         }}
       />
