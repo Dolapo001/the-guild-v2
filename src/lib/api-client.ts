@@ -167,8 +167,17 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
     };
 
     if (responseData && typeof responseData === 'object' && responseData.status === 'success' && 'data' in responseData) {
-      return normalize(responseData.data) as T;
+      const data = responseData.data;
+      if (data && typeof data === 'object' && 'results' in data && 'count' in data && Array.isArray(data.results)) {
+        return normalize(data.results) as T;
+      }
+      return normalize(data) as T;
     }
+
+    if (responseData && typeof responseData === 'object' && 'results' in responseData && 'count' in responseData && Array.isArray(responseData.results)) {
+      return normalize(responseData.results) as T;
+    }
+
     return normalize(responseData) as T;
   } catch (error) {
     if (error instanceof ApiError) throw error;
