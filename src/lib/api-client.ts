@@ -1,4 +1,8 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+// Same-origin by default: the browser calls the Next.js origin, which proxies
+// to the backend (see next.config.ts rewrites). This keeps the httpOnly auth
+// cookies first-party. Override with NEXT_PUBLIC_API_URL only for non-proxied
+// setups.
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -17,43 +21,29 @@ class ApiError extends Error {
  }
 }
 
-async function refreshToken(): Promise<string | null> {
-  const refresh = typeof window !== 'undefined' ? localStorage.getItem('the-guild-refresh') : null;
-  if (!refresh) return null;
-
+// Cookie-based refresh: the httpOnly refresh cookie is sent automatically with
+// credentials:'include'; the backend rotates it and sets a fresh access cookie.
+// No tokens ever touch JavaScript.
+async function refreshToken(): Promise<boolean> {
   try {
     const response = await fetch(`${BASE_URL}/auth/token/refresh/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh }),
+      credentials: 'include',
     });
-
-    if (!response.ok) throw new Error('Refresh failed');
-
-    const data = await response.json();
-    const newAccess = data?.data?.access || data?.access;
-    
-    if (newAccess && typeof window !== 'undefined') {
-      localStorage.setItem('the-guild-token', newAccess);
-      return newAccess;
-    }
-    return null;
+    return response.ok;
   } catch (error) {
     console.error('Token refresh error:', error);
-    return null;
+    return false;
   }
 }
 
 let isRefreshing = false;
-let failedQueue: any[] = [];
+let failedQueue: { resolve: (v: boolean) => void; reject: (e: any) => void }[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: any, success = false) => {
   failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
+    if (error) prom.reject(error);
+    else prom.resolve(success);
   });
   failedQueue = [];
 };
@@ -67,21 +57,16 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
     url += `?${query}`;
   }
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('the-guild-token') : null;
-
   const defaultHeaders: Record<string, string> = {};
-  
+
   if (!(options.body instanceof FormData)) {
     defaultHeaders['Content-Type'] = 'application/json';
-  }
-
-  if (token) {
-    defaultHeaders['Authorization'] = `Bearer ${token}`;
   }
 
   try {
     const response = await fetch(url, {
       method,
+      credentials: 'include', // send/receive httpOnly auth cookies
       headers: {
         ...defaultHeaders,
         ...headers,
@@ -91,39 +76,25 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
 
     if (response.status === 401 && !endpoint.includes('/auth/login') && !endpoint.includes('/auth/token/refresh/')) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise<boolean>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((newToken) => {
-          return request<T>(method, endpoint, {
-            ...options,
-            headers: { ...headers, 'Authorization': `Bearer ${newToken}` }
-          });
-        }).catch((err) => {
-          throw err;
+        }).then((ok) => {
+          if (!ok) throw new ApiError(401, { message: 'Session expired' });
+          return request<T>(method, endpoint, options);
         });
       }
 
       isRefreshing = true;
+      const ok = await refreshToken();
+      isRefreshing = false;
 
-      const newToken = await refreshToken();
-      
-      if (newToken) {
-        isRefreshing = false;
-        processQueue(null, newToken);
-        return request<T>(method, endpoint, {
-          ...options,
-          headers: { ...headers, 'Authorization': `Bearer ${newToken}` }
-        });
+      if (ok) {
+        processQueue(null, true);
+        return request<T>(method, endpoint, options);
       } else {
-        isRefreshing = false;
-        processQueue(new Error('Session expired'));
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('the-guild-token');
-          localStorage.removeItem('the-guild-refresh');
-          localStorage.removeItem('the-guild-user');
-          if (!window.location.pathname.includes('/login')) {
-            window.location.href = '/login?expired=true';
-          }
+        processQueue(null, false);
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+          window.location.href = '/login?expired=true';
         }
         throw new ApiError(401, { message: 'Session expired' });
       }

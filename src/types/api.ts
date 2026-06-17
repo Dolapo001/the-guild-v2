@@ -28,9 +28,12 @@ export interface User {
 }
 
 export interface AuthResponse {
-  access: string;
-  refresh: string;
-  user: User;
+  /** Present on success. Tokens themselves are delivered as httpOnly cookies. */
+  user?: User;
+  /** Present when a second factor is required (MFA challenge). */
+  mfaRequired?: boolean;
+  mfaToken?: string;
+  method?: string;
 }
 
 export interface Service {

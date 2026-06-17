@@ -34,34 +34,12 @@ const normalizeUser = (u: User): User => ({
   name: u.name ?? u.username,
 });
 
-const safeSaveUserToStorage = (userObj: User) => {
-  try {
-    const cleanUser = { ...userObj };
-    if (cleanUser.avatar && cleanUser.avatar.startsWith("data:") && cleanUser.avatar.length > 200000) {
-      cleanUser.avatar = "large_base64_stripped";
-    }
-    if ((cleanUser as any).profile) {
-      const p = { ...(cleanUser as any).profile };
-      if (p.avatar && p.avatar.startsWith("data:") && p.avatar.length > 200000) {
-        p.avatar = "large_base64_stripped";
-      }
-      if (p.portfolio && Array.isArray(p.portfolio)) {
-        p.portfolio = p.portfolio.map((item: any) => {
-          if (item.image && item.image.startsWith("data:") && item.image.length > 100000) {
-            return { ...item, image: "stripped_portfolio_image" };
-          }
-          return item;
-        });
-      }
-      (cleanUser as any).profile = p;
-    }
-    localStorage.setItem("the-guild-user", JSON.stringify(cleanUser));
-  } catch (error) {
-    console.warn("Storage quota exceeded or unavailable. Retaining user in memory only:", error);
-    try {
-      localStorage.removeItem("the-guild-user");
-    } catch {}
-  }
+// Cookie-based auth: the user is NOT persisted in JS-readable storage. On
+// reload it is rehydrated from the backend via /auth/profile/ (the httpOnly
+// cookie authenticates the request). Kept as a no-op so existing call sites
+// stay simple.
+const safeSaveUserToStorage = (_userObj: User) => {
+  /* intentionally no client-side persistence under httpOnly cookie auth */
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -73,24 +51,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    // Check for stored user on mount and fetch fresh profile from backend
+    // Rehydrate the session from the httpOnly cookie: if the profile fetch
+    // succeeds the cookie is valid and we restore the user; otherwise we stay
+    // logged out. (The api-client transparently attempts a cookie refresh on 401.)
     const initAuth = async () => {
       try {
-        const storedUser = localStorage.getItem("the-guild-user");
-        if (storedUser) {
-          const parsedUser = normalizeUser(JSON.parse(storedUser));
-          setUser(parsedUser);
-          
-          // Fetch fresh profile details from backend
-          const freshUser = await authService.getProfile();
-          if (freshUser) {
-            const normalized = normalizeUser(freshUser);
-            setUser(normalized);
-            safeSaveUserToStorage(normalized);
-          }
-        }
-      } catch (err) {
-        console.warn("Auth initialization failed or user not logged in:", err);
+        const freshUser = await authService.getProfile();
+        if (freshUser) setUser(normalizeUser(freshUser));
+      } catch {
+        /* not authenticated */
       } finally {
         setIsLoading(false);
       }
@@ -103,14 +72,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null);
     try {
       const response = await authService.login(email, password);
-      if (response && response.access) {
+      if (response?.mfaRequired) {
+        throw new Error("MFA verification required. Please complete the second step.");
+      }
+      if (response?.user) {
         const normalizedUser = normalizeUser(response.user);
         setUser(normalizedUser);
-        localStorage.setItem("the-guild-token", response.access);
-        if (response.refresh) {
-          localStorage.setItem("the-guild-refresh", response.refresh);
-        }
-        safeSaveUserToStorage(normalizedUser);
         router.push(getRedirectPath(normalizedUser));
       }
     } catch (err: any) {
@@ -127,15 +94,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setError(null);
     try {
       const response = await authService.register(data);
-      if (response && response.access) {
+      if (response?.user) {
         const normalizedUser = normalizeUser(response.user);
         setUser(normalizedUser);
-        localStorage.setItem("the-guild-token", response.access);
-        if (response.refresh) {
-          localStorage.setItem("the-guild-refresh", response.refresh);
-        }
-        safeSaveUserToStorage(normalizedUser);
-        
+
         // New CEOs go to onboarding, others use standard redirect
         if (normalizedUser.role === "ceo") {
           router.push("/onboarding/business");
@@ -152,11 +114,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = () => {
-    authService.logout();
+  const logout = async () => {
+    await authService.logout(); // clears httpOnly cookies + blacklists refresh
     setUser(null);
     setError(null);
-    localStorage.removeItem("the-guild-user");
     toast.success("Successfully logged out. See you soon!");
     router.push("/login");
   };

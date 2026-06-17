@@ -24,12 +24,9 @@ export function useTicketedWsUrl(path: string | null): string | null {
     let timer: ReturnType<typeof setTimeout> | null = null;
 
     async function refresh() {
-      const token = localStorage.getItem("the-guild-token");
-      if (!token) {
-        setUrl(null);
-        return;
-      }
       try {
+        // Cookie-authed: the ticket request succeeds only when logged in;
+        // a 401 throws and we fall back to no socket.
         const res = await api.post<{ token: string; expiresIn: number }>(
           "/auth/ws/ticket/",
           {},

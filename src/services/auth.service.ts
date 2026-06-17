@@ -2,30 +2,23 @@ import { api } from '../lib/api-client';
 import { AuthResponse, User, UserRole } from '../types/api';
 
 export const authService = {
+  // Auth tokens are delivered as httpOnly cookies by the backend; the body
+  // only carries the user. Nothing is persisted in JS-readable storage.
   login: async (email: string, password: string): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/login/', { email, password });
-    if (response.access) {
-      localStorage.setItem('the-guild-token', response.access);
-      localStorage.setItem('the-guild-refresh', response.refresh);
-      localStorage.setItem('the-guild-user', JSON.stringify(response.user));
-    }
-    return response;
+    return api.post<AuthResponse>('/auth/login/', { email, password });
   },
 
   register: async (data: any): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/register/', data);
-    if (response.access) {
-      localStorage.setItem('the-guild-token', response.access);
-      localStorage.setItem('the-guild-refresh', response.refresh);
-      localStorage.setItem('the-guild-user', JSON.stringify(response.user));
-    }
-    return response;
+    return api.post<AuthResponse>('/auth/register/', data);
   },
 
-  logout: () => {
-    localStorage.removeItem('the-guild-token');
-    localStorage.removeItem('the-guild-refresh');
-    localStorage.removeItem('the-guild-user');
+  logout: async (): Promise<void> => {
+    // Clears the httpOnly cookies + blacklists the refresh token server-side.
+    try {
+      await api.post('/auth/logout/', {});
+    } catch {
+      /* best-effort: still clear client state */
+    }
   },
 
   getProfile: async (): Promise<User> => {
