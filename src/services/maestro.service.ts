@@ -46,5 +46,5 @@ export const maestroService = {
   uploadBusinessAssets: async (businessUid: string, data: FormData) =>
     api.post<{ logo?: string; banner?: string }>(`/maestro/portal/business/${businessUid}/upload-assets/`, data),
 
-  chatbot: async (message: string) => api.post<{ response: string }>('/maestro/chatbot/', { message }),
+  chatbot: async (message: string) => api.post<{ response: string }>('/maestro/chat/', { message }),
 };
