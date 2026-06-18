@@ -24,7 +24,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
-import { bookingService } from "@/services/booking.service";
+import { bookingService, asList } from "@/services/booking.service";
 import {
  Dialog,
  DialogContent,
@@ -72,7 +72,7 @@ export default function ActivitiesPage() {
  const fetchActivities = async () => {
     setLoading(true);
     try {
-        const bookings = await bookingService.getMyBookings();
+        const bookings = asList(await bookingService.getMyBookings());
         const mapped: Activity[] = bookings.map(b => ({
             id: b.uid,
             type: 'Service',

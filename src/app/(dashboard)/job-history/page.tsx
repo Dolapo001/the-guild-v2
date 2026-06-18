@@ -35,7 +35,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { bookingService } from "@/services/booking.service";
+import { bookingService, asList } from "@/services/booking.service";
 import { Booking } from "@/types/api";
 import { toast } from "sonner";
 
@@ -50,7 +50,7 @@ export default function JobHistoryPage() {
   const fetchHistory = async () => {
     setLoading(true);
     try {
-      const bookings = await bookingService.getBookings();
+      const bookings = asList(await bookingService.getBookings());
       // Map completed and paid bookings from live backend
       const backendHistory = bookings
         .filter((b: any) => ['COMPLETED', 'PAID', 'CLEARING'].includes(b.status))

@@ -28,6 +28,7 @@ interface Review {
  replied_at: string | null;
  createdAt: string;
  serviceName?: string;
+ images?: string[];
 }
 
 export default function ReviewsPage() {

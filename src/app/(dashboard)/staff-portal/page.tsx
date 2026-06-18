@@ -34,7 +34,7 @@ import {
  PlusCircle,
  ShieldAlert
 } from "lucide-react";
-import { bookingService } from "@/services/booking.service";
+import { bookingService, asList } from "@/services/booking.service";
 import { staffService } from "@/services/staff.service";
 import { api } from "@/lib/api-client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -106,11 +106,11 @@ export default function StaffPortal() {
           staffService.getShifts()
         ]);
 
-        setBookings(allBookings);
-        setMonthJobs(monthSchedule);
+        setBookings(asList(allBookings));
+        setMonthJobs(asList(monthSchedule));
         setShifts(allShifts);
-        
-        const mappedTasks = schedule.map((b: any) => ({
+
+        const mappedTasks = asList(schedule).map((b: any) => ({
           id: b.uid,
           customer: b.customerDetails?.name || b.customerName || b.walkinName || 'Guest',
           customerAvatar: b.customerDetails?.avatar || '',
@@ -257,8 +257,8 @@ export default function StaffPortal() {
       bookingService.getStaffSchedule({ date: selectedDate }),
       bookingService.getStaffSchedule({ month: monthStr })
     ]);
-    setBookings(allBookings);
-    setMonthJobs(monthSchedule);
+    setBookings(asList(allBookings));
+    setMonthJobs(asList(monthSchedule));
    } catch (err) {
     console.error("Failed to accept request", err);
     toast.error("Failed to accept request");

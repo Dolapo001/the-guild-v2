@@ -30,7 +30,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { bookingService } from "@/services/booking.service";
+import { bookingService, asList } from "@/services/booking.service";
 import { dashboardService, DashboardStats } from "@/services/dashboard.service";
 import { staffService } from "@/services/staff.service";
 import { authService } from "@/services/auth.service";
@@ -87,7 +87,7 @@ export default function DashboardHome() {
           dashboardService.getRevenue()
         ]);
         setStatsData(stats);
-        setBookings(bks);
+        setBookings(asList(bks));
         setStaffList(staff.map((s: any) => ({
           ...s,
           id: s.uid,
@@ -132,7 +132,7 @@ export default function DashboardHome() {
     try {
       await bookingService.updateBookingStatus(selectedBooking.uid, "CONFIRMED");
       const bks = await bookingService.getBookings();
-      setBookings(bks);
+      setBookings(asList(bks));
       setIsAssignModalOpen(false);
       setSelectedBooking(null);
       toast.success(`Assignment confirmed! ${staff.name} has been notified.`, { id: toastId });

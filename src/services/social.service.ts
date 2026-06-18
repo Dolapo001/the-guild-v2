@@ -31,7 +31,7 @@ export const socialService = {
         return api.post('/social/reviews/', params);
     },
 
-    moderateReview: async (reviewUid: string, status: 'PENDING' | 'APPROVED' | 'REJECTED'): Promise<any> => {
+    moderateReview: async (reviewUid: string, status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'DELETED'): Promise<any> => {
         return api.patch(`/social/reviews/${reviewUid}/moderate/`, { status });
     }
 };

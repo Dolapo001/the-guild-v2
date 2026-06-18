@@ -20,7 +20,8 @@ import { marketplaceService } from "@/services/marketplace.service";
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
-  
+  const { cart, cartCity, cartTotal, clearCart } = useCart();
+
   const [deliveryDetails, setDeliveryDetails] = useState({
     name: user?.name || '',
     phone: user?.phone || '',

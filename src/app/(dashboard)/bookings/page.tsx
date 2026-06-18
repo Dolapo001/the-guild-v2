@@ -45,7 +45,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { bookingService } from "@/services/booking.service";
+import { bookingService, asList } from "@/services/booking.service";
 import { staffService } from "@/services/staff.service";
 import { maestroService } from "@/services/maestro.service";
 import { Booking, User as ApiUser, Service } from "@/types/api";
@@ -92,7 +92,7 @@ export default function BookingsPage() {
               staffService.getStaffList(),
               maestroService.getMyBusinesses()
           ]);
-          setBookings(bookingData);
+          setBookings(asList(bookingData));
           setRealStaff(staffData);
           setMyBusinesses(businessData);
           if (businessData.length > 0) {

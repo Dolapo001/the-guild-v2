@@ -57,7 +57,7 @@ export const bookingService = {
     api.post('/bookings/review/', data),
 
   getStaffSchedule: async (params: { month?: string; date?: string }) =>
-    api.get('/bookings/staff/schedule/', { params: params as any }),
+    api.get<Paginated<Booking> | Booking[]>('/bookings/staff/schedule/', { params: params as any }),
 
   getActiveJob: async () => api.get<Booking | null>('/bookings/active/'),
 

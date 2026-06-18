@@ -122,7 +122,7 @@ export default function CustomerDashboard() {
       const toastId = toast.loading("Updating your booking...");
       try {
         await bookingService.updateBookingStatus(activeBooking.uid, "CONFIRMED");
-        const bks = await bookingService.getBookings();
+        const bks = asList(await bookingService.getBookings());
         setActiveBooking(bks.find(b => b.uid === activeBooking.uid) || null);
         toast.success("Replacement accepted! See you then.", { id: toastId });
       } catch (err) {
@@ -440,7 +440,7 @@ export default function CustomerDashboard() {
                     <div className="flex items-center gap-3 mt-1">
                       {item.status === 'COMPLETED' && (
                         <button
-                          onClick={(e) => { e.preventDefault(); openReviewModal(item.uid, item.serviceName); }}
+                          onClick={(e) => { e.preventDefault(); openReviewModal(item.uid, item.serviceName || ''); }}
                           className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-widest hover:underline transition-colors flex items-center gap-1"
                         >
                           <Star className="h-3 w-3" /> Review
