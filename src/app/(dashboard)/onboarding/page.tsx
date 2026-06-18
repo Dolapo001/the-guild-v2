@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { TextField } from "@/components/ui/text-field";
 import {
  Building2,
  MapPin,
@@ -132,22 +132,19 @@ export default function OnboardingPage() {
  <div className="space-y-6">
  {currentStep === 0 && (
  <div className="space-y-4">
- <div className="space-y-2">
- <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest">Business Name</label>
- <Input
- placeholder="e.g. Glow Spa Lekki"
+ <TextField
+ label="Business name"
+ icon={Building2}
  value={formData.name}
- onChange={(e) => setFormData({ ...formData, name: e.target.value })}
- className="h-12 rounded-xl bg-white/50 border-glass-border"
+ onChange={(v) => setFormData({ ...formData, name: v })}
  />
- </div>
  <div className="space-y-2">
  <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest">Description</label>
  <textarea
  placeholder="Tell us about your services..."
  value={formData.description}
  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
- className="w-full min-h-[120px] rounded-2xl border border-glass-border bg-white/50 px-4 py-3 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20"
+ className="w-full min-h-[120px] rounded-input border border-border bg-surface px-4 py-3 text-body focus:outline-none focus:ring-2 focus:ring-ring/15"
  />
  </div>
  </div>
@@ -155,15 +152,12 @@ export default function OnboardingPage() {
 
  {currentStep === 1 && (
  <div className="space-y-6">
- <div className="space-y-2">
- <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest">Business Address</label>
- <Input
- placeholder="12 Adeola Odeku St, VI, Lagos"
+ <TextField
+ label="Business address"
+ icon={MapPin}
  value={formData.address}
- onChange={(e) => setFormData({ ...formData, address: e.target.value })}
- className="h-12 rounded-xl bg-white/50 border-glass-border"
+ onChange={(v) => setFormData({ ...formData, address: v })}
  />
- </div>
  <div className="aspect-video rounded-2xl bg-primary/5 border border-glass-border flex flex-col items-center justify-center text-center p-8">
  <MapPin className="h-10 w-10 text-primary/20 mb-4" />
  <p className="text-sm font-bold text-primary">Interactive Map Placeholder</p>
@@ -196,18 +190,16 @@ export default function OnboardingPage() {
  <Lock className="h-5 w-5 text-accent" />
  <p className="text-xs font-bold text-accent">Your data is encrypted and handled securely.</p>
  </div>
- <div className="space-y-2">
- <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest">CAC Registration Number</label>
- <Input
- placeholder="RC-123456"
+ <TextField
+ label="CAC registration number"
+ icon={FileText}
  value={formData.cacNumber}
- onChange={(e) => setFormData({ ...formData, cacNumber: e.target.value })}
- className="h-12 rounded-xl bg-white/50 border-glass-border"
+ onChange={(v) => setFormData({ ...formData, cacNumber: v })}
+ error={formData.cacNumber.length > 0 && !CAC_REGEX.test(formData.cacNumber) ? "Invalid format. Use RC-XXXXXX" : null}
+ valid={CAC_REGEX.test(formData.cacNumber)}
+ helper="Format: RC-XXXXXX"
+ className="[&_input]:font-mono"
  />
- {!CAC_REGEX.test(formData.cacNumber) && formData.cacNumber && (
- <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Invalid format. Use RC-XXXXXX</p>
- )}
- </div>
  <div className="grid grid-cols-2 gap-4">
  <div className="border-2 border-dashed border-glass-border rounded-2xl p-6 text-center hover:bg-primary/5 transition-colors cursor-pointer group">
  <Upload className="h-6 w-6 text-foreground/20 mx-auto mb-2 group-hover:text-primary transition-colors" />
