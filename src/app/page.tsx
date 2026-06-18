@@ -296,6 +296,13 @@ function Workflow() {
 /* ------------------------------------------------------------------ */
 
 function WhyInstall() {
+  const lines = [
+    { from: "user", text: "Need a cleaner for a 3-bedroom apartment tomorrow." },
+    { from: "ai", text: "Found 4 verified cleaners. The top-rated charges ₦15k. Should I book?" },
+    { from: "user", text: "Yes, book them for 10 AM." },
+    { from: "ai", text: "Done. Locked ₦15k in escrow. They'll see you at 10 AM." },
+  ];
+
   const reasons = [
     { icon: WifiOff, title: "Works offline", body: "Your bookings, wallet and chats stay available even with no signal — synced the moment you reconnect." },
     { icon: Gauge, title: "Instantly fast", body: "Cached and compiled to your device. Opens in a tap, no page loads, no spinners." },

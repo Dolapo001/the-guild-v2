@@ -26,7 +26,7 @@ const APP_PREFIXES = [
 // Always reachable in a browser tab (marketing, install funnel, auth, entry).
 const AUTH_PAGES = ["/login", "/register"];
 
-export function middleware(req: NextRequest) {
+export default function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const hasSession = Boolean(
     req.cookies.get(ACCESS_COOKIE)?.value || req.cookies.get(REFRESH_COOKIE)?.value,
