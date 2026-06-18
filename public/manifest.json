@@ -2,7 +2,7 @@
     "name": "The Guild",
     "short_name": "The Guild",
     "description": "Nigeria's Premium Verified Marketplace",
-    "start_url": "/",
+    "start_url": "/?source=pwa",
     "display": "standalone",
     "background_color": "#02040a",
     "theme_color": "#1A237E",

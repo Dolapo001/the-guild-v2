@@ -76,11 +76,10 @@ function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-3">
       <nav
-        className={`flex w-full max-w-6xl items-center justify-between gap-4 rounded-2xl px-4 py-2.5 transition-all duration-300 ${
-          scrolled
+        className={`flex w-full max-w-6xl items-center justify-between gap-4 rounded-2xl px-4 py-2.5 transition-all duration-300 ${scrolled
             ? "border border-white/10 bg-[#0a0e1c]/80 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.4)]"
             : "border border-transparent"
-        }`}
+          }`}
       >
         <Link href="/" className="flex items-center gap-2.5">
           <span className="h-9 w-9 overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
@@ -322,9 +321,8 @@ function PreviewSection() {
                   {Array.from({ length: 12 }).map((_, i) => (
                     <span
                       key={i}
-                      className={`flex h-9 items-center justify-center rounded-lg text-[11px] font-bold ${
-                        i === 5 ? "bg-[#ffb74d] text-[#0b0f1f]" : "bg-white/[0.04] text-white/50"
-                      }`}
+                      className={`flex h-9 items-center justify-center rounded-lg text-[11px] font-bold ${i === 5 ? "bg-[#ffb74d] text-[#0b0f1f]" : "bg-white/[0.04] text-white/50"
+                        }`}
                     >
                       {9 + i}
                     </span>
@@ -497,9 +495,8 @@ function AILayer() {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.25 }}
-                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[13px] font-medium leading-snug ${
-                    l.from === "ai" ? "bg-white/[0.05] text-white/85" : "ml-auto bg-[#3949ab] text-white"
-                  }`}
+                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[13px] font-medium leading-snug ${l.from === "ai" ? "bg-white/[0.05] text-white/85" : "ml-auto bg-[#3949ab] text-white"
+                    }`}
                 >
                   {l.text}
                 </motion.div>
