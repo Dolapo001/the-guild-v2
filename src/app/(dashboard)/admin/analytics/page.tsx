@@ -6,11 +6,12 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   LineChart, Line, PieChart, Pie, Cell, AreaChart, Area
 } from "recharts";
-import { 
-  TrendingUp, Users, Calendar, DollarSign, Download, 
-  AlertTriangle, ArrowUpRight, ArrowDownRight, Activity, Map
+import {
+  TrendingUp, Users, Calendar, DollarSign, Download,
+  AlertTriangle, Activity, Map
 } from "lucide-react";
 import { GlassCard } from "@/components/ui/glass-card";
+import { KpiCard } from "@/components/ui/kpi-card";
 import { analyticsService, AnalyticsSummary, TrendItem } from "@/services/analytics.service";
 import { toast } from "sonner";
 
@@ -88,34 +89,17 @@ export default function AdminAnalyticsPage() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard 
-          title="New Signups" 
-          value={userData?.summary.newSignups || 0} 
-          icon={<Users className="h-5 w-5" />}
-          trend="+15%"
-          isUp={true}
-        />
-        <StatCard 
-          title="Avg Daily Active" 
-          value={userData?.summary.avgDau || 0} 
-          icon={<Activity className="h-5 w-5" />}
-          trend="+5.2%"
-          isUp={true}
-        />
-        <StatCard 
-          title="Platform Fees" 
-          value={`₦${(userData?.summary.totalFees || 0).toLocaleString()}`} 
-          icon={<DollarSign className="h-5 w-5" />}
-          trend="+12%"
-          isUp={true}
-        />
-        <StatCard 
-          title="Fraud Alerts" 
-          value={fraudData?.totalFraudFlags || 0} 
-          icon={<AlertTriangle className="h-5 w-5" />}
-          trend={fraudData?.totalFraudFlags ? "+1" : "Stable"}
-          isUp={false}
-          isWarning={!!fraudData?.totalFraudFlags}
+        <KpiCard label="New Signups" value={userData?.summary.newSignups || 0} icon={Users} delta="+15%" trend="up" delay={0} />
+        <KpiCard label="Avg Daily Active" value={userData?.summary.avgDau || 0} icon={Activity} delta="+5.2%" trend="up" delay={0.06} />
+        <KpiCard label="Platform Fees" value={`₦${(userData?.summary.totalFees || 0).toLocaleString()}`} icon={DollarSign} delta="+12%" trend="up" delay={0.12} />
+        <KpiCard
+          label="Fraud Alerts"
+          value={fraudData?.totalFraudFlags || 0}
+          icon={AlertTriangle}
+          iconClassName={fraudData?.totalFraudFlags ? "bg-error/10 text-error" : "bg-muted text-muted-foreground"}
+          delta={fraudData?.totalFraudFlags ? "+1" : "Stable"}
+          trend={fraudData?.totalFraudFlags ? "down" : "neutral"}
+          delay={0.18}
         />
       </div>
 
@@ -213,26 +197,6 @@ export default function AdminAnalyticsPage() {
         </GlassCard>
       </div>
     </div>
-  );
-}
-
-function StatCard({ title, value, icon, trend, isUp, isWarning }: any) {
-  return (
-    <GlassCard className={`p-6 ${isWarning ? "border-rose-200/50" : ""}`}>
-      <div className="flex items-center justify-between mb-4">
-        <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${isWarning ? "bg-rose-100 text-rose-500" : "bg-primary/10 text-primary"}`}>
-          {icon}
-        </div>
-        <div className={`flex items-center gap-1 text-xs font-bold ${isUp ? "text-emerald-500" : isWarning ? "text-rose-500" : "text-foreground/40"}`}>
-          {isUp && <ArrowUpRight className="h-3 w-3" />}
-          {trend}
-        </div>
-      </div>
-      <div>
-        <p className="text-xs font-extrabold text-foreground/40 uppercase tracking-widest mb-1">{title}</p>
-        <h4 className="text-2xl font-black text-primary">{value}</h4>
-      </div>
-    </GlassCard>
   );
 }
 
