@@ -15,7 +15,9 @@ import { toast } from "sonner";
  * Without this route Paystack's redirect 404'd; users were left in
  * limbo and never had their balances updated.
  */
-export default function PaymentCallbackPage() {
+import { Suspense } from "react";
+
+function PaymentCallbackContent() {
   const router = useRouter();
   const params = useSearchParams();
   const reference = params.get("reference") || params.get("trxref");
@@ -80,5 +82,13 @@ export default function PaymentCallbackPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function PaymentCallbackPage() {
+  return (
+    <Suspense>
+      <PaymentCallbackContent />
+    </Suspense>
   );
 }

@@ -24,7 +24,9 @@ import { toast } from "sonner";
 
 type Step = "role" | "details" | "invite";
 
-export default function RegisterPage() {
+import { Suspense } from "react";
+
+function RegisterContent() {
  const searchParams = useSearchParams();
  const { register, error: authError } = useAuth();
  
@@ -246,4 +248,12 @@ export default function RegisterPage() {
   </motion.div>
   </div>
  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterContent />
+    </Suspense>
+  );
 }

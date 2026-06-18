@@ -1973,7 +1973,9 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
 
 // --- Main Page ---
 
-export default function ProfilePage() {
+import { Suspense } from "react";
+
+function ProfileContent() {
   const { user, updateUser } = useAuth();
   const searchParams = useSearchParams();
   const currentRole = user?.role || "customer";
@@ -2232,5 +2234,13 @@ export default function ProfilePage() {
       </AnimatePresence>
 
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense>
+      <ProfileContent />
+    </Suspense>
   );
 }
