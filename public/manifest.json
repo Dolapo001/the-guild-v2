@@ -5,6 +5,7 @@
     "start_url": "/app",
     "id": "/app",
     "scope": "/",
+    "start_url": "/?source=pwa",
     "display": "standalone",
     "display_override": ["standalone", "fullscreen", "minimal-ui"],
     "orientation": "portrait",
