@@ -184,7 +184,7 @@ export default function SearchPage() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px] p-0">
-              <div className="h-full p-6 bg-white ">
+              <div className="h-full p-6 bg-card ">
                 <FilterPanel
                   filters={filters}
                   setFilters={setFilters}
@@ -208,7 +208,7 @@ export default function SearchPage() {
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="hidden lg:block overflow-hidden shrink-0 h-fit sticky top-24"
         >
-          <div className="w-[280px] p-6 rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div className="w-[280px] p-6 rounded-2xl border border-gray-200 bg-card shadow-sm">
             <FilterPanel
               filters={filters}
               setFilters={setFilters}
@@ -252,7 +252,7 @@ export default function SearchPage() {
           {loading ? (
             <div className={`grid grid-cols-1 md:grid-cols-2 ${showFilters ? 'xl:grid-cols-3' : 'xl:grid-cols-4'} gap-6 transition-all duration-300`}>
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="h-[400px] rounded-2xl border border-gray-200 bg-white animate-pulse">
+                <div key={i} className="h-[400px] rounded-2xl border border-gray-200 bg-card animate-pulse">
                   <div className="h-48 bg-gray-200 rounded-t-2xl" />
                   <div className="p-5 space-y-4">
                     <div className="h-6 w-2/3 bg-gray-200 rounded-lg" />

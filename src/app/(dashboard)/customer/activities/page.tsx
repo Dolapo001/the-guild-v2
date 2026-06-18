@@ -271,7 +271,7 @@ export default function ActivitiesPage() {
 
   {/* Review Dialog */}
   <Dialog open={!!reviewingActivity} onOpenChange={() => setReviewingActivity(null)}>
-    <DialogContent className="bg-white border-none rounded-3xl p-8 max-w-md">
+    <DialogContent className="bg-card border-none rounded-3xl p-8 max-w-md">
         <DialogHeader>
             <DialogTitle className="text-2xl font-extrabold text-primary flex items-center gap-3">
                 <Star className="h-7 w-7 text-accent" /> Rate your experience

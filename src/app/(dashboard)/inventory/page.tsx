@@ -306,7 +306,7 @@ export default function InventoryPage() {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-11 h-12 bg-white border-glass-border rounded-xl focus:ring-primary/10 text-sm font-bold"
+                className="pl-11 h-12 bg-card border-glass-border rounded-xl focus:ring-primary/10 text-sm font-bold"
               />
             </div>
           </div>
@@ -630,7 +630,7 @@ export default function InventoryPage() {
                       <select
                         value={newProduct.city}
                         onChange={(e) => setNewProduct({ ...newProduct, city: e.target.value })}
-                        className="w-full h-11 px-3 border border-glass-border bg-white rounded-xl text-sm outline-none"
+                        className="w-full h-11 px-3 border border-glass-border bg-card rounded-xl text-sm outline-none"
                       >
                         <option value="Lagos">Lagos</option>
                         <option value="Abuja">Abuja</option>
@@ -715,7 +715,7 @@ export default function InventoryPage() {
                       <select
                         value={newPackage.city}
                         onChange={(e) => setNewPackage({ ...newPackage, city: e.target.value })}
-                        className="w-full h-11 px-3 border border-glass-border bg-white rounded-xl text-sm outline-none"
+                        className="w-full h-11 px-3 border border-glass-border bg-card rounded-xl text-sm outline-none"
                       >
                         <option value="Lagos">Lagos</option>
                         <option value="Abuja">Abuja</option>

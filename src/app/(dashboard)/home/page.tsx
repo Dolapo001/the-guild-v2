@@ -454,7 +454,7 @@ export default function DashboardHome() {
             <div className="flex flex-col gap-4 sm:gap-5 mt-6 sm:mt-10">
               <Link href="/profile">
                 <Button 
-                  className="w-full justify-between h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-primary group"
+                  className="w-full justify-between h-12 sm:h-14 rounded-xl sm:rounded-2xl bg-card border border-gray-100 shadow-sm hover:shadow-md transition-all text-primary group"
                 >
                   <span className="text-sm sm:text-base font-bold">Update Portfolio</span>
                   <Plus className="h-4 w-4 sm:h-5 sm:w-5 opacity-40 group-hover:rotate-90 transition-transform" />

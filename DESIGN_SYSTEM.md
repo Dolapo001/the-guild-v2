@@ -110,3 +110,28 @@ build on these tokens without re-deciding visuals:
 
 These are best done iteratively per screen so each can be verified, rather than
 in one unverifiable sweep.
+
+## Dark-readiness sweep (in progress)
+
+Goal: replace hardcoded light-only colors with semantic tokens so the app can
+later switch to dark mode by toggling the root `.dark` class — **without
+changing the current light appearance**.
+
+**Phase 1 (done):** an app-wide codemod applied only the *pixel-identical*
+mappings (the token's light value is byte-for-byte the replaced color), so the
+light UI is provably unchanged:
+
+| Hardcoded | Token | Light value (identical) |
+|---|---|---|
+| `bg-white` | `bg-card` | `#ffffff` |
+| `bg-slate-100` | `bg-muted` | `#f1f5f9` |
+| `text-slate-500` | `text-muted-foreground` | `#64748b` |
+| `text-slate-800` | `text-foreground` | `#1e293b` |
+| `border-slate-100` | `border-border` | slate @ ~8% |
+
+**Remaining (per-screen, needs visual review):** non-exact colors —
+`text-gray-*`, `text-slate-400/600/700/900`, `bg-gray-50`, `border-gray-*`, and
+the translucent `bg-white/NN` glass overlays. These don't map 1:1 to a token, so
+each should be converted and eye-checked screen by screen (heaviest files:
+`profile`, `staff-portal`, `active-job`, `job-history`, `wallet`). Only after
+this is complete should dark mode be switched on.

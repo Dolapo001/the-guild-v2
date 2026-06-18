@@ -150,18 +150,18 @@ function CustomerWalletView({ balance, pendingEscrow, isObscured, toggleObscure,
             <div className="relative z-10 flex gap-4">
               <Dialog open={fundOpen} onOpenChange={setFundOpen}>
                 <DialogTrigger asChild>
-                  <Button className="h-12 px-8 rounded-xl bg-white text-blue-700 font-bold hover:bg-white/90 shadow-lg">
+                  <Button className="h-12 px-8 rounded-xl bg-card text-blue-700 font-bold hover:bg-white/90 shadow-lg">
                     <Plus className="mr-2 h-4 w-4" /> Fund Wallet
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md bg-white text-slate-800 rounded-3xl p-8">
+                <DialogContent className="max-w-md bg-card text-foreground rounded-3xl p-8">
                   <DialogHeader>
                     <DialogTitle className="text-xl font-black">Top-up Wallet</DialogTitle>
-                    <p className="text-xs font-semibold text-slate-500">Securely add funds to your wallet for bookings.</p>
+                    <p className="text-xs font-semibold text-muted-foreground">Securely add funds to your wallet for bookings.</p>
                   </DialogHeader>
                   <form onSubmit={handleFundSubmit} className="space-y-6 pt-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Amount (₦)</label>
+                      <label className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Amount (₦)</label>
                       <Input
                         type="number"
                         placeholder="e.g. 5000"
@@ -327,41 +327,41 @@ function StaffWalletView({ balance, tipsBalance, isObscured, toggleObscure, with
             <div className="relative z-10">
               <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                 <DialogTrigger asChild>
-                  <Button className="h-12 px-8 rounded-xl bg-white text-indigo-600 font-bold hover:bg-white/90 shadow-lg hover:shadow-indigo-500/10 transition-all">
+                  <Button className="h-12 px-8 rounded-xl bg-card text-indigo-600 font-bold hover:bg-white/90 shadow-lg hover:shadow-indigo-500/10 transition-all">
                     <ArrowUpRight className="mr-2 h-4 w-4 text-indigo-600" /> Request Payout
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-md bg-white border border-slate-200 text-slate-800 rounded-3xl p-8 shadow-2xl">
+                <DialogContent className="max-w-md bg-card border border-slate-200 text-foreground rounded-3xl p-8 shadow-2xl">
                   <DialogHeader className="space-y-2">
-                    <DialogTitle className="text-xl font-black text-slate-800">Secure Withdrawal</DialogTitle>
-                    <p className="text-xs font-semibold text-slate-500">Instant payout from your Tip Jar to any Nigerian Bank Account.</p>
+                    <DialogTitle className="text-xl font-black text-foreground">Secure Withdrawal</DialogTitle>
+                    <p className="text-xs font-semibold text-muted-foreground">Instant payout from your Tip Jar to any Nigerian Bank Account.</p>
                   </DialogHeader>
 
                   <form onSubmit={handleWithdrawalSubmit} className="space-y-6 pt-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Payout Amount (₦)</label>
+                      <label className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Payout Amount (₦)</label>
                       <Input
                         type="number"
                         placeholder="e.g. 500"
                         value={withdrawAmount}
                         onChange={e => setWithdrawAmount(e.target.value)}
-                        className="h-12 rounded-xl border-slate-200 font-bold focus:ring-primary focus:border-primary text-slate-800"
+                        className="h-12 rounded-xl border-slate-200 font-bold focus:ring-primary focus:border-primary text-foreground"
                         required
                       />
                       <p className="text-[10px] font-bold text-slate-400">Withdrawable Balance: ₦ {withdrawableBalance.toLocaleString()}</p>
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Target Bank</label>
+                      <label className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Target Bank</label>
                       {loadingBanks ? (
-                        <div className="flex items-center justify-center h-12 bg-slate-50 rounded-xl border border-slate-100">
+                        <div className="flex items-center justify-center h-12 bg-slate-50 rounded-xl border border-border">
                           <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
                         </div>
                       ) : (
                         <select
                           value={bankCode}
                           onChange={e => setBankCode(e.target.value)}
-                          className="w-full h-12 rounded-xl border border-slate-200 px-3 bg-white font-bold text-slate-700 text-sm focus:ring-primary focus:border-primary"
+                          className="w-full h-12 rounded-xl border border-slate-200 px-3 bg-card font-bold text-slate-700 text-sm focus:ring-primary focus:border-primary"
                           required
                         >
                           {banksList.map((b: any) => (
@@ -372,14 +372,14 @@ function StaffWalletView({ balance, tipsBalance, isObscured, toggleObscure, with
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Account Number</label>
+                      <label className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Account Number</label>
                       <Input
                         type="text"
                         maxLength={10}
                         placeholder="10-digit NUBAN number"
                         value={accountNumber}
                         onChange={e => setAccountNumber(e.target.value.replace(/\D/g, ''))}
-                        className="h-12 rounded-xl border-slate-200 font-bold tracking-widest focus:ring-primary focus:border-primary text-slate-800"
+                        className="h-12 rounded-xl border-slate-200 font-bold tracking-widest focus:ring-primary focus:border-primary text-foreground"
                         required
                       />
                     </div>
@@ -433,7 +433,7 @@ function StaffWalletView({ balance, tipsBalance, isObscured, toggleObscure, with
           { label: "Base Service Earnings", value: `₦ ${actualServiceEarnings.toLocaleString()}`, icon: TrendingUp, color: "text-indigo-600", bg: "bg-indigo-100/50 border border-indigo-200" },
           { label: "Total Earned", value: "₦ 245K", icon: DollarSign, color: "text-primary", bg: "bg-primary/10 border border-primary/20" },
         ].map((stat, i) => (
-          <GlassCard key={i} className="p-6 border-slate-200 bg-white shadow-sm flex items-center gap-4 rounded-3xl">
+          <GlassCard key={i} className="p-6 border-slate-200 bg-card shadow-sm flex items-center gap-4 rounded-3xl">
             <div className={cn("h-12 w-12 rounded-2xl flex items-center justify-center", stat.bg)}>
               <stat.icon className={cn("h-6 w-6", stat.color)} />
             </div>
@@ -537,20 +537,20 @@ function BusinessWalletView({
                   <DialogTrigger asChild>
                     <Button
                       disabled={user?.verificationStatus !== 'verified'}
-                      className="flex-1 h-12 rounded-xl bg-white text-primary font-bold hover:bg-white/90 shadow-xl disabled:opacity-50 disabled:grayscale transition-all"
+                      className="flex-1 h-12 rounded-xl bg-card text-primary font-bold hover:bg-white/90 shadow-xl disabled:opacity-50 disabled:grayscale transition-all"
                       title={user?.verificationStatus !== 'verified' ? "CAC Verification Required" : ""}
                     >
                       <ArrowUpRight className="mr-2 h-4 w-4" /> Withdraw
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md bg-white text-slate-800 rounded-3xl p-8">
+                  <DialogContent className="max-w-md bg-card text-foreground rounded-3xl p-8">
                     <DialogHeader>
                       <DialogTitle className="text-xl font-black">Business Withdrawal</DialogTitle>
-                      <p className="text-xs font-semibold text-slate-500">Transfer funds from your business balance to your linked bank account.</p>
+                      <p className="text-xs font-semibold text-muted-foreground">Transfer funds from your business balance to your linked bank account.</p>
                     </DialogHeader>
                     <form onSubmit={handleWithdrawSubmit} className="space-y-6 pt-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-extrabold uppercase tracking-wider text-slate-500">Amount (₦)</label>
+                        <label className="text-xs font-extrabold uppercase tracking-wider text-muted-foreground">Amount (₦)</label>
                         <Input
                           type="number"
                           placeholder="e.g. 10000"

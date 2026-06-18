@@ -100,7 +100,7 @@ const CustomSwitch = ({ checked, onChange, label, disabled }: { checked: boolean
     >
       <span
         className={cn(
-          "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+          "inline-block h-4 w-4 transform rounded-full bg-card transition-transform",
           checked ? "translate-x-6" : "translate-x-1"
         )}
       />
@@ -392,7 +392,7 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
       <div className="grid gap-8 lg:grid-cols-3">
         {/* Left Column: Avatar, Completion, Standing, Badges */}
         <div className="lg:col-span-1 space-y-8">
-          <GlassCard className="p-6 flex flex-col items-center text-center border-slate-200 bg-white shadow-md rounded-2xl relative">
+          <GlassCard className="p-6 flex flex-col items-center text-center border-slate-200 bg-card shadow-md rounded-2xl relative">
             <div className="relative group">
               <div className="h-28 w-28 rounded-2xl overflow-hidden border-2 border-primary/20 shadow-lg relative mb-4">
                 <Image
@@ -432,7 +432,7 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
               )}
             </div>
 
-            <h3 className="font-extrabold text-xl text-slate-800 leading-tight">{profileData.name}</h3>
+            <h3 className="font-extrabold text-xl text-foreground leading-tight">{profileData.name}</h3>
             
             {/* Employed Business Partner Label */}
             <div className="mt-2.5 flex flex-col items-center gap-1">
@@ -450,30 +450,30 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
           </GlassCard>
 
           {/* Profile Completion Card */}
-          <GlassCard className="p-6 border-slate-200 bg-white shadow-sm rounded-2xl">
+          <GlassCard className="p-6 border-slate-200 bg-card shadow-sm rounded-2xl">
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Standing & Visibility</h4>
               <ShieldCheck className="h-4.5 w-4.5 text-primary" />
             </div>
             <div className="space-y-4">
               <div className="flex justify-between items-end">
-                <span className="text-4xl font-black text-slate-800 leading-none">92%</span>
+                <span className="text-4xl font-black text-foreground leading-none">92%</span>
                 <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Profile Complete</span>
               </div>
-              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+              <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                 <div 
                   className="bg-primary h-full rounded-full transition-all duration-1000" 
                   style={{ width: "92%" }}
                 />
               </div>
-              <p className="text-[10px] font-bold text-slate-500 text-center italic">
+              <p className="text-[10px] font-bold text-muted-foreground text-center italic">
                 Highly optimized standing! Clients find your profile at top priority in search.
               </p>
             </div>
           </GlassCard>
 
           {/* Badges & Verifications */}
-          <GlassCard className="p-6 border-slate-200 bg-white shadow-sm rounded-2xl space-y-4">
+          <GlassCard className="p-6 border-slate-200 bg-card shadow-sm rounded-2xl space-y-4">
             <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verifications</h4>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-xl">
@@ -509,13 +509,13 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
 
         {/* Right Column: Bio, Skills, Masterwork Portfolio, Schedule, Testimonials */}
         <div className="lg:col-span-2 space-y-8">
-          <GlassCard className="p-8 border-slate-200 bg-white shadow-md rounded-2xl space-y-6">
+          <GlassCard className="p-8 border-slate-200 bg-card shadow-md rounded-2xl space-y-6">
             <div className="grid gap-6 sm:grid-cols-2">
               <div>
                 <FormLabel>Job Title / Business Role</FormLabel>
-                <div className="flex items-center gap-2 px-4 h-12 bg-slate-50 border border-slate-100 rounded-xl">
+                <div className="flex items-center gap-2 px-4 h-12 bg-slate-50 border border-border rounded-xl">
                   <Briefcase className="h-4.5 w-4.5 text-slate-400" />
-                  <span className="text-sm font-black text-slate-800">{profileData.jobTitle || "Not specified"}</span>
+                  <span className="text-sm font-black text-foreground">{profileData.jobTitle || "Not specified"}</span>
                 </div>
                 <p className="text-[9px] font-bold text-slate-400 mt-1.5 px-1">CEO Assigned recruitment title (Read-only)</p>
               </div>
@@ -575,8 +575,8 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
           <GlassCard className="p-8 border-indigo-500/10 bg-indigo-50/5 rounded-2xl space-y-6">
             <div className="flex items-center justify-between border-b border-indigo-500/10 pb-4">
               <div>
-                <h4 className="text-base font-black text-slate-800">Payout Destination</h4>
-                <p className="text-xs font-semibold text-slate-500">Linked bank account for automatic instant tip payouts.</p>
+                <h4 className="text-base font-black text-foreground">Payout Destination</h4>
+                <p className="text-xs font-semibold text-muted-foreground">Linked bank account for automatic instant tip payouts.</p>
               </div>
               <CreditCard className="h-5 w-5 text-indigo-500" />
             </div>
@@ -590,7 +590,7 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
                     <select
                       value={profileData.bankName}
                       onChange={(e) => setProfileData({ ...profileData, bankName: e.target.value })}
-                      className="w-full h-12 rounded-xl bg-slate-50 border border-slate-100 pl-11 pr-4 text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-0 outline-none transition-all appearance-none"
+                      className="w-full h-12 rounded-xl bg-slate-50 border border-border pl-11 pr-4 text-sm font-bold text-slate-700 focus:border-indigo-500 focus:ring-0 outline-none transition-all appearance-none"
                     >
                       <option value="" disabled>Select Bank...</option>
                       {banks.map((bank: any) => (
@@ -599,7 +599,7 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
                     </select>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 px-4 h-12 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-3 px-4 h-12 bg-slate-50 rounded-xl border border-border">
                     <Building2 className="h-4.5 w-4.5 text-indigo-500" />
                     <span className="text-sm font-bold text-slate-700">{profileData.bankName || "No Bank Linked"}</span>
                   </div>
@@ -616,14 +616,14 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
                       maxLength={10}
                       placeholder="e.g. 0123456789"
                       onChange={(e) => handleAccountNumberChange(e.target.value.replace(/\D/g, ''))}
-                      className="pl-11 h-12 rounded-xl bg-slate-50 border border-slate-100 focus:border-indigo-500 font-bold text-sm"
+                      className="pl-11 h-12 rounded-xl bg-slate-50 border border-border focus:border-indigo-500 font-bold text-sm"
                     />
                     {isFetchingAccount && (
                       <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-indigo-500 animate-spin" />
                     )}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 px-4 h-12 bg-slate-50 rounded-xl border border-slate-100">
+                  <div className="flex items-center gap-3 px-4 h-12 bg-slate-50 rounded-xl border border-border">
                     <CreditCard className="h-4.5 w-4.5 text-indigo-500" />
                     <span className="text-sm font-mono font-bold tracking-wider text-slate-700">
                       {profileData.accountNumber ? `**** **** ${profileData.accountNumber.slice(-4)}` : "Not Provided"}
@@ -649,11 +649,11 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
           </GlassCard>
 
           {/* Masterwork Portfolio Showcase */}
-          <GlassCard className="p-8 border-slate-200 bg-white shadow-md rounded-2xl space-y-6">
+          <GlassCard className="p-8 border-slate-200 bg-card shadow-md rounded-2xl space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="text-base font-black text-slate-800">My Masterwork Portfolio</h4>
-                <p className="text-xs font-semibold text-slate-500">Visual showcase of past beauty and bodywork treatments.</p>
+                <h4 className="text-base font-black text-foreground">My Masterwork Portfolio</h4>
+                <p className="text-xs font-semibold text-muted-foreground">Visual showcase of past beauty and bodywork treatments.</p>
               </div>
               <Button 
                 onClick={() => setPortfolioOpen(true)}
@@ -667,13 +667,13 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {activePortfolio.map((item: any) => (
-                <div key={item.id} className="group/item border border-slate-100 rounded-xl overflow-hidden bg-slate-50 flex flex-col shadow-sm">
+                <div key={item.id} className="group/item border border-border rounded-xl overflow-hidden bg-slate-50 flex flex-col shadow-sm">
                   <div className="relative h-32 w-full">
                     <Image src={item.image} alt={item.title} fill className="object-cover group-hover/item:scale-105 transition-transform duration-300" />
                   </div>
                   <div className="p-3 space-y-1 flex-1">
-                    <p className="text-xs font-black text-slate-800 line-clamp-1">{item.title}</p>
-                    <p className="text-[10px] font-medium text-slate-500 line-clamp-2 leading-relaxed">{item.desc}</p>
+                    <p className="text-xs font-black text-foreground line-clamp-1">{item.title}</p>
+                    <p className="text-[10px] font-medium text-muted-foreground line-clamp-2 leading-relaxed">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -681,10 +681,10 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
           </GlassCard>
 
           {/* Client Testimonials */}
-          <GlassCard className="p-8 border-slate-200 bg-white shadow-md rounded-2xl space-y-6">
+          <GlassCard className="p-8 border-slate-200 bg-card shadow-md rounded-2xl space-y-6">
             <div>
-              <h4 className="text-base font-black text-slate-800">What Clients Say</h4>
-              <p className="text-xs font-semibold text-slate-500">
+              <h4 className="text-base font-black text-foreground">What Clients Say</h4>
+              <p className="text-xs font-semibold text-muted-foreground">
                 {reviews && reviews.length > 0 
                   ? `Real verified feedback left after completed jobs (Showing ${reviews.length} reviews).`
                   : `Real verified feedback left after completed jobs (Showing 4 of 42 reviews).`}
@@ -697,16 +697,16 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
             ) : reviews && reviews.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2">
                 {reviews.map((rev: any, index: number) => (
-                  <div key={index} className="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-2 hover:border-primary/10 transition-colors">
+                  <div key={index} className="p-4 rounded-xl bg-slate-50 border border-border space-y-2 hover:border-primary/10 transition-colors">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs font-black text-slate-800">{rev.customerName || "Verified Client"}</span>
+                      <span className="text-xs font-black text-foreground">{rev.customerName || "Verified Client"}</span>
                       <div className="flex gap-0.5">
                         {[...Array(rev.rating || 5)].map((_, i) => (
                           <Star key={i} className="h-3 w-3 fill-amber-500 text-amber-500" />
                         ))}
                       </div>
                     </div>
-                    <p className="text-xs text-slate-500 font-medium italic">"{rev.comment}"</p>
+                    <p className="text-xs text-muted-foreground font-medium italic">"{rev.comment}"</p>
                   </div>
                 ))}
               </div>
@@ -718,10 +718,10 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
           </GlassCard>
 
           {/* Active Work Shifts Schedule */}
-          <GlassCard className="p-8 border-slate-200 bg-white shadow-md rounded-2xl space-y-6">
+          <GlassCard className="p-8 border-slate-200 bg-card shadow-md rounded-2xl space-y-6">
             <div>
-              <h4 className="text-base font-black text-slate-800">Shift Schedule</h4>
-              <p className="text-xs font-semibold text-slate-500">Your assigned shift roster with Rhyve Beauty Oasis.</p>
+              <h4 className="text-base font-black text-foreground">Shift Schedule</h4>
+              <p className="text-xs font-semibold text-muted-foreground">Your assigned shift roster with Rhyve Beauty Oasis.</p>
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
               {[
@@ -744,8 +744,8 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
 
       {/* Add Project Portfolio Dialog */}
       <Dialog open={portfolioOpen} onOpenChange={setPortfolioOpen}>
-        <DialogContent className="bg-white border-slate-200 text-slate-800 rounded-3xl p-6 max-w-sm shadow-2xl">
-          <DialogHeader className="pb-3 border-b border-slate-100 text-center">
+        <DialogContent className="bg-card border-slate-200 text-foreground rounded-3xl p-6 max-w-sm shadow-2xl">
+          <DialogHeader className="pb-3 border-b border-border text-center">
             <div className="mx-auto h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-2 border border-primary/20">
               <Camera className="h-6 w-6 text-primary" />
             </div>
@@ -760,7 +760,7 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
                 type="text"
                 placeholder="e.g. Lymphatic Therapy Setup"
                 required
-                className="bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 font-bold rounded-xl h-11"
+                className="bg-slate-50 border-slate-200 text-foreground placeholder-slate-400 font-bold rounded-xl h-11"
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
               />
@@ -770,7 +770,7 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Description</label>
               <Textarea
                 placeholder="Brief description of the work and results..."
-                className="bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 font-bold rounded-xl"
+                className="bg-slate-50 border-slate-200 text-foreground placeholder-slate-400 font-bold rounded-xl"
                 value={newDesc}
                 onChange={(e) => setNewDesc(e.target.value)}
               />
@@ -819,7 +819,7 @@ const StaffProfileView = ({ isEditing, setIsEditing, profileData, setProfileData
               <Button
                 type="button"
                 onClick={() => setPortfolioOpen(false)}
-                className="flex-1 h-11 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 font-black hover:bg-slate-200 text-xs"
+                className="flex-1 h-11 rounded-xl bg-muted border border-slate-200 text-slate-700 font-black hover:bg-slate-200 text-xs"
               >
                 Cancel
               </Button>
@@ -1121,7 +1121,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
       />
 
       {/* Header Section: Banner + Logo */}
-      <div className="relative h-48 md:h-80 w-full rounded-[1.5rem] md:rounded-[2.5rem] bg-slate-100 group shadow-premium">
+      <div className="relative h-48 md:h-80 w-full rounded-[1.5rem] md:rounded-[2.5rem] bg-muted group shadow-premium">
         <div className="absolute inset-0 rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden z-0">
           {isUploadingBanner ? (
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
@@ -1158,7 +1158,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
 
         <div className="absolute -bottom-1 left-0 right-0 md:left-12 md:right-auto flex flex-col md:flex-row items-center md:items-end gap-4 md:gap-10 z-10 pointer-events-none">
           <div className="relative translate-y-1/2 pointer-events-auto">
-            <div className="h-32 w-32 md:h-44 md:w-44 rounded-[1.5rem] md:rounded-[2.5rem] bg-white p-2 md:p-4 border-[4px] md:border-[6px] border-white shadow-2xl relative overflow-hidden group/logo">
+            <div className="h-32 w-32 md:h-44 md:w-44 rounded-[1.5rem] md:rounded-[2.5rem] bg-card p-2 md:p-4 border-[4px] md:border-[6px] border-white shadow-2xl relative overflow-hidden group/logo">
               {isUploadingLogo ? (
                 <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
                   <Loader2 className="h-8 w-8 text-primary animate-spin" />
@@ -1482,7 +1482,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                           !isEditing && "opacity-50"
                         )}
                       >
-                        <span className={cn("inline-block h-6 w-6 transform rounded-full bg-white transition-transform shadow-md", !item.isClosed ? "translate-x-7" : "translate-x-1")} />
+                        <span className={cn("inline-block h-6 w-6 transform rounded-full bg-card transition-transform shadow-md", !item.isClosed ? "translate-x-7" : "translate-x-1")} />
                       </button>
                       <span className="text-[10px] font-black uppercase tracking-widest text-foreground/30 min-w-[50px]">
                         {item.isClosed ? "OFFLINE" : "ACTIVE"}
@@ -1525,7 +1525,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                   <h3 className="text-2xl font-black text-primary">Operations & Scaling</h3>
                   <Badge className={cn(
                     "px-4 py-1.5 font-bold rounded-full border tracking-[0.2em] uppercase text-[9px]",
-                    isSolo ? "bg-slate-500/10 text-slate-500 border-slate-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                    isSolo ? "bg-slate-500/10 text-muted-foreground border-slate-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
                   )}>
                     {isSolo ? "SOLO MODE" : "TEAM MODE"}
                   </Badge>
@@ -1581,11 +1581,11 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                     <select
                       value={profileData.bankName}
                       onChange={(e) => setProfileData({ ...profileData, bankName: e.target.value })}
-                      className="w-full h-16 rounded-[1.5rem] bg-white border border-glass-border pl-14 pr-10 text-sm font-bold text-slate-800 focus:border-accent focus:ring-0 outline-none transition-all appearance-none cursor-pointer"
+                      className="w-full h-16 rounded-[1.5rem] bg-card border border-glass-border pl-14 pr-10 text-sm font-bold text-foreground focus:border-accent focus:ring-0 outline-none transition-all appearance-none cursor-pointer"
                     >
-                      <option value="" disabled className="text-slate-400 bg-white">Select Bank...</option>
+                      <option value="" disabled className="text-slate-400 bg-card">Select Bank...</option>
                       {banks.map(bank => (
-                        <option key={bank.uid || bank.id || bank.name} value={bank.name} className="text-slate-800 bg-white">
+                        <option key={bank.uid || bank.id || bank.name} value={bank.name} className="text-foreground bg-card">
                           {bank.name}
                         </option>
                       ))}
@@ -1609,7 +1609,7 @@ const BusinessProfileView = ({ isEditing, setIsEditing, profileData, setProfileD
                       value={profileData.accountNumber}
                       maxLength={10}
                       onChange={(e) => handleAccountNumberChange(e.target.value)}
-                      className="pl-14 h-16 rounded-[1.5rem] bg-white border border-glass-border focus:border-accent font-black text-xl tracking-widest text-slate-800"
+                      className="pl-14 h-16 rounded-[1.5rem] bg-card border border-glass-border focus:border-accent font-black text-xl tracking-widest text-foreground"
                     />
                     {isFetchingAccount && (
                       <Loader2 className="absolute right-5 top-1/2 -translate-y-1/2 h-5 w-5 text-accent animate-spin" />

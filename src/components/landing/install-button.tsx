@@ -73,7 +73,7 @@ export function InstallButton({
           "group relative inline-flex items-center justify-center gap-2.5 font-bold tracking-tight overflow-hidden",
           sizeClasses[size],
           tone === "solid"
-            ? "bg-white text-[#0b0f1f] shadow-[0_8px_30px_rgba(255,255,255,0.18)]"
+            ? "bg-card text-[#0b0f1f] shadow-[0_8px_30px_rgba(255,255,255,0.18)]"
             : "bg-white/10 text-white border border-white/20 backdrop-blur-xl hover:bg-white/15",
           className,
         )}

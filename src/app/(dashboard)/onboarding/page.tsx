@@ -96,7 +96,7 @@ export default function OnboardingPage() {
  <div className="space-y-6">
  {STEPS.map((step, i) => (
  <div key={step.id} className="flex items-center gap-4">
- <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${i <= currentStep ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white text-foreground/30 border border-glass-border'
+ <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${i <= currentStep ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-card text-foreground/30 border border-glass-border'
  }`}>
  {i < currentStep ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
  </div>

@@ -72,7 +72,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="py-24 px-6 border-t border-black/5 bg-white relative z-10">
+    <footer className="py-24 px-6 border-t border-black/5 bg-card relative z-10">
       <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-16">
         <div className="space-y-8">
           <Link href="/" className="flex items-center gap-2.5 group">
@@ -81,7 +81,7 @@ export function Footer() {
             </div>
             <span className="text-2xl font-extrabold tracking-tight text-slate-900 ">The Guild</span>
           </Link>
-          <p className="text-slate-500 font-medium leading-relaxed">
+          <p className="text-muted-foreground font-medium leading-relaxed">
             Nigeria's premier verified service marketplace. Building trust, one service at a time.
           </p>
         </div>
@@ -91,7 +91,7 @@ export function Footer() {
           <ul className="space-y-4">
             {navigation.platform.map((item) => (
               <li key={item.name}>
-                <Link href={item.href} className="text-slate-500 hover:text-primary transition-colors font-medium">
+                <Link href={item.href} className="text-muted-foreground hover:text-primary transition-colors font-medium">
                   {item.name}
                 </Link>
               </li>
@@ -104,7 +104,7 @@ export function Footer() {
           <ul className="space-y-4">
             {navigation.business.map((item) => (
               <li key={item.name}>
-                <Link href={item.href} className="text-slate-500 hover:text-primary transition-colors font-medium">
+                <Link href={item.href} className="text-muted-foreground hover:text-primary transition-colors font-medium">
                   {item.name}
                 </Link>
               </li>
@@ -123,7 +123,7 @@ export function Footer() {
             >
               <Apple className="h-7 w-7 text-slate-900 group-hover:text-primary transition-colors" />
               <div className="text-left">
-                <p className="text-[10px] text-slate-500 uppercase font-bold">Download on the</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold">Download on the</p>
                 <p className="text-sm font-bold text-slate-900 ">App Store</p>
               </div>
             </motion.div>
@@ -136,7 +136,7 @@ export function Footer() {
             >
               <Play className="h-6 w-6 text-slate-900 group-hover:text-primary transition-colors fill-current" />
               <div className="text-left">
-                <p className="text-[10px] text-slate-500 uppercase font-bold">Get it on</p>
+                <p className="text-[10px] text-muted-foreground uppercase font-bold">Get it on</p>
                 <p className="text-sm font-bold text-slate-900 ">Google Play</p>
               </div>
             </motion.div>
@@ -163,7 +163,7 @@ export function Footer() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="w-full max-w-md bg-white rounded-[32px] p-8 shadow-2xl border border-black/5 relative overflow-hidden"
+              className="w-full max-w-md bg-card rounded-[32px] p-8 shadow-2xl border border-black/5 relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-primary/60" />
 
@@ -171,7 +171,7 @@ export function Footer() {
                 onClick={() => setShowIOSInstructions(false)}
                 className="absolute top-6 right-6 p-2 rounded-full hover:bg-black/5 transition-colors"
               >
-                <X className="h-5 w-5 text-slate-500" />
+                <X className="h-5 w-5 text-muted-foreground" />
               </button>
 
               <div className="space-y-6">
@@ -181,18 +181,18 @@ export function Footer() {
 
                 <div className="space-y-2">
                   <h3 className="text-2xl font-extrabold text-slate-900 ">Install The Guild</h3>
-                  <p className="text-slate-500 font-medium">Follow these steps to add the app to your home screen:</p>
+                  <p className="text-muted-foreground font-medium">Follow these steps to add the app to your home screen:</p>
                 </div>
 
                 <div className="space-y-4 pt-2">
                   <div className="flex items-start gap-4">
-                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-900 shrink-0">1</div>
+                    <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-slate-900 shrink-0">1</div>
                     <p className="text-slate-700 font-medium pt-1">
                       Tap the <span className="font-bold text-primary">Share</span> icon in the bottom bar of Safari.
                     </p>
                   </div>
                   <div className="flex items-start gap-4">
-                    <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-900 shrink-0">2</div>
+                    <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-slate-900 shrink-0">2</div>
                     <p className="text-slate-700 font-medium pt-1">
                       Scroll down and tap <span className="font-bold text-primary">Add to Home Screen</span>.
                     </p>

@@ -131,7 +131,7 @@ export default function JoinPage() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-mesh-gradient">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-xl">
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-white shadow-xl mb-6 overflow-hidden">
+          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-card shadow-xl mb-6 overflow-hidden">
             <Building2 className="h-8 w-8 text-primary" />
           </div>
           <h1 className="text-3xl font-extrabold text-primary tracking-tight">Join {invitation?.businessName}</h1>

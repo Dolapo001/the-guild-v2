@@ -12,7 +12,7 @@ import { toast } from "sonner";
 const LeafletMap = dynamic(() => import("./leaflet-map"), { 
   ssr: false,
   loading: () => (
-    <div className="w-full h-72 md:h-96 rounded-2xl bg-slate-100 flex items-center justify-center">
+    <div className="w-full h-72 md:h-96 rounded-2xl bg-muted flex items-center justify-center">
       <Loader2 className="w-8 h-8 animate-spin text-primary" />
     </div>
   ),
@@ -187,7 +187,7 @@ export function LocationPicker({ onSelect, onClose, initialLocation }: LocationP
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="absolute top-full mt-1 left-0 right-0 z-50 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden"
+              className="absolute top-full mt-1 left-0 right-0 z-50 bg-card rounded-xl shadow-xl border border-border overflow-hidden"
             >
               {searchResults.map((r, i) => (
                 <button

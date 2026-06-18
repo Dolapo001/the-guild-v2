@@ -132,7 +132,7 @@ export default function BusinessProfilePage() {
                   <Badge className={cn(
                     "px-3 py-1 font-bold flex items-center gap-1.5 border-0 tracking-widest uppercase text-[10px]",
                     String(user?.verificationStatus).toLowerCase() === 'verified' ? "bg-accent/10 text-accent" :
-                      String(user?.verificationStatus).toLowerCase() === 'pending' ? "bg-amber-500/10 text-amber-600" : "bg-slate-500/10 text-slate-500"
+                      String(user?.verificationStatus).toLowerCase() === 'pending' ? "bg-amber-500/10 text-amber-600" : "bg-slate-500/10 text-muted-foreground"
                   )}>
                     <ShieldCheck className="h-4 w-4" /> {user?.verificationStatus || 'NOT VERIFIED'}
                   </Badge>
@@ -207,7 +207,7 @@ export default function BusinessProfilePage() {
                     <h3 className="text-2xl font-extrabold text-primary">Operations & Scaling</h3>
                     <Badge className={cn(
                       "px-3 py-1 font-bold rounded-full border tracking-widest uppercase text-[10px]",
-                      isSolo ? "bg-slate-500/10 text-slate-500 border-slate-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                      isSolo ? "bg-slate-500/10 text-muted-foreground border-slate-500/20" : "bg-amber-500/10 text-amber-600 border-amber-500/20"
                     )}>
                       {isSolo ? "SOLO" : "TEAM"}
                     </Badge>
@@ -217,7 +217,7 @@ export default function BusinessProfilePage() {
                     <div className="flex items-start gap-4">
                       <div className={cn(
                         "h-12 w-12 rounded-xl flex items-center justify-center shrink-0",
-                        isSolo ? "bg-slate-500/10 text-slate-500" : "bg-amber-500/10 text-amber-600"
+                        isSolo ? "bg-slate-500/10 text-muted-foreground" : "bg-amber-500/10 text-amber-600"
                       )}>
                         {isSolo ? <User className="h-6 w-6" /> : <Users className="h-6 w-6" />}
                       </div>

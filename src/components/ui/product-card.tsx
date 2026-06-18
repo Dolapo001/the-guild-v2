@@ -50,7 +50,7 @@ export function ProductCard({ product, isMaestroMatch, onAddToCart }: ProductCar
  >
  <Link href={`/marketplace/product/${uid}`} className="block h-full">
  <div className={cn(
- "h-full flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white backdrop-blur-md shadow-sm hover:shadow-md transition-all group",
+ "h-full flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-card backdrop-blur-md shadow-sm hover:shadow-md transition-all group",
  isMaestroMatch && "ring-2 ring-secondary/50 shadow-xl shadow-secondary/10"
  )}>
  <div className="relative aspect-square w-full overflow-hidden bg-gray-100 ">

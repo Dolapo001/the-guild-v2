@@ -463,7 +463,7 @@ export default function StaffPage() {
           <Button 
               variant="outline" 
               onClick={() => router.push(`/bookings?staff=${selectedStaff.uid}`)}
-              className="h-10 sm:h-11 rounded-xl border-glass-border font-bold text-primary px-3 sm:px-4 bg-white/50 hover:bg-white transition-all flex-1 sm:flex-none text-xs sm:text-sm"
+              className="h-10 sm:h-11 rounded-xl border-glass-border font-bold text-primary px-3 sm:px-4 bg-white/50 hover:bg-card transition-all flex-1 sm:flex-none text-xs sm:text-sm"
           >
               <CalendarCheck className="sm:mr-2 h-4 w-4" /> <span className="hidden sm:inline">Schedule</span>
           </Button>
@@ -487,7 +487,7 @@ export default function StaffPage() {
       
       <DropdownMenu>
           <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl border border-glass-border hover:bg-white transition-all flex-shrink-0">
+              <Button variant="ghost" size="icon" className="h-10 w-10 sm:h-11 sm:w-11 rounded-xl border border-glass-border hover:bg-card transition-all flex-shrink-0">
                   <MoreVertical className="h-5 w-5 text-foreground/40" />
               </Button>
           </DropdownMenuTrigger>

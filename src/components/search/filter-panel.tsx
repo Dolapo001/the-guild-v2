@@ -114,7 +114,7 @@ export function FilterPanel({
               placeholder="Min"
               value={filters.minPrice !== null ? filters.minPrice : ""}
               onChange={(e) => updateFilter("minPrice", e.target.value ? parseFloat(e.target.value) : null)}
-              className="w-1/2 px-3 py-2 border border-gray-200 rounded-xl text-xs font-bold focus:outline-none focus:border-primary bg-white text-foreground"
+              className="w-1/2 px-3 py-2 border border-gray-200 rounded-xl text-xs font-bold focus:outline-none focus:border-primary bg-card text-foreground"
             />
             <span className="text-foreground/30 font-bold text-xs">-</span>
             <input
@@ -122,7 +122,7 @@ export function FilterPanel({
               placeholder="Max"
               value={filters.maxPrice !== null ? filters.maxPrice : ""}
               onChange={(e) => updateFilter("maxPrice", e.target.value ? parseFloat(e.target.value) : null)}
-              className="w-1/2 px-3 py-2 border border-gray-200 rounded-xl text-xs font-bold focus:outline-none focus:border-primary bg-white text-foreground"
+              className="w-1/2 px-3 py-2 border border-gray-200 rounded-xl text-xs font-bold focus:outline-none focus:border-primary bg-card text-foreground"
             />
           </div>
         </div>
@@ -141,7 +141,7 @@ export function FilterPanel({
                   "py-1.5 px-2 rounded-xl text-xs font-bold border transition-all text-center",
                   filters.minRating === val
                     ? "bg-primary text-white border-primary shadow-lg shadow-primary/20"
-                    : "bg-white text-foreground/60 border-gray-200 hover:border-primary hover:text-primary"
+                    : "bg-card text-foreground/60 border-gray-200 hover:border-primary hover:text-primary"
                 )}
               >
                 {val === null ? "Any" : `${val}★`}
@@ -194,7 +194,7 @@ export function FilterPanel({
               onClick={() => updateFilter("availabilityOnly", !filters.availabilityOnly)}
             >
               {filters.availabilityOnly && (
-                <div className="h-2 w-2 bg-white rounded-full" />
+                <div className="h-2 w-2 bg-card rounded-full" />
               )}
             </div>
             <span
@@ -220,7 +220,7 @@ export function FilterPanel({
                 step="1"
                 value={filters.radius}
                 onChange={(e) => updateFilter("radius", parseInt(e.target.value))}
-                className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
+                className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-card [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-primary [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
               />
               <div
                 className="absolute top-1 left-0 h-1.5 bg-primary rounded-full pointer-events-none"
