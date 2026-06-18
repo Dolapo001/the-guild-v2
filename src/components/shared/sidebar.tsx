@@ -16,7 +16,6 @@ import {
     Heart,
     Clock,
     Briefcase,
-    ShieldAlert,
     UserCircle,
     Star,
     ShoppingBag,
@@ -24,7 +23,10 @@ import {
     PlayCircle,
     MessageSquare,
     CalendarClock,
-    AlertTriangle
+    AlertTriangle,
+    Building2,
+    BarChart3,
+    ScrollText
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -72,9 +74,10 @@ export function SidebarContent({ className, onItemClick }: { className?: string;
         ],
         admin: [
             { title: "Dashboard", href: "/admin", icon: LayoutDashboard },
-            { title: "Verification Queue", href: "/admin/verification", icon: ShieldAlert },
-            { title: "User Management", href: "/admin/users", icon: Users },
-            { title: "Disputes", href: "/admin/disputes", icon: ShieldCheck },
+            { title: "Business Verification", href: "/admin/businesses", icon: Building2 },
+            { title: "Reviews", href: "/admin/reviews", icon: Star },
+            { title: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+            { title: "Audit Trail", href: "/admin/audit", icon: ScrollText },
         ],
     };
 

@@ -8,7 +8,9 @@ import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ mfaRequired: boolean }>;
+  verifyMfa: (code: string) => Promise<void>;
+  mfaPending: boolean;
   register: (data: any) => Promise<void>;
   logout: () => void;
   setRole: (role: UserRole) => Promise<void>;
@@ -48,6 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mfaToken, setMfaToken] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -67,21 +70,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<{ mfaRequired: boolean }> => {
     setIsLoading(true);
     setError(null);
     try {
       const response = await authService.login(email, password);
-      if (response?.mfaRequired) {
-        throw new Error("MFA verification required. Please complete the second step.");
+      if (response?.mfaRequired && response.mfaToken) {
+        // Hold the short-lived MFA token; the login page renders the OTP step.
+        setMfaToken(response.mfaToken);
+        return { mfaRequired: true };
       }
       if (response?.user) {
         const normalizedUser = normalizeUser(response.user);
         setUser(normalizedUser);
         router.push(getRedirectPath(normalizedUser));
       }
+      return { mfaRequired: false };
     } catch (err: any) {
       const message = err?.data?.detail || err?.data?.message || "Login failed. Please check your credentials.";
+      setError(message);
+      throw new Error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const verifyMfa = async (code: string) => {
+    if (!mfaToken) throw new Error("No MFA challenge in progress. Please log in again.");
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await authService.verifyMfa(mfaToken, code);
+      if (response?.user) {
+        const normalizedUser = normalizeUser(response.user);
+        setMfaToken(null);
+        setUser(normalizedUser);
+        router.push(getRedirectPath(normalizedUser));
+      } else {
+        throw new Error("Verification failed.");
+      }
+    } catch (err: any) {
+      const message = err?.data?.error || err?.message || "Invalid verification code.";
       setError(message);
       throw new Error(message);
     } finally {
@@ -178,7 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, setRole, setVerificationStatus, updateUser, isLoading, error }}>
+    <AuthContext.Provider value={{ user, login, verifyMfa, mfaPending: !!mfaToken, register, logout, setRole, setVerificationStatus, updateUser, isLoading, error }}>
       {children}
     </AuthContext.Provider>
   );

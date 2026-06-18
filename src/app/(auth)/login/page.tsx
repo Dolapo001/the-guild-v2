@@ -12,9 +12,10 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 
 export default function LoginPage() {
-  const { login, error: authError } = useAuth();
+  const { login, verifyMfa, mfaPending, error: authError } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -23,8 +24,17 @@ export default function LoginPage() {
     setIsLoading(true);
     setLocalError(null);
     try {
-      await login(email, password);
-      toast.success("Welcome back! Login successful.");
+      if (mfaPending) {
+        await verifyMfa(code);
+        toast.success("Verified! Welcome back.");
+      } else {
+        const { mfaRequired } = await login(email, password);
+        if (mfaRequired) {
+          toast.info("Enter the verification code sent to you.");
+        } else {
+          toast.success("Welcome back! Login successful.");
+        }
+      }
     } catch (err: any) {
       const msg = err?.message || "Login failed.";
       setLocalError(msg);
@@ -53,38 +63,60 @@ export default function LoginPage() {
 
         <GlassCard className="p-8 border-white/40 shadow-2xl">
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest px-1">Email Address</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/30" />
-                <Input
-                  type="email"
-                  placeholder="name@company.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="pl-11 h-12 rounded-xl bg-white/50 border-glass-border focus:ring-primary/10"
-                />
-              </div>
-            </div>
+            {!mfaPending && (
+              <>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest px-1">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/30" />
+                    <Input
+                      type="email"
+                      placeholder="name@company.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="pl-11 h-12 rounded-xl bg-white/50 border-glass-border focus:ring-primary/10"
+                    />
+                  </div>
+                </div>
 
-            <div className="space-y-2">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest">Password</label>
-                <Link href="#" className="text-[10px] font-extrabold text-primary uppercase tracking-widest hover:underline">Forgot Password?</Link>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest px-1">Password</label>
+                  <div className="relative">
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/30" />
+                    <Input
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="pl-11 h-12 rounded-xl bg-white/50 border-glass-border focus:ring-primary/10"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+
+            {mfaPending && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest px-1">Verification Code</label>
+                <div className="relative">
+                  <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/30" />
+                  <Input
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    placeholder="123456"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value)}
+                    required
+                    autoFocus
+                    className="pl-11 h-12 rounded-xl bg-white/50 border-glass-border focus:ring-primary/10 tracking-[0.4em] font-bold"
+                  />
+                </div>
+                <p className="text-[10px] font-medium text-foreground/40 px-1">Enter the 6-digit code sent to your email / authenticator.</p>
               </div>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/30" />
-                <Input
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="pl-11 h-12 rounded-xl bg-white/50 border-glass-border focus:ring-primary/10"
-                />
-              </div>
-            </div>
+            )}
 
             {displayError && (
               <motion.div
@@ -101,7 +133,9 @@ export default function LoginPage() {
               disabled={isLoading}
               className="w-full h-14 rounded-2xl bg-primary text-white font-bold text-lg shadow-xl shadow-primary/20 hover:scale-[1.02] transition-transform"
             >
-              {isLoading ? "Signing in..." : "Sign In"} <ArrowRight className="ml-2 h-5 w-5" />
+              {isLoading
+                ? (mfaPending ? "Verifying..." : "Signing in...")
+                : (mfaPending ? "Verify Code" : "Sign In")} <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </form>
 

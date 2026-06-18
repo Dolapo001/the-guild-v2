@@ -21,5 +21,11 @@ export const trustService = {
 
   getStatus: async (): Promise<VerificationDocument[]> => {
     return api.get<VerificationDocument[]>('/trust/status/');
-  }
+  },
+
+  // Admin-only: manually approve/reject an uploaded document
+  // (POST /trust/review/<doc_uid>/).
+  reviewDocument: async (docUid: string, decision: 'verified' | 'rejected', reason?: string): Promise<any> => {
+    return api.post(`/trust/review/${docUid}/`, { decision, reason });
+  },
 };

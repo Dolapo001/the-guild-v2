@@ -12,6 +12,12 @@ export const authService = {
     return api.post<AuthResponse>('/auth/register/', data);
   },
 
+  // Completes a two-factor login: exchanges the short-lived mfaToken + OTP for
+  // an authenticated session (cookies set by the backend).
+  verifyMfa: async (mfaToken: string, code: string): Promise<AuthResponse> => {
+    return api.post<AuthResponse>('/auth/mfa/verify/', { mfaToken, code });
+  },
+
   logout: async (): Promise<void> => {
     // Clears the httpOnly cookies + blacklists the refresh token server-side.
     try {

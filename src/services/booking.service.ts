@@ -70,6 +70,16 @@ export const bookingService = {
   cancelAndRefund: async (id: string) => api.post<Booking>(`/bookings/${id}/cancel-refund/`, {}),
 
   contactLog: async (id: string) => api.post(`/bookings/${id}/contact-log/`, {}),
+
+  // Confirm a (manual/offline) payment was received for a booking.
+  confirmPayment: async (id: string, reference?: string) =>
+    api.post(`/bookings/${id}/payment-confirm/`, { reference }),
+
+  // Recurring bookings: list occurrences and mark one complete.
+  getOccurrences: async (id: string) =>
+    api.get<Booking[]>(`/bookings/${id}/occurrences/`),
+  completeOccurrence: async (occurrenceId: string) =>
+    api.post(`/bookings/occurrences/${occurrenceId}/complete/`, {}),
 };
 
 export interface Shift {
