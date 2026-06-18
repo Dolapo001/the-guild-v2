@@ -44,10 +44,11 @@ export default function proxy(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // 2) Install-first: app routes are only for the installed (standalone) app.
-  if (isAppRoute && ENFORCE_PWA && !isStandalone) {
+  // 2) Install-first: app routes and auth are only for the installed (standalone) app.
+  // If visited in a browser tab, they are redirected to the landing page.
+  if ((isAppRoute || isAuthPage) && ENFORCE_PWA && !isStandalone) {
     const url = req.nextUrl.clone();
-    url.pathname = "/install";
+    url.pathname = "/";
     url.search = "";
     return NextResponse.redirect(url);
   }

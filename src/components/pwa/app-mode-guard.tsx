@@ -20,7 +20,9 @@ export function AppModeGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (ENFORCE && ready && isBrowser) router.replace("/install");
+    if (ENFORCE && ready && isBrowser && window.location.pathname !== "/") {
+      router.replace("/");
+    }
   }, [ready, isBrowser, router]);
 
   if (!ENFORCE) return <>{children}</>;
