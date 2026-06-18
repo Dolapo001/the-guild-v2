@@ -203,6 +203,18 @@ export function TopNav() {
 
       {/* Right Side: Actions */}
       <div className="flex items-center gap-2 md:gap-4">
+        {/* Command palette launcher (⌘K) */}
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event("open-command-palette"))}
+          aria-label="Open command palette"
+          className="hidden md:flex items-center gap-2 h-10 rounded-xl border border-glass-border bg-muted/50 px-3 text-foreground/50 hover:bg-muted hover:text-foreground transition-colors"
+        >
+          <Search className="h-4 w-4" />
+          <span className="text-xs font-semibold">Quick actions</span>
+          <kbd className="rounded-md border border-glass-border bg-background px-1.5 py-0.5 text-[10px] font-bold">⌘K</kbd>
+        </button>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="relative h-10 w-10 rounded-xl hover:bg-muted transition-colors">

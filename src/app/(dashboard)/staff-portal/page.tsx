@@ -364,7 +364,7 @@ export default function StaffPortal() {
    className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 px-1"
    >
    <div>
-   <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-slate-800">Staff Portal</h1>
+   <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-foreground">Staff Portal</h1>
    <p className="text-slate-600 font-semibold text-sm sm:text-base">Hello, {user?.name || user?.firstName || user?.username?.split('@')[0] || "Pro"}.</p>
    </div>
 
@@ -416,12 +416,12 @@ export default function StaffPortal() {
    {request.uid[0]}
    </div>
    <div className="min-w-0">
-   <p className="font-black text-slate-800 dark:text-white text-base sm:text-lg truncate">{request.customerName || 'Guest'}</p>
+   <p className="font-black text-foreground dark:text-white text-base sm:text-lg truncate">{request.customerName || 'Guest'}</p>
    <p className="text-[10px] font-bold text-gray-500 truncate">{request.serviceName}</p>
    </div>
    </div>
    <div className="text-right shrink-0">
-   <p className="text-base sm:text-lg font-black text-slate-800 dark:text-white">₦{Number(request.totalPrice).toLocaleString()}</p>
+   <p className="text-base sm:text-lg font-black text-foreground dark:text-white">₦{Number(request.totalPrice).toLocaleString()}</p>
    <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{request.startTime}</p>
    </div>
    </div>
@@ -461,7 +461,7 @@ export default function StaffPortal() {
    >
    <GlassCard className="p-4 sm:p-8 border-slate-200 shadow-xl bg-white/95 backdrop-blur-xl relative">
    <div className="flex items-center justify-between mb-6 sm:mb-8">
-   <h3 className="text-lg sm:text-xl font-black text-slate-800 px-1">
+   <h3 className="text-lg sm:text-xl font-black text-foreground px-1">
     {currentViewDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
    </h3>
    <div className="flex gap-2">
@@ -489,7 +489,7 @@ export default function StaffPortal() {
    </div>
    <div className="grid grid-cols-7 gap-1 sm:gap-2">
    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-   <div key={`${day}-${i}`} className="text-center text-[10px] font-black text-slate-500 uppercase tracking-widest py-1 sm:py-2">
+   <div key={`${day}-${i}`} className="text-center text-[10px] font-black text-muted-foreground uppercase tracking-widest py-1 sm:py-2">
    {day}
    </div>
    ))}
@@ -521,7 +521,7 @@ export default function StaffPortal() {
       "aspect-square rounded-xl sm:rounded-2xl flex flex-col items-center justify-center transition-all border relative group",
       isSelected
       ? "bg-primary border-primary shadow-lg shadow-primary/20 text-white font-extrabold"
-      : "bg-slate-50 border-slate-100 text-slate-800 hover:bg-slate-100 hover:border-slate-200",
+      : "bg-slate-50 border-border text-foreground hover:bg-muted hover:border-slate-200",
       isToday && !isSelected && "border-primary text-primary font-black",
       hasShift && !isSelected && "border-blue-300 bg-blue-50"
       )}
@@ -544,13 +544,13 @@ export default function StaffPortal() {
          {hasJobs && (
          <span className={cn(
            "h-1.5 w-1.5 rounded-full",
-           isSelected ? "bg-white" : "bg-primary"
+           isSelected ? "bg-card" : "bg-primary"
          )} />
          )}
        </div>
       )}
       {jobData?.count > 1 && (
-       <span className={cn("absolute top-1 right-1 text-[8px] font-black opacity-60", isSelected ? "text-white" : "text-slate-800")}>{jobData.count}</span>
+       <span className={cn("absolute top-1 right-1 text-[8px] font-black opacity-60", isSelected ? "text-white" : "text-foreground")}>{jobData.count}</span>
       )}
      </button>
      );
@@ -613,14 +613,14 @@ export default function StaffPortal() {
   "h-10 w-10 sm:h-12 sm:w-12 rounded-full flex items-center justify-center font-black text-[10px] sm:text-xs shrink-0 z-10 border shadow-lg",
   task.status === "completed" ? "bg-emerald-500 text-white border-emerald-400" :
   task.status === "in-progress" ? "bg-primary text-white border-primary/50" :
-  "bg-slate-100 text-slate-700 border-slate-200"
+  "bg-muted text-slate-700 border-slate-200"
   )}>
   {task.time.split(' ')[0]}
   </div>
   <div className="flex-1 min-w-0">
   <div className="flex justify-between items-start">
   <div className="min-w-0">
-  <h4 className="font-black text-slate-800 text-sm sm:text-base truncate">{task.service}</h4>
+  <h4 className="font-black text-foreground text-sm sm:text-base truncate">{task.service}</h4>
   <p className="text-[10px] sm:text-sm font-semibold text-gray-500 flex items-center gap-1.5 mt-0.5 truncate">
   <User className="h-3 w-3" /> {task.customer}
   </p>
@@ -674,7 +674,7 @@ export default function StaffPortal() {
   {/* Close Button to Deselect/Close Details Panel */}
   <button 
     onClick={() => setSelectedTask(null)}
-    className="absolute top-4 right-4 h-8 w-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all z-20 border border-slate-200"
+    className="absolute top-4 right-4 h-8 w-8 rounded-full bg-muted hover:bg-slate-200 text-muted-foreground hover:text-foreground flex items-center justify-center transition-all z-20 border border-slate-200"
     title="Close Details & Return to Calendar"
   >
     <X className="h-4 w-4" />
@@ -693,7 +693,7 @@ export default function StaffPortal() {
       <User className="h-8 w-8 sm:h-10 sm:w-10 text-primary" />
     )}
   </div>
-  <h4 className="text-xl sm:text-2xl font-black text-slate-800">{selectedTask.customer}</h4>
+  <h4 className="text-xl sm:text-2xl font-black text-foreground">{selectedTask.customer}</h4>
   <p className="text-xs sm:text-sm font-bold text-gray-500 mt-1">{selectedTask.service}</p>
   
   {/* Quick Contact Action Icons Row */}
@@ -731,16 +731,16 @@ export default function StaffPortal() {
   </div>
 
   <div className="space-y-4">
-  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/80 border border-slate-100 space-y-1">
+  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-slate-50/80 border border-border space-y-1">
   <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-widest">
   <Clock className="h-3 w-3" /> Time Window
   </div>
-  <p className="text-xs sm:text-sm font-bold text-slate-800">
+  <p className="text-xs sm:text-sm font-bold text-foreground">
   {selectedTask.time} - {selectedTask.endTime} • {selectedTask.duration}
   </p>
   </div>
 
-  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/10 border border-slate-100 dark:border-white/10 space-y-1">
+  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/10 border border-border dark:border-white/10 space-y-1">
   <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-widest">
   <MessageSquare className="h-3 w-3" /> Special Notes
   </div>
@@ -749,7 +749,7 @@ export default function StaffPortal() {
   </p>
   </div>
 
-  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/10 border border-slate-100 dark:border-white/10 space-y-3">
+  <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white/10 border border-border dark:border-white/10 space-y-3">
   <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-widest">
   <Maximize2 className="h-3 w-3" /> Reference Style
   </div>
@@ -796,7 +796,7 @@ export default function StaffPortal() {
    )}
    {selectedTask.status === "in-progress" && (
     <div className="space-y-4">
-     <div className="p-4 rounded-2xl bg-white/10 border border-slate-100 dark:border-white/10 space-y-3">
+     <div className="p-4 rounded-2xl bg-white/10 border border-border dark:border-white/10 space-y-3">
       <div className="flex items-center justify-between">
        <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-widest">
         <ListTodo className="h-3 w-3" /> SOP Checklist
@@ -812,7 +812,7 @@ export default function StaffPortal() {
          onClick={() => toggleSop(item.id)}
          className={cn(
           "w-full flex items-center gap-3 p-2.5 rounded-xl border transition-all text-left",
-          item.completed ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500" : "bg-white/5 border-slate-100 dark:border-white/5 text-slate-500 dark:text-gray-500"
+          item.completed ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500" : "bg-white/5 border-border dark:border-white/5 text-muted-foreground dark:text-gray-500"
          )}
         >
          <div className={cn(
@@ -827,7 +827,7 @@ export default function StaffPortal() {
       </div>
      </div>
 
-     <div className="p-4 rounded-2xl bg-white/10 border border-slate-100 dark:border-white/10 space-y-3">
+     <div className="p-4 rounded-2xl bg-white/10 border border-border dark:border-white/10 space-y-3">
        <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-[9px] sm:text-[10px] font-black text-gray-500 uppercase tracking-widest">
          <PlusCircle className="h-3 w-3" /> Upsell Item
@@ -837,7 +837,7 @@ export default function StaffPortal() {
          <Button 
           variant="outline" 
           size="sm" 
-          className="flex-1 h-9 rounded-lg border-slate-100 dark:border-white/5 bg-white/5 text-[9px] font-black text-slate-500 dark:text-gray-400"
+          className="flex-1 h-9 rounded-lg border-border dark:border-white/5 bg-white/5 text-[9px] font-black text-muted-foreground dark:text-gray-400"
           onClick={() => addExtra("Premium Oil", 2000)}
          >
            Add Oil
@@ -845,18 +845,18 @@ export default function StaffPortal() {
          <Button 
           variant="outline" 
           size="sm" 
-          className="flex-1 h-9 rounded-lg border-slate-100 dark:border-white/5 bg-white/5 text-[9px] font-black text-slate-500 dark:text-gray-400"
+          className="flex-1 h-9 rounded-lg border-border dark:border-white/5 bg-white/5 text-[9px] font-black text-muted-foreground dark:text-gray-400"
           onClick={() => addExtra("30 Mins Extra", 5000)}
          >
            Add 30m
          </Button>
        </div>
        {extraItems.length > 0 && (
-        <div className="pt-2 border-t border-slate-100 dark:border-white/5 space-y-1">
+        <div className="pt-2 border-t border-border dark:border-white/5 space-y-1">
           {extraItems.map((item, idx) => (
             <div key={idx} className="flex justify-between text-[9px] font-black">
               <span className="text-gray-500">{item.name}</span>
-              <span className="text-slate-800 dark:text-white">+₦{item.price.toLocaleString()}</span>
+              <span className="text-foreground dark:text-white">+₦{item.price.toLocaleString()}</span>
             </div>
           ))}
         </div>
@@ -875,7 +875,7 @@ export default function StaffPortal() {
 
      <div className="flex items-center justify-center gap-3 py-3 rounded-2xl bg-primary/10 border border-primary/20">
       <Timer className="h-5 w-5 text-primary" />
-      <span className="text-2xl font-mono font-black text-slate-800 dark:text-white tracking-widest">{formatTime(elapsedTime)}</span>
+      <span className="text-2xl font-mono font-black text-foreground dark:text-white tracking-widest">{formatTime(elapsedTime)}</span>
      </div>
      <Button
       onClick={() => updateTaskStatus(selectedTask.id, "completed")}
@@ -892,14 +892,14 @@ export default function StaffPortal() {
       <CheckCircle2 className="h-6 w-6" />
       <span className="text-base sm:text-lg font-black">Success!</span>
      </div>
-     <p className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white">Earned ₦{selectedTask.price.toLocaleString()}</p>
+     <p className="text-xl sm:text-2xl font-black text-foreground dark:text-white">Earned ₦{selectedTask.price.toLocaleString()}</p>
     </div>
    )}
   </div>
 
   <Dialog>
    <DialogTrigger asChild>
-    <Button variant="outline" className="w-full h-14 rounded-2xl border-slate-100 dark:border-white/10 bg-white/10 text-slate-700 dark:text-white font-bold hover:bg-white/20 transition-all">
+    <Button variant="outline" className="w-full h-14 rounded-2xl border-border dark:border-white/10 bg-white/10 text-slate-700 dark:text-white font-bold hover:bg-white/20 transition-all">
      Contact Customer
     </Button>
    </DialogTrigger>
@@ -953,7 +953,7 @@ export default function StaffPortal() {
 ) : (
  <GlassCard className="p-12 text-center border-dashed border-slate-200 shadow-md bg-white/95 backdrop-blur-xl">
   <AlertCircle className="h-12 w-12 text-slate-400 mx-auto mb-4 animate-pulse" />
-  <p className="text-sm font-bold text-slate-500">Select a job to view details and start working.</p>
+  <p className="text-sm font-bold text-muted-foreground">Select a job to view details and start working.</p>
  </GlassCard>
 )}
   </AnimatePresence>

@@ -104,7 +104,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   initial={{ opacity: 0, y: 50, x: "-50%" }}
   animate={{ opacity: 1, y: 0, x: "-50%" }}
   exit={{ opacity: 0, y: 20, x: "-50%" }}
-  className="fixed bottom-10 left-1/2 z-[200] px-6 py-3 rounded-2xl bg-white shadow-2xl border border-glass-border flex items-center gap-3"
+  className="fixed bottom-10 left-1/2 z-[200] px-6 py-3 rounded-2xl bg-card shadow-2xl border border-glass-border flex items-center gap-3"
   >
   <span className="text-xl">{toast.icon}</span>
   <span className="font-bold text-sm text-primary">{toast.message}</span>

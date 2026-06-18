@@ -34,13 +34,13 @@ export function MapModal({ isOpen, onClose, title = "Pick Location", children }:
             transition={{ type: "spring", damping: 28, stiffness: 300 }}
             className="fixed inset-x-4 bottom-0 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 z-50 w-full md:max-w-2xl md:max-h-[90vh] overflow-y-auto"
           >
-            <div className="bg-white rounded-t-3xl md:rounded-3xl shadow-2xl">
+            <div className="bg-card rounded-t-3xl md:rounded-3xl shadow-2xl">
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
+              <div className="flex items-center justify-between px-6 py-5 border-b border-border">
                 <h2 className="text-xl font-extrabold text-slate-900">{title}</h2>
                 <button
                   onClick={onClose}
-                  className="h-9 w-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center transition-colors"
+                  className="h-9 w-9 rounded-xl bg-muted hover:bg-slate-200 flex items-center justify-center transition-colors"
                 >
                   <X className="w-5 h-5 text-slate-600" />
                 </button>

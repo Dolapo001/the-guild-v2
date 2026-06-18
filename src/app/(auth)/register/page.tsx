@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { GlassCard } from "@/components/ui/glass-card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { TextField } from "@/components/ui/text-field";
 import {
  ShieldCheck,
  Mail,
@@ -29,7 +30,7 @@ export default function RegisterPage() {
  
  const initialEmail = searchParams.get("email") || "";
  const initialInvite = searchParams.get("invite") || "";
- const initialRole = searchParams.get("role") as any;
+ const initialRole = searchParams.get("role") as "customer" | "ceo" | "staff" | null;
  
  const [step, setStep] = useState<Step>(initialInvite ? "details" : "role");
  const [role, setRole] = useState<"customer" | "ceo" | "staff" | null>(initialRole || (initialInvite ? "staff" : null));
@@ -41,10 +42,18 @@ export default function RegisterPage() {
  });
  const [isLoading, setIsLoading] = useState(false);
  const [localError, setLocalError] = useState<string | null>(null);
+ const [touched, setTouched] = useState<{ name?: boolean; email?: boolean; password?: boolean }>({});
+
+ const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+ const nameError = touched.name && formData.name.trim().length < 2 ? "Enter your full name" : null;
+ const emailError = touched.email && !emailValid ? "Enter a valid email address" : null;
+ const passwordError = touched.password && formData.password.length < 6 ? "Use at least 6 characters" : null;
 
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   if (!role) return;
+  setTouched({ name: true, email: true, password: true });
+  if (formData.name.trim().length < 2 || !emailValid || formData.password.length < 6) return;
   setIsLoading(true);
   setLocalError(null);
   try {
@@ -57,8 +66,8 @@ export default function RegisterPage() {
      } : {}) 
    });
    toast.success("Welcome to the team!");
-  } catch (err: any) {
-   const msg = err?.message || "Registration failed.";
+  } catch (err) {
+   const msg = err instanceof Error ? err.message : "Registration failed.";
    setLocalError(msg);
    toast.error(msg);
   } finally {
@@ -101,7 +110,7 @@ export default function RegisterPage() {
   ].map((item) => (
   <button
   key={item.id}
-  onClick={() => setRole(item.id as any)}
+  onClick={() => setRole(item.id as "customer" | "ceo" | "staff")}
   className={`p-6 rounded-2xl border text-left transition-all flex items-center gap-6 ${role === item.id
   ? 'bg-primary/15 border-primary shadow-lg'
   : 'bg-white/10 border-white/10 hover:border-white/20 hover:bg-white/15'
@@ -173,53 +182,43 @@ export default function RegisterPage() {
   <button onClick={() => setStep(role === "staff" ? "invite" : "role")} className="flex items-center gap-2 text-xs font-bold text-foreground/60 uppercase tracking-wider hover:text-primary transition-colors mb-8">
   <ChevronLeft className="h-3 w-3" /> Back
   </button>
-   <form onSubmit={handleSubmit} className="space-y-6">
-   <div className="space-y-2">
-   <label className="text-xs font-bold text-gray-700 uppercase tracking-wider px-1">Full Name</label>
-   <div className="relative">
-   <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/60" />
-   <Input
-   placeholder="Adedolapo"
-   value={formData.name}
-   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-   required
-   className="pl-11 h-14 rounded-xl bg-gray-50 border-gray-100 placeholder:text-gray-400"
+   <form onSubmit={handleSubmit} className="space-y-5">
+   <TextField
+    label="Full name"
+    icon={User}
+    autoComplete="name"
+    value={formData.name}
+    onChange={(v) => setFormData({ ...formData, name: v })}
+    onBlur={() => setTouched((t) => ({ ...t, name: true }))}
+    error={nameError}
    />
-   </div>
-   </div>
-   <div className="space-y-2">
-   <label className="text-xs font-bold text-gray-700 uppercase tracking-wider px-1">Email Address</label>
-   <div className="relative">
-   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/60" />
-   <Input
-   type="email"
-   placeholder="name@example.com"
-   value={formData.email}
-   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-   required
-   className="pl-11 h-14 rounded-xl bg-gray-50 border-gray-100 placeholder:text-gray-400"
+   <TextField
+    label="Email address"
+    type="email"
+    icon={Mail}
+    autoComplete="email"
+    value={formData.email}
+    onChange={(v) => setFormData({ ...formData, email: v })}
+    onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+    error={emailError}
+    valid={emailValid}
    />
-   </div>
-   </div>
-   <div className="space-y-2">
-   <label className="text-xs font-bold text-gray-700 uppercase tracking-wider px-1">Password</label>
-   <div className="relative">
-   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/60" />
-   <Input
-   type="password"
-   placeholder="••••••••"
-   value={formData.password}
-   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-   required
-   className="pl-11 h-14 rounded-xl bg-gray-50 border-gray-100 placeholder:text-gray-400"
+   <TextField
+    label="Password"
+    type="password"
+    icon={Lock}
+    autoComplete="new-password"
+    value={formData.password}
+    onChange={(v) => setFormData({ ...formData, password: v })}
+    onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+    error={passwordError}
+    helper={!passwordError ? "At least 6 characters." : undefined}
    />
-   </div>
-   </div>
    {displayError && (
     <motion.div
      initial={{ opacity: 0, y: -8 }}
      animate={{ opacity: 1, y: 0 }}
-     className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-sm font-bold text-red-600 text-center mb-2"
+     className="p-3 rounded-input bg-error/10 border border-error/20 text-small font-bold text-error text-center"
      role="alert"
     >
      {displayError}

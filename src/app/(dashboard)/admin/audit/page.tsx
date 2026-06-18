@@ -1,68 +1,101 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { GlassCard } from "@/components/ui/glass-card";
-import { ScrollText, Loader2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { ScrollText } from "lucide-react";
 import { auditService, AuditLog } from "@/services/audit.service";
-import { toast } from "sonner";
+import { DataTable, type Column } from "@/components/ui/data-table";
+
+const columns: Column<AuditLog>[] = [
+  {
+    key: "action",
+    header: "Action",
+    sortable: true,
+    accessor: (l) => l.action,
+    render: (l) => (
+      <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-caption font-bold text-primary">
+        {l.action}
+      </span>
+    ),
+  },
+  {
+    key: "actor",
+    header: "Actor",
+    sortable: true,
+    accessor: (l) => l.actorName || l.actor || "system",
+    render: (l) => <span className="font-semibold">{l.actorName || l.actor || "system"}</span>,
+  },
+  {
+    key: "metadata",
+    header: "Details",
+    hideOnMobile: true,
+    accessor: (l) => (l.metadata && Object.keys(l.metadata).length ? JSON.stringify(l.metadata) : ""),
+    render: (l) =>
+      l.metadata && Object.keys(l.metadata).length ? (
+        <code className="text-caption text-muted-foreground">{JSON.stringify(l.metadata)}</code>
+      ) : (
+        <span className="text-muted-foreground">—</span>
+      ),
+  },
+  {
+    key: "createdAt",
+    header: "When",
+    sortable: true,
+    align: "right",
+    accessor: (l) => l.createdAt,
+    render: (l) => (
+      <span className="whitespace-nowrap text-muted-foreground">
+        {l.createdAt ? new Date(l.createdAt).toLocaleString() : "—"}
+      </span>
+    ),
+  },
+];
 
 export default function AdminAuditPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      setLogs(await auditService.getLogs());
+    } catch (err) {
+      console.error("Failed to load audit logs", err);
+      setError("We couldn't load the audit trail. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    (async () => {
-      try {
-        setLogs(await auditService.getLogs());
-      } catch (err) {
-        console.error("Failed to load audit logs", err);
-        toast.error("Could not load the audit trail.");
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+    load();
+  }, [load]);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <div className="h-11 w-11 rounded-2xl bg-primary/10 flex items-center justify-center">
+        <div className="grid h-11 w-11 place-items-center rounded-card bg-primary/10">
           <ScrollText className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-extrabold text-primary">Audit Trail</h1>
-          <p className="text-sm font-medium text-foreground/50">Security & activity events across the platform.</p>
+          <h1 className="text-h2 text-foreground">Audit Trail</h1>
+          <p className="text-small text-muted-foreground">Security &amp; activity events across the platform.</p>
         </div>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center py-20 text-foreground/40">
-          <Loader2 className="h-6 w-6 animate-spin" />
-        </div>
-      ) : logs.length === 0 ? (
-        <GlassCard className="p-12 text-center text-foreground/50 font-medium">No audit events recorded.</GlassCard>
-      ) : (
-        <GlassCard className="p-0 overflow-hidden">
-          <div className="divide-y divide-glass-border">
-            {logs.map((log) => (
-              <div key={log.uid} className="flex items-start justify-between gap-4 px-5 py-3.5 hover:bg-primary/[0.02]">
-                <div className="min-w-0">
-                  <p className="font-bold text-sm text-primary">{log.action}</p>
-                  <p className="text-xs font-medium text-foreground/50 truncate">
-                    {log.actorName || log.actor || "system"}
-                    {log.metadata && Object.keys(log.metadata).length > 0
-                      ? ` • ${JSON.stringify(log.metadata)}`
-                      : ""}
-                  </p>
-                </div>
-                <span className="text-[10px] font-bold text-foreground/40 whitespace-nowrap shrink-0">
-                  {log.createdAt ? new Date(log.createdAt).toLocaleString() : ""}
-                </span>
-              </div>
-            ))}
-          </div>
-        </GlassCard>
-      )}
+      <DataTable
+        data={logs}
+        columns={columns}
+        getRowId={(l) => l.uid}
+        loading={loading}
+        error={error}
+        onRetry={load}
+        searchPlaceholder="Search actions, actors…"
+        pageSize={12}
+        exportFileName="guild-audit-log"
+        emptyState={{ icon: ScrollText, title: "No audit events yet", description: "Security and activity events will appear here as they happen." }}
+      />
     </div>
   );
 }

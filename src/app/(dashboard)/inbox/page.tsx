@@ -206,7 +206,7 @@ export default function InboxPage() {
                   className={cn(
                     "w-full p-4 rounded-2xl border transition-all text-left flex gap-4 group relative overflow-hidden",
                     selectedChatId === chat.uid
-                      ? "bg-white border-primary shadow-xl shadow-primary/5 scale-[1.02] z-10"
+                      ? "bg-card border-primary shadow-xl shadow-primary/5 scale-[1.02] z-10"
                       : "bg-white/40 border-glass-border hover:bg-white/60 hover:border-primary/20"
                   )}
                 >

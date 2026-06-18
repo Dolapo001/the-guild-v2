@@ -200,7 +200,7 @@ export function MaestroChatWidget() {
 
  <Button
  onClick={() => setIsOpen(!isOpen)}
- className={`h-14 w-14 rounded-full shadow-2xl transition-all duration-300 ${isOpen ? 'bg-white text-primary' : 'bg-primary text-white hover:scale-110'}`}
+ className={`h-14 w-14 rounded-full shadow-2xl transition-all duration-300 ${isOpen ? 'bg-card text-primary' : 'bg-primary text-white hover:scale-110'}`}
  >
  {isOpen ? <X className="h-6 w-6" /> : <Sparkles className="h-6 w-6" />}
  </Button>

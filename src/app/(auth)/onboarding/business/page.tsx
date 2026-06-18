@@ -161,7 +161,7 @@ export default function BusinessOnboarding() {
                 "h-10 w-10 rounded-xl flex items-center justify-center transition-all duration-500 border-2",
                 step >= s.id
                   ? "bg-primary border-primary text-white shadow-lg shadow-primary/20"
-                  : "bg-white border-slate-200 text-slate-400"
+                  : "bg-card border-slate-200 text-slate-400"
               )}>
                 <s.icon className="h-5 w-5" />
               </div>
@@ -193,7 +193,7 @@ export default function BusinessOnboarding() {
               >
                 <div>
                   <h2 className="text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Tell us about your craft.</h2>
-                  <p className="text-slate-500 text-lg font-medium">Let's start with the basics of your business.</p>
+                  <p className="text-muted-foreground text-lg font-medium">Let's start with the basics of your business.</p>
                 </div>
 
                 <div className="space-y-6">
@@ -218,7 +218,7 @@ export default function BusinessOnboarding() {
                             "px-4 py-4 rounded-2xl border-2 font-bold text-sm transition-all text-left flex items-center justify-between group",
                             formData.categories.includes(cat.name)
                               ? "bg-primary/5 border-primary text-primary shadow-sm"
-                              : "bg-slate-50 border-slate-200 text-slate-500 hover:border-slate-300"
+                              : "bg-slate-50 border-slate-200 text-muted-foreground hover:border-slate-300"
                           )}
                         >
                           {cat.name}
@@ -256,7 +256,7 @@ export default function BusinessOnboarding() {
               >
                 <div>
                   <h2 className="text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">How do you operate?</h2>
-                  <p className="text-slate-500 text-lg font-medium">This helps us customize your dashboard experience.</p>
+                  <p className="text-muted-foreground text-lg font-medium">This helps us customize your dashboard experience.</p>
                 </div>
 
                 <div className="flex flex-col gap-6">
@@ -271,13 +271,13 @@ export default function BusinessOnboarding() {
                   >
                     <div className={cn(
                       "h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105",
-                      formData.isSolo ? "bg-primary text-white" : "bg-slate-200 text-slate-500"
+                      formData.isSolo ? "bg-primary text-white" : "bg-slate-200 text-muted-foreground"
                     )}>
                       <User className="h-7 w-7" />
                     </div>
                     <div className="flex-1 pr-8">
                       <h3 className="text-xl font-bold text-slate-900 mb-1">Solo Professional</h3>
-                      <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                      <p className="text-sm text-muted-foreground leading-relaxed font-medium">
                         I work alone. I manage my own bookings and perform the services myself.
                       </p>
                     </div>
@@ -299,13 +299,13 @@ export default function BusinessOnboarding() {
                   >
                     <div className={cn(
                       "h-14 w-14 rounded-2xl flex items-center justify-center shrink-0 transition-transform group-hover:scale-105",
-                      !formData.isSolo ? "bg-primary text-white" : "bg-slate-200 text-slate-500"
+                      !formData.isSolo ? "bg-primary text-white" : "bg-slate-200 text-muted-foreground"
                     )}>
                       <Users className="h-7 w-7" />
                     </div>
                     <div className="flex-1 pr-8">
                       <h3 className="text-xl font-bold text-slate-900 mb-1">Team / Agency</h3>
-                      <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                      <p className="text-sm text-muted-foreground leading-relaxed font-medium">
                         I manage a team. I have staff members or riders who fulfill orders.
                       </p>
                     </div>
@@ -329,7 +329,7 @@ export default function BusinessOnboarding() {
               >
                 <div>
                   <h2 className="text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Location & Logistics</h2>
-                  <p className="text-slate-500 text-lg font-medium">Where can customers find you?</p>
+                  <p className="text-muted-foreground text-lg font-medium">Where can customers find you?</p>
                 </div>
 
                 <div className="space-y-5">
@@ -358,7 +358,7 @@ export default function BusinessOnboarding() {
                       <button
                         type="button"
                         onClick={() => setMapOpen(true)}
-                        className="w-full h-14 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex items-center gap-3 px-4 text-slate-500 font-bold hover:border-primary/50 hover:bg-primary/5 hover:text-primary transition-all group"
+                        className="w-full h-14 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex items-center gap-3 px-4 text-muted-foreground font-bold hover:border-primary/50 hover:bg-primary/5 hover:text-primary transition-all group"
                       >
                         <MapPin className="w-5 h-5 text-slate-400 group-hover:text-primary transition-colors" />
                         <span className="text-sm">Pick location on map</span>
@@ -407,13 +407,13 @@ export default function BusinessOnboarding() {
                     <div className="flex items-center gap-4">
                       <div className={cn(
                         "h-12 w-12 rounded-xl flex items-center justify-center",
-                        formData.isMobile ? "bg-secondary text-white" : "bg-slate-200 text-slate-500"
+                        formData.isMobile ? "bg-secondary text-white" : "bg-slate-200 text-muted-foreground"
                       )}>
                         <Sparkles className="h-6 w-6" />
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-900 text-base">I offer mobile services</h4>
-                        <p className="text-sm text-slate-500 font-medium">I can travel to the customer's location.</p>
+                        <p className="text-sm text-muted-foreground font-medium">I can travel to the customer's location.</p>
                       </div>
                     </div>
                     <div className={cn(
@@ -437,7 +437,7 @@ export default function BusinessOnboarding() {
               >
                 <div>
                   <h2 className="text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Let's get you verified.</h2>
-                  <p className="text-slate-500 text-lg font-medium">Verified businesses earn 3x more and build trust faster.</p>
+                  <p className="text-muted-foreground text-lg font-medium">Verified businesses earn 3x more and build trust faster.</p>
                 </div>
 
                 <div className="space-y-6">
@@ -455,7 +455,7 @@ export default function BusinessOnboarding() {
                         if (file) setFormData({ ...formData, cacDocument: file });
                       }}
                     />
-                    <div className="h-20 w-20 bg-slate-100 rounded-3xl flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                    <div className="h-20 w-20 bg-muted rounded-3xl flex items-center justify-center group-hover:bg-primary/10 transition-colors">
                       {formData.cacDocument ? (
                         <FileText className="h-10 w-10 text-primary" />
                       ) : (
@@ -466,11 +466,11 @@ export default function BusinessOnboarding() {
                       <h3 className="text-xl font-bold text-slate-900 mb-1">
                         {formData.cacDocument ? formData.cacDocument.name : "Upload CAC Document"}
                       </h3>
-                      <p className="text-sm text-slate-500 font-medium">PDF, JPG or PNG (Max 5MB)</p>
+                      <p className="text-sm text-muted-foreground font-medium">PDF, JPG or PNG (Max 5MB)</p>
                     </div>
                     <Button 
                       variant="outline" 
-                      className="mt-2 h-11 px-6 rounded-xl border-slate-200 font-bold text-slate-600 hover:bg-white"
+                      className="mt-2 h-11 px-6 rounded-xl border-slate-200 font-bold text-slate-600 hover:bg-card"
                     >
                       {formData.cacDocument ? "Change File" : "Select File"}
                     </Button>
@@ -497,12 +497,12 @@ export default function BusinessOnboarding() {
           </AnimatePresence>
 
           {/* Navigation */}
-          <div className="flex flex-col sm:flex-row items-center gap-4 mt-12 pt-8 border-t border-slate-100">
+          <div className="flex flex-col sm:flex-row items-center gap-4 mt-12 pt-8 border-t border-border">
             {step > 1 && (
               <Button
                 onClick={prevStep}
                 variant="ghost"
-                className="w-full sm:w-auto h-14 px-8 rounded-2xl font-bold text-slate-400 hover:text-slate-700 hover:bg-slate-100 order-2 sm:order-1"
+                className="w-full sm:w-auto h-14 px-8 rounded-2xl font-bold text-slate-400 hover:text-slate-700 hover:bg-muted order-2 sm:order-1"
               >
                 <ChevronLeft className="mr-2 h-5 w-5" /> Back
               </Button>

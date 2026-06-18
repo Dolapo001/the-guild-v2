@@ -286,7 +286,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  "h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-all border-2",
  i <= currentStepIndex
  ? 'bg-primary border-primary text-white shadow-lg shadow-primary/20'
- : 'bg-white text-foreground/30 border-gray-200 '
+ : 'bg-card text-foreground/30 border-gray-200 '
  )}>
  {i < currentStepIndex ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
  </div>
@@ -454,7 +454,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  )}
  >
  <div className={cn(
- "h-4 w-4 rounded-full bg-white transition-all shadow-md",
+ "h-4 w-4 rounded-full bg-card transition-all shadow-md",
  bookingState.bookingType === 'RECURRING' ? "translate-x-6" : "translate-x-0"
  )} />
  </button>
@@ -478,7 +478,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  "flex-1 py-1 px-2 rounded-xl text-xs font-bold border-2 transition-all capitalize",
  bookingState.recurrenceRule === freq
  ? "bg-primary border-primary text-white"
- : "bg-white border-transparent text-foreground/60"
+ : "bg-card border-transparent text-foreground/60"
  )}
  >
  {freq}
@@ -498,7 +498,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  "flex-1 py-1 px-2 rounded-xl text-xs font-bold border-2 transition-all",
  bookingState.recurrenceCount === count
  ? "bg-primary border-primary text-white"
- : "bg-white border-transparent text-foreground/60"
+ : "bg-card border-transparent text-foreground/60"
  )}
  >
  {count}x
@@ -529,7 +529,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <div className="space-y-3">
  <label className="text-xs font-extrabold uppercase tracking-widest text-foreground/60">Reference Photo (Optional)</label>
  <div className="h-32 rounded-2xl border-2 border-dashed border-gray-300 bg-white/40 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group">
- <div className="h-10 w-10 rounded-full bg-white flex items-center justify-center group-hover:scale-110 transition-transform">
+ <div className="h-10 w-10 rounded-full bg-card flex items-center justify-center group-hover:scale-110 transition-transform">
  <UploadCloud className="h-5 w-5 text-primary" />
  </div>
  <p className="text-xs font-bold text-foreground/60">Click to upload reference</p>
@@ -580,7 +580,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  "h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all",
  bookingState.staffId === 'AUTO' ? 'bg-primary border-primary' : 'bg-transparent border-gray-300 '
  )}>
- {bookingState.staffId === 'AUTO' && <div className="h-2 w-2 rounded-full bg-white" />}
+ {bookingState.staffId === 'AUTO' && <div className="h-2 w-2 rounded-full bg-card" />}
  </div>
  </div>
 
@@ -624,7 +624,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  "h-5 w-5 rounded-full border-2 flex items-center justify-center transition-all",
  bookingState.staffId === staff.uid ? 'bg-primary border-primary' : 'bg-transparent border-gray-300 '
  )}>
- {bookingState.staffId === staff.uid && <div className="h-2 w-2 rounded-full bg-white" />}
+ {bookingState.staffId === staff.uid && <div className="h-2 w-2 rounded-full bg-card" />}
  </div>
  </div>
  ))}

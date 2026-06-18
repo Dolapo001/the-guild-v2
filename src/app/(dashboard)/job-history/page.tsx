@@ -305,35 +305,35 @@ export default function JobHistoryPage() {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="border-b border-slate-100 pb-6"
+        className="border-b border-border pb-6"
       >
         <h1 className="text-4xl font-black tracking-tight text-slate-900">My Job History</h1>
-        <p className="text-slate-500 font-semibold mt-1.5 text-base">Track your past work, earnings, and client feedback.</p>
+        <p className="text-muted-foreground font-semibold mt-1.5 text-base">Track your past work, earnings, and client feedback.</p>
       </motion.div>
 
       {/* Stats Row */}
       <div className="grid gap-6 md:grid-cols-3">
         {stats.map((stat, i) => (
-          <div key={i} className={cn("p-6 rounded-3xl border shadow-sm flex items-center gap-5 bg-white", stat.bg)}>
-            <div className="h-14 w-14 rounded-2xl bg-white flex items-center justify-center shadow-sm border border-slate-100">
+          <div key={i} className={cn("p-6 rounded-3xl border shadow-sm flex items-center gap-5 bg-card", stat.bg)}>
+            <div className="h-14 w-14 rounded-2xl bg-card flex items-center justify-center shadow-sm border border-border">
               <stat.icon className={cn("h-7 w-7", stat.color)} />
             </div>
             <div>
               <p className="text-xs font-black text-slate-400 uppercase tracking-widest">{stat.label}</p>
-              <p className="text-2xl font-black text-slate-800 mt-0.5">{stat.value}</p>
+              <p className="text-2xl font-black text-foreground mt-0.5">{stat.value}</p>
             </div>
           </div>
         ))}
       </div>
 
       {/* Filter Bar */}
-      <GlassCard className="p-4 border-slate-200/80 bg-white shadow-md rounded-2xl">
+      <GlassCard className="p-4 border-slate-200/80 bg-card shadow-md rounded-2xl">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
             <Input
               placeholder="Search by client name or service..."
-              className="pl-11 bg-slate-50 border-slate-200 text-slate-800 placeholder-slate-400 font-semibold rounded-xl h-12 focus:ring-primary/20"
+              className="pl-11 bg-slate-50 border-slate-200 text-foreground placeholder-slate-400 font-semibold rounded-xl h-12 focus:ring-primary/20"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -348,7 +348,7 @@ export default function JobHistoryPage() {
                   "rounded-xl h-12 px-6 font-bold transition-all text-sm",
                   timeFilter === filter
                     ? "bg-primary text-white shadow-lg shadow-primary/20"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50 bg-white"
+                    : "border-slate-200 text-slate-600 hover:bg-slate-50 bg-card"
                 )}
               >
                 {filter}
@@ -377,7 +377,7 @@ export default function JobHistoryPage() {
                   layout
                 >
                   <GlassCard
-                    className="p-5 border-slate-100 bg-white shadow-sm hover:shadow-md hover:border-primary/20 transition-all cursor-pointer group rounded-2xl"
+                    className="p-5 border-border bg-card shadow-sm hover:shadow-md hover:border-primary/20 transition-all cursor-pointer group rounded-2xl"
                     onClick={() => setSelectedJob(job)}
                   >
                     <div className="grid md:grid-cols-3 gap-6 items-center">
@@ -387,7 +387,7 @@ export default function JobHistoryPage() {
                           <Briefcase className="h-6 w-6 text-primary" />
                         </div>
                         <div>
-                          <h4 className="text-base font-black text-slate-800">{job.service}</h4>
+                          <h4 className="text-base font-black text-foreground">{job.service}</h4>
                           <p className="text-sm font-semibold text-slate-600 flex items-center gap-1.5 mt-0.5">
                             <User className="h-3.5 w-3.5 text-slate-400" /> {job.client}
                           </p>
@@ -406,7 +406,7 @@ export default function JobHistoryPage() {
                                 <Star key={i} className={cn("h-3.5 w-3.5", i < job.rating! ? "fill-amber-500 text-amber-500" : "text-slate-200")} />
                               ))}
                             </div>
-                            <p className="text-xs text-slate-500 font-medium italic line-clamp-1">"{job.comment}"</p>
+                            <p className="text-xs text-muted-foreground font-medium italic line-clamp-1">"{job.comment}"</p>
                           </div>
                         ) : (
                           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">No rating yet</p>
@@ -448,8 +448,8 @@ export default function JobHistoryPage() {
                 <div className="h-24 w-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-slate-200">
                   <Calendar className="h-10 w-10 text-slate-400" />
                 </div>
-                <h3 className="text-xl font-black text-slate-800">History Empty</h3>
-                <p className="text-slate-500 font-semibold mt-2">No matching transactions found in this period.</p>
+                <h3 className="text-xl font-black text-foreground">History Empty</h3>
+                <p className="text-muted-foreground font-semibold mt-2">No matching transactions found in this period.</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -458,7 +458,7 @@ export default function JobHistoryPage() {
 
       {/* Job Receipt Modal - Compact, non-full-screen sizing */}
       <Dialog open={!!selectedJob} onOpenChange={(open) => !open && setSelectedJob(null)}>
-        <DialogContent className="bg-white border-slate-200 text-slate-800 rounded-3xl p-0 max-w-[360px] shadow-2xl overflow-hidden mx-auto my-auto max-h-[85vh] flex flex-col">
+        <DialogContent className="bg-card border-slate-200 text-foreground rounded-3xl p-0 max-w-[360px] shadow-2xl overflow-hidden mx-auto my-auto max-h-[85vh] flex flex-col">
           {selectedJob && (
             <div className="relative overflow-y-auto">
               {/* Decorative cash receipt serrated style line */}
@@ -477,7 +477,7 @@ export default function JobHistoryPage() {
 
                 <div className="text-center space-y-0.5 py-0.5">
                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Service Provided</p>
-                  <h4 className="text-lg font-black text-slate-800 leading-tight">{selectedJob.service}</h4>
+                  <h4 className="text-lg font-black text-foreground leading-tight">{selectedJob.service}</h4>
                   <p className="text-xs font-semibold text-primary flex items-center justify-center gap-1 mt-0.5">
                     <User className="h-3 w-3" /> with {selectedJob.client}
                   </p>
@@ -486,11 +486,11 @@ export default function JobHistoryPage() {
                 <div className="grid grid-cols-2 gap-2 border-y border-dashed border-slate-200 py-3 text-center">
                   <div>
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Date</p>
-                    <p className="text-xs font-bold text-slate-800">{selectedJob.date}</p>
+                    <p className="text-xs font-bold text-foreground">{selectedJob.date}</p>
                   </div>
-                  <div className="border-l border-slate-100">
+                  <div className="border-l border-border">
                     <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Time Range</p>
-                    <p className="text-xs font-bold text-slate-800">{selectedJob.time} - {selectedJob.endTime}</p>
+                    <p className="text-xs font-bold text-foreground">{selectedJob.time} - {selectedJob.endTime}</p>
                   </div>
                 </div>
 
@@ -498,13 +498,13 @@ export default function JobHistoryPage() {
                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Financial Summary</p>
                   <div className="space-y-1.5 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-slate-500 font-semibold">Base Service Fee</span>
-                      <span className="font-bold text-slate-800">₦{selectedJob.price.toLocaleString()}</span>
+                      <span className="text-muted-foreground font-semibold">Base Service Fee</span>
+                      <span className="font-bold text-foreground">₦{selectedJob.price.toLocaleString()}</span>
                     </div>
                     {selectedJob.upsells && selectedJob.upsells.map((extra: any, i: number) => (
                       <div key={i} className="flex justify-between">
-                        <span className="text-slate-500 font-semibold">{extra.name} (Upsell)</span>
-                        <span className="font-bold text-slate-800">₦{extra.price.toLocaleString()}</span>
+                        <span className="text-muted-foreground font-semibold">{extra.name} (Upsell)</span>
+                        <span className="font-bold text-foreground">₦{extra.price.toLocaleString()}</span>
                       </div>
                     ))}
                     {selectedJob.tip > 0 && (
@@ -517,7 +517,7 @@ export default function JobHistoryPage() {
                     )}
                     <div className="border-t border-dashed border-slate-200 pt-2" />
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-black text-slate-800">Final Payout</span>
+                      <span className="text-sm font-black text-foreground">Final Payout</span>
                       <span className="text-lg font-black text-emerald-600">
                         ₦{(selectedJob.price + selectedJob.tip + (selectedJob.upsells ? selectedJob.upsells.reduce((acc: number, curr: any) => acc + curr.price, 0) : 0)).toLocaleString()}
                       </span>
@@ -551,7 +551,7 @@ export default function JobHistoryPage() {
                   </div>
                   <Button
                     onClick={() => setSelectedJob(null)}
-                    className="h-10 rounded-xl bg-slate-100 border border-slate-200 text-slate-700 font-black hover:bg-slate-200 hover:text-slate-800 transition-all text-xs"
+                    className="h-10 rounded-xl bg-muted border border-slate-200 text-slate-700 font-black hover:bg-slate-200 hover:text-foreground transition-all text-xs"
                   >
                     Close
                   </Button>

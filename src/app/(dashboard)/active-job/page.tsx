@@ -191,17 +191,17 @@ export default function ActiveJobPage() {
     animate={{ opacity: 1, scale: 1 }}
     className="w-full max-w-md"
    >
-    <GlassCard className="bg-white p-8 sm:p-10 border-slate-200/80 shadow-xl text-center space-y-6 rounded-[32px]">
+    <GlassCard className="bg-card p-8 sm:p-10 border-slate-200/80 shadow-xl text-center space-y-6 rounded-[32px]">
      <div className="relative mx-auto w-24 h-24 sm:w-28 sm:h-28">
       <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse" />
-      <div className="relative h-full w-full bg-white rounded-full flex items-center justify-center border-4 border-primary/10 shadow-inner">
+      <div className="relative h-full w-full bg-card rounded-full flex items-center justify-center border-4 border-primary/10 shadow-inner">
        <PlayCircle className="h-12 w-12 sm:h-14 sm:w-14 text-primary" />
       </div>
      </div>
      
      <div className="space-y-3">
       <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">No active job</h2>
-      <p className="text-slate-500 font-semibold text-sm sm:text-base leading-relaxed max-w-sm mx-auto">
+      <p className="text-muted-foreground font-semibold text-sm sm:text-base leading-relaxed max-w-sm mx-auto">
        {user?.role === 'staff' 
         ? "Jump to your portal to accept a request or start your next shift."
         : user?.isSoloOperator
@@ -225,7 +225,7 @@ export default function ActiveJobPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-8 pb-20 px-4">
       {/* Header Cockpit */}
-      <div className="p-6 border border-slate-100 bg-white shadow-sm rounded-2xl">
+      <div className="p-6 border border-border bg-card shadow-sm rounded-2xl">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-4">
             <Avatar className="h-16 w-16 border-2 border-primary shadow-lg">
@@ -233,7 +233,7 @@ export default function ActiveJobPage() {
               <AvatarFallback className="bg-primary/10 text-primary font-bold text-lg">{activeBooking.customer[0]}</AvatarFallback>
             </Avatar>
             <div>
-              <h2 className="text-2xl font-black text-slate-850 text-slate-800">{activeBooking.customer}</h2>
+              <h2 className="text-2xl font-black text-slate-850 text-foreground">{activeBooking.customer}</h2>
               <p className="text-sm font-bold text-primary flex items-center gap-1.5 mt-0.5">
                 <Sparkles className="h-3.5 w-3.5" /> Premium Member
               </p>
@@ -247,7 +247,7 @@ export default function ActiveJobPage() {
                   <Shield className="h-7 w-7" />
                 </button>
               </DialogTrigger>
-              <DialogContent className="bg-white border-slate-200 text-slate-800 rounded-3xl p-8 max-w-sm shadow-2xl">
+              <DialogContent className="bg-card border-slate-200 text-foreground rounded-3xl p-8 max-w-sm shadow-2xl">
                 <DialogHeader>
                   <DialogTitle className="text-2xl font-black text-center text-red-500 flex items-center justify-center gap-3">
                     <AlertTriangle className="h-8 w-8" /> SOS Alert
@@ -269,7 +269,7 @@ export default function ActiveJobPage() {
       <div className="grid lg:grid-cols-3 gap-8">
         {/* Center Stage: Timer & Controls */}
         <div className="lg:col-span-2 space-y-8">
-          <GlassCard className="p-12 border-slate-200 bg-white text-center relative overflow-hidden shadow-xl shadow-slate-200/50 rounded-[32px]">
+          <GlassCard className="p-12 border-slate-200 bg-card text-center relative overflow-hidden shadow-xl shadow-slate-200/50 rounded-[32px]">
             {/* Background Glow */}
             <div className={cn(
               "absolute inset-0 blur-[120px] rounded-full transition-colors duration-1000",
@@ -277,7 +277,7 @@ export default function ActiveJobPage() {
             )} />
 
             <div className="relative z-10 space-y-8">
-              <div className="flex items-center justify-center gap-3 text-slate-500 uppercase tracking-[0.3em] font-black text-xs">
+              <div className="flex items-center justify-center gap-3 text-muted-foreground uppercase tracking-[0.3em] font-black text-xs">
                 <Timer className={cn("h-4 w-4", jobStatus === 'running' && "animate-pulse text-primary")} />
                 {jobStatus === 'running' ? "Session in Progress" : "Session Paused"}
               </div>
@@ -306,7 +306,7 @@ export default function ActiveJobPage() {
                 </div>
 
                 {/* Slide to Complete */}
-                <div className="relative w-full max-w-xs h-16 bg-slate-100 rounded-2xl border border-slate-200 flex items-center p-1 overflow-hidden shadow-inner">
+                <div className="relative w-full max-w-xs h-16 bg-muted rounded-2xl border border-slate-200 flex items-center p-1 overflow-hidden shadow-inner">
                   <motion.div
                     style={{ background }}
                     className="absolute inset-0 z-0"
@@ -316,13 +316,13 @@ export default function ActiveJobPage() {
                     dragConstraints={{ left: 0, right: 240 }}
                     style={{ x }}
                     onDragEnd={handleDragEnd}
-                    className="relative z-20 h-14 w-14 bg-white rounded-xl flex items-center justify-center cursor-grab active:cursor-grabbing shadow-md border border-slate-100 group/handle"
+                    className="relative z-20 h-14 w-14 bg-card rounded-xl flex items-center justify-center cursor-grab active:cursor-grabbing shadow-md border border-border group/handle"
                   >
                     <CheckCircle2 className="h-7 w-7 text-emerald-600 group-active/handle:scale-90 transition-transform" />
                   </motion.div>
                   <motion.p
                     style={{ opacity }}
-                    className="absolute inset-0 flex items-center justify-center text-xs font-black text-slate-500 pointer-events-none uppercase tracking-widest"
+                    className="absolute inset-0 flex items-center justify-center text-xs font-black text-muted-foreground pointer-events-none uppercase tracking-widest"
                   >
                     Slide to Complete
                   </motion.p>
@@ -338,12 +338,12 @@ export default function ActiveJobPage() {
               <div className="h-px flex-1 bg-slate-200 mx-4" />
             </div>
 
-            <div className="p-8 border border-slate-100 bg-white space-y-8 shadow-sm rounded-2xl">
+            <div className="p-8 border border-border bg-card space-y-8 shadow-sm rounded-2xl">
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <p className="text-xs font-black text-primary uppercase tracking-widest">Service</p>
-                  <h4 className="text-2xl font-black text-slate-800">{activeBooking.service}</h4>
-                  <p className="text-sm font-semibold text-slate-500 mt-1">90 Minutes • Premium Room</p>
+                  <h4 className="text-2xl font-black text-foreground">{activeBooking.service}</h4>
+                  <p className="text-sm font-semibold text-muted-foreground mt-1">90 Minutes • Premium Room</p>
                 </div>
                 <div className="h-12 w-12 bg-primary/5 rounded-xl flex items-center justify-center border border-primary/10">
                   <Clock className="h-6 w-6 text-primary" />
@@ -352,7 +352,7 @@ export default function ActiveJobPage() {
 
               {/* Upsell Section */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between border-t border-slate-100 pt-6">
+                <div className="flex items-center justify-between border-t border-border pt-6">
                   <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Add-ons</p>
                   <Dialog open={showUpsell} onOpenChange={setShowUpsell}>
                     <DialogTrigger asChild>
@@ -360,7 +360,7 @@ export default function ActiveJobPage() {
                         <Plus className="mr-1.5 h-4 w-4" /> Add Item
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-white border-slate-200 text-slate-800 rounded-3xl p-8 max-w-md shadow-2xl">
+                    <DialogContent className="bg-card border-slate-200 text-foreground rounded-3xl p-8 max-w-md shadow-2xl">
                       <DialogHeader>
                         <DialogTitle className="text-2xl font-black text-slate-900">Available Extras</DialogTitle>
                       </DialogHeader>
@@ -376,11 +376,11 @@ export default function ActiveJobPage() {
                             className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:bg-primary/5 hover:border-primary/30 transition-all group text-left"
                           >
                             <div className="flex items-center gap-4">
-                              <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors border border-slate-100">
+                              <div className="h-12 w-12 bg-card rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors border border-border">
                                 <item.icon className="h-6 w-6 text-primary" />
                               </div>
                               <div>
-                                <p className="font-black text-slate-800">{item.name}</p>
+                                <p className="font-black text-foreground">{item.name}</p>
                                 <p className="text-xs text-slate-400 font-semibold mt-0.5">Premium Upgrade</p>
                               </div>
                             </div>
@@ -399,7 +399,7 @@ export default function ActiveJobPage() {
         {/* Sidebar: Checklist & Notes */}
         <div className="space-y-8">
           {/* SOP Checklist */}
-          <div className="p-6 border border-slate-100 bg-white shadow-sm space-y-6 rounded-2xl">
+          <div className="p-6 border border-border bg-card shadow-sm space-y-6 rounded-2xl">
             <h3 className="text-xs font-black text-slate-700 uppercase tracking-widest flex items-center gap-2 border-b border-slate-50 pb-3">
               <CheckSquare className="h-4 w-4 text-primary" /> Service Checklist (SOP)
             </h3>
@@ -430,7 +430,7 @@ export default function ActiveJobPage() {
           </div>
 
           {/* Client Notes */}
-          <div className="border border-slate-100 bg-white shadow-sm overflow-hidden rounded-2xl">
+          <div className="border border-border bg-card shadow-sm overflow-hidden rounded-2xl">
             <button
               onClick={() => setNotesOpen(!notesOpen)}
               className="w-full p-6 flex items-center justify-between hover:bg-slate-50 transition-colors"
@@ -464,19 +464,19 @@ export default function ActiveJobPage() {
 
       {/* Completion Summary Summary Modal */}
       <Dialog open={showSummary} onOpenChange={setShowSummary}>
-        <DialogContent className="bg-white border-slate-200 text-slate-800 rounded-3xl p-8 max-w-md shadow-2xl">
-          <DialogHeader className="border-b border-slate-100 pb-4">
+        <DialogContent className="bg-card border-slate-200 text-foreground rounded-3xl p-8 max-w-md shadow-2xl">
+          <DialogHeader className="border-b border-border pb-4">
             <DialogTitle className="text-3xl font-black text-center text-slate-900 mb-2">Job Summary</DialogTitle>
-            <p className="text-center text-slate-500 font-bold text-sm">Review the session details before closing.</p>
+            <p className="text-center text-muted-foreground font-bold text-sm">Review the session details before closing.</p>
           </DialogHeader>
 
           <div className="py-6 space-y-6">
             <div className="flex justify-between items-center p-5 rounded-2xl bg-slate-50 border border-slate-200/80">
-              <span className="text-slate-500 font-black uppercase text-xs tracking-widest">Total Time</span>
-              <span className="text-2xl font-mono font-black text-slate-800 tracking-widest">{formatTime(elapsedTime)}</span>
+              <span className="text-muted-foreground font-black uppercase text-xs tracking-widest">Total Time</span>
+              <span className="text-2xl font-mono font-black text-foreground tracking-widest">{formatTime(elapsedTime)}</span>
             </div>
 
-            <div className="h-px bg-slate-100" />
+            <div className="h-px bg-muted" />
 
             <div className="flex justify-between items-center px-2">
               <span className="text-lg font-black text-slate-700">Total Earnings</span>
@@ -494,7 +494,7 @@ export default function ActiveJobPage() {
             >
               Confirm & Release
             </Button>
-            <Button variant="ghost" onClick={() => setShowSummary(false)} className="text-slate-500 font-bold hover:text-slate-800 hover:bg-slate-50 transition-colors">
+            <Button variant="ghost" onClick={() => setShowSummary(false)} className="text-muted-foreground font-bold hover:text-foreground hover:bg-slate-50 transition-colors">
               Back to Session
             </Button>
           </DialogFooter>

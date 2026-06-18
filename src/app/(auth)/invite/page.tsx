@@ -74,7 +74,7 @@ export default function InviteValidationPage() {
                     <ShieldCheck className="h-8 w-8 text-primary" />
                   </div>
                   <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Join The Guild</h1>
-                  <p className="text-slate-500 font-medium">Enter your invitation details to join your team.</p>
+                  <p className="text-muted-foreground font-medium">Enter your invitation details to join your team.</p>
                 </div>
 
                 <form onSubmit={handleValidate} className="space-y-6">
@@ -88,7 +88,7 @@ export default function InviteValidationPage() {
                           placeholder="name@company.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="h-14 pl-12 rounded-2xl bg-slate-50/50 border-slate-100 focus:border-primary focus:ring-primary/20 font-bold"
+                          className="h-14 pl-12 rounded-2xl bg-slate-50/50 border-border focus:border-primary focus:ring-primary/20 font-bold"
                           required
                         />
                       </div>
@@ -103,7 +103,7 @@ export default function InviteValidationPage() {
                           placeholder="Enter 6-digit code"
                           value={code}
                           onChange={(e) => setCode(e.target.value.toUpperCase())}
-                          className="h-14 pl-12 rounded-2xl bg-slate-50/50 border-slate-100 focus:border-primary focus:ring-primary/20 font-black tracking-widest"
+                          className="h-14 pl-12 rounded-2xl bg-slate-50/50 border-border focus:border-primary focus:ring-primary/20 font-black tracking-widest"
                           required
                         />
                       </div>
@@ -152,12 +152,12 @@ export default function InviteValidationPage() {
 
                 <div className="space-y-2">
                   <h2 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Invitation Confirmed</h2>
-                  <p className="text-slate-500 font-medium">You've been invited to join an elite team.</p>
+                  <p className="text-muted-foreground font-medium">You've been invited to join an elite team.</p>
                 </div>
 
-                <div className="p-6 rounded-3xl bg-slate-50 border border-slate-100 space-y-4">
+                <div className="p-6 rounded-3xl bg-slate-50 border border-border space-y-4">
                   <div className="flex items-center gap-4 text-left">
-                    <div className="h-12 w-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                    <div className="h-12 w-12 rounded-2xl bg-card border border-border flex items-center justify-center shadow-sm">
                       <Building2 className="h-6 w-6 text-primary" />
                     </div>
                     <div>
@@ -165,9 +165,9 @@ export default function InviteValidationPage() {
                       <p className="text-lg font-black text-slate-900">{invitationData.businessName}</p>
                     </div>
                   </div>
-                  <div className="h-px bg-slate-100 w-full" />
+                  <div className="h-px bg-muted w-full" />
                   <div className="flex items-center gap-4 text-left">
-                    <div className="h-12 w-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                    <div className="h-12 w-12 rounded-2xl bg-card border border-border flex items-center justify-center shadow-sm">
                       <ShieldCheck className="h-6 w-6 text-secondary" />
                     </div>
                     <div>

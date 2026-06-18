@@ -236,7 +236,7 @@ export default function VendorOrdersPage() {
       className={cn(
        "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all",
        activeTab === tab.id
-        ? "bg-white text-primary shadow-sm border border-glass-border"
+        ? "bg-card text-primary shadow-sm border border-glass-border"
         : "text-foreground/40 hover:text-foreground/60"
       )}
      >
@@ -401,7 +401,7 @@ export default function VendorOrdersPage() {
        initial={{ opacity: 0, scale: 0.9, y: 20 }}
        animate={{ opacity: 1, scale: 1, y: 0 }}
        exit={{ opacity: 0, scale: 0.9, y: 20 }}
-       className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-glass-border"
+       className="relative w-full max-w-lg bg-card rounded-3xl shadow-2xl overflow-hidden border border-glass-border"
       >
        <div className="p-6 border-b border-glass-border flex items-center justify-between bg-muted/10">
         <div>

@@ -43,8 +43,8 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  transition={{ duration: 0.3 }}
  >
  <Link href={`/service/${service.uid}`} className="block h-full">
- <div className={`h-full flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white backdrop-blur-md shadow-sm hover:shadow-md transition-all group ${isMaestroMatch ? 'ring-2 ring-secondary/50 shadow-xl shadow-secondary/10' : ''}`}>
- <div className="relative h-48 w-full overflow-hidden bg-gray-100 ">
+ <div className={`h-full flex flex-col overflow-hidden rounded-2xl border border-border bg-card backdrop-blur-md shadow-sm hover:shadow-md transition-all group ${isMaestroMatch ? 'ring-2 ring-secondary/50 shadow-xl shadow-secondary/10' : ''}`}>
+ <div className="relative h-48 w-full overflow-hidden bg-muted ">
  <Image
  src={image}
  alt={name}
@@ -55,7 +55,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  {/* Favorite Button */}
  <button
  onClick={handleFavorite}
- className="absolute top-3 right-3 z-10 h-9 w-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 group/heart"
+ className="absolute top-3 right-3 z-10 h-9 w-9 rounded-full bg-card/90 backdrop-blur-md flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 group/heart"
  >
  <motion.div
  animate={favorited ? { scale: [1, 1.3, 1] } : {}}
@@ -64,7 +64,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  <Heart
  className={cn(
  "h-5 w-5 transition-colors",
- favorited ? "fill-red-500 text-red-500" : "text-gray-400 group-hover/heart:text-red-500"
+ favorited ? "fill-red-500 text-red-500" : "text-muted-foreground group-hover/heart:text-red-500"
  )}
  />
  </motion.div>
@@ -82,12 +82,12 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  </div>
  )}
  {service.isVerified ? (
-  <div className="bg-emerald-500/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
+  <div className="bg-success/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
    <ShieldCheck className="h-3 w-3" />
    VERIFIED
   </div>
  ) : (
-  <div className="bg-red-500/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg animate-pulse">
+  <div className="bg-error/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg animate-pulse">
    UNVERIFIED (CANNOT BOOK)
   </div>
  )}
@@ -100,7 +100,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  {distance !== undefined && (
  <div className={cn(
  "backdrop-blur-md text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg",
- distance < 2 ? "bg-green-500/90 text-white" : "bg-white/90 text-foreground"
+ distance < 2 ? "bg-success/90 text-white" : "bg-card/90 text-foreground"
  )}>
  <MapPin className="h-3 w-3" />
  {distance.toFixed(1)}km away
@@ -111,30 +111,30 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
 
  <div className="p-5 flex-1 flex flex-col relative">
  <div className="flex justify-between items-start mb-2">
- <h3 className="font-bold text-lg text-gray-900 leading-tight group-hover:text-primary transition-colors line-clamp-1">
+ <h3 className="font-bold text-lg text-foreground leading-tight group-hover:text-primary transition-colors line-clamp-1">
  {businessName}
  </h3>
- <div className="flex items-center gap-1 text-sm font-bold text-gray-900 ">
+ <div className="flex items-center gap-1 text-sm font-bold text-foreground ">
  <Star className="h-4 w-4 fill-secondary text-secondary" />
  {service.rating}
  </div>
  </div>
 
- <p className="text-sm text-gray-500 font-medium mb-4 line-clamp-1">
+ <p className="text-sm text-muted-foreground font-medium mb-4 line-clamp-1">
  {name}
  </p>
 
- <div className="flex items-center gap-1.5 text-xs font-bold text-gray-400 uppercase tracking-wider mb-6">
+ <div className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground uppercase tracking-wider mb-6">
  <MapPin className="h-3.5 w-3.5" />
  {location}
  </div>
 
- <div className="mt-auto pt-4 border-t border-gray-100 ">
+ <div className="mt-auto pt-4 border-t border-border ">
  {/* Mobile Layout (Always Visible) */}
  <div className="flex lg:hidden flex-col gap-3">
   <div className="flex justify-between items-end">
    <div>
-    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Starting at</p>
+    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Starting at</p>
     <p className="text-lg font-extrabold text-amber-600 ">₦{(service.price || 0).toLocaleString()}</p>
    </div>
   </div>
@@ -143,7 +143,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
     Book Now
    </div>
   ) : (
-   <div className="w-full h-10 rounded-xl border border-red-200 bg-red-50/50 text-red-500 flex items-center justify-center font-bold text-xs uppercase tracking-wider">
+   <div className="w-full h-10 rounded-xl border border-error/20 bg-error/5 text-error flex items-center justify-center font-bold text-xs uppercase tracking-wider">
     Booking Disabled
    </div>
   )}
@@ -153,7 +153,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  <div className="hidden lg:block h-14 relative overflow-hidden">
   <div className="absolute top-4 left-0 w-full flex items-center justify-between group-hover:-translate-y-full group-hover:opacity-0 transition-all duration-300">
    <div>
-    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Starting at</p>
+    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Starting at</p>
     <p className="text-lg font-extrabold text-amber-600 ">₦{(service.price || 0).toLocaleString()}</p>
    </div>
    <div className="text-sm font-bold text-primary flex items-center gap-1">
@@ -166,7 +166,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
     Book Now
    </div>
   ) : (
-   <div className="w-full h-10 rounded-xl border border-red-200 bg-red-50/50 text-red-500 flex items-center justify-center font-bold text-xs uppercase tracking-wider transition-all absolute top-0 left-0 translate-y-full opacity-0 group-hover:translate-y-4 group-hover:opacity-100 duration-300">
+   <div className="w-full h-10 rounded-xl border border-error/20 bg-error/5 text-error flex items-center justify-center font-bold text-xs uppercase tracking-wider transition-all absolute top-0 left-0 translate-y-full opacity-0 group-hover:translate-y-4 group-hover:opacity-100 duration-300">
     Booking Disabled
    </div>
   )}

@@ -132,7 +132,7 @@ export default function MarketplacePage() {
               setSelectedCity(e.target.value);
               setSelectedItem(null);
             }}
-            className="h-10 px-4 rounded-xl border border-glass-border bg-white text-sm font-bold text-primary shadow-sm focus:ring-primary/10 focus:border-primary outline-none"
+            className="h-10 px-4 rounded-xl border border-glass-border bg-card text-sm font-bold text-primary shadow-sm focus:ring-primary/10 focus:border-primary outline-none"
           >
             {AVAILABLE_CITIES.map(city => (
               <option key={city} value={city}>{city}</option>
@@ -154,7 +154,7 @@ export default function MarketplacePage() {
             <button
               onClick={() => setActiveTab("products")}
               className={`px-4 py-2 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 ${
-                activeTab === "products" ? "bg-white text-primary shadow-sm" : "text-foreground/50 hover:text-foreground"
+                activeTab === "products" ? "bg-card text-primary shadow-sm" : "text-foreground/50 hover:text-foreground"
               }`}
             >
               <ShoppingBag className="h-3.5 w-3.5" />
@@ -163,7 +163,7 @@ export default function MarketplacePage() {
             <button
               onClick={() => setActiveTab("packages")}
               className={`px-4 py-2 text-xs font-extrabold rounded-lg transition-all flex items-center gap-2 ${
-                activeTab === "packages" ? "bg-white text-primary shadow-sm" : "text-foreground/50 hover:text-foreground"
+                activeTab === "packages" ? "bg-card text-primary shadow-sm" : "text-foreground/50 hover:text-foreground"
               }`}
             >
               <Package2 className="h-3.5 w-3.5" />
@@ -204,7 +204,7 @@ export default function MarketplacePage() {
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="p-6 bg-white border border-glass-border rounded-2xl grid md:grid-cols-4 gap-4 shadow-sm">
+            <div className="p-6 bg-card border border-glass-border rounded-2xl grid md:grid-cols-4 gap-4 shadow-sm">
               <div className="space-y-1.5">
                 <label className="text-[10px] font-bold text-foreground/40 uppercase tracking-widest">Search</label>
                 <div className="relative">
@@ -223,7 +223,7 @@ export default function MarketplacePage() {
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full h-10 px-3 rounded-lg border border-glass-border bg-white text-xs font-bold"
+                  className="w-full h-10 px-3 rounded-lg border border-glass-border bg-card text-xs font-bold"
                 >
                   {CATEGORIES.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -274,7 +274,7 @@ export default function MarketplacePage() {
                 key={product.uid}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl border border-glass-border shadow-glass-sm flex flex-col overflow-hidden hover:shadow-md transition-all group"
+                className="bg-card rounded-2xl border border-glass-border shadow-glass-sm flex flex-col overflow-hidden hover:shadow-md transition-all group"
               >
                 <div className="relative aspect-square w-full bg-gray-100 overflow-hidden">
                   <Image
@@ -348,7 +348,7 @@ export default function MarketplacePage() {
               key={pkg.uid}
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-2xl border border-glass-border shadow-glass-sm flex flex-col justify-between overflow-hidden hover:shadow-md transition-all group p-6 space-y-4"
+              className="bg-card rounded-2xl border border-glass-border shadow-glass-sm flex flex-col justify-between overflow-hidden hover:shadow-md transition-all group p-6 space-y-4"
             >
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -414,7 +414,7 @@ export default function MarketplacePage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="fixed inset-0 m-auto w-full max-w-lg h-fit bg-white rounded-3xl border border-glass-border shadow-2xl p-6 z-[110] overflow-hidden flex flex-col space-y-4"
+              className="fixed inset-0 m-auto w-full max-w-lg h-fit bg-card rounded-3xl border border-glass-border shadow-2xl p-6 z-[110] overflow-hidden flex flex-col space-y-4"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">

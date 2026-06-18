@@ -2,13 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useTransform,
-  type Variants,
-} from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   ShieldCheck,
   WifiOff,
@@ -19,49 +13,24 @@ import {
   Fingerprint,
   Sparkles,
   CheckCircle2,
-  TrendingUp,
   Wallet,
   CalendarCheck,
   Search,
   Star,
+  Lock,
+  TrendingUp,
 } from "lucide-react";
 import { InstallButton, WatchDemoButton } from "@/components/landing/install-button";
 import { useInstallPrompt } from "@/hooks/use-install-prompt";
+import { Reveal, Eyebrow, TransitionTag } from "@/components/landing/primitives";
+import { GuildSeal } from "@/components/landing/guild-seal";
+import { JoiningTheGuild } from "@/components/landing/hero-joining";
+import { MaestroMatch } from "@/components/landing/maestro-match";
+import { EscrowVault } from "@/components/landing/escrow-vault";
+import { SoloToTeam } from "@/components/landing/solo-to-team";
 
 /* ------------------------------------------------------------------ */
-/*  Motion helpers                                                      */
-/* ------------------------------------------------------------------ */
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
-};
-
-function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
-  return (
-    <motion.div
-      variants={fadeUp}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ delay }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-function Eyebrow({ children }: { children: ReactNode }) {
-  return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">
-      {children}
-    </span>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Navigation (glass, persistent Install CTA)                         */
+/*  Navigation                                                         */
 /* ------------------------------------------------------------------ */
 
 function Nav() {
@@ -91,9 +60,9 @@ function Nav() {
         <div className="hidden items-center gap-7 md:flex">
           {[
             ["Preview", "#preview"],
-            ["Why install", "#why"],
-            ["Workflow", "#workflow"],
-            ["Intelligence", "#ai"],
+            ["Matching", "#ai"],
+            ["Escrow", "#escrow"],
+            ["Growth", "#growth"],
           ].map(([label, href]) => (
             <a key={href} href={href} className="text-sm font-semibold text-white/55 transition-colors hover:text-white">
               {label}
@@ -108,70 +77,7 @@ function Nav() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  App-preview mock (real-UI feel, built from primitives)             */
-/* ------------------------------------------------------------------ */
-
-function AppPreview() {
-  const bars = [38, 62, 45, 78, 56, 90, 70];
-  return (
-    <div className="relative w-full max-w-sm rounded-[28px] border border-white/10 bg-[#0c1022]/90 p-4 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] backdrop-blur-xl">
-      <div className="mb-3 flex items-center justify-between px-1 text-[10px] font-bold text-white/40">
-        <span>9:41</span>
-        <span className="flex items-center gap-1">
-          <WifiOff className="h-3 w-3 text-[#34d399]" /> Offline ready
-        </span>
-      </div>
-
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <p className="text-[11px] font-semibold text-white/40">Good morning</p>
-          <p className="text-base font-extrabold text-white">Your business pulse</p>
-        </div>
-        <span className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#3949ab] to-[#1a237e]" />
-      </div>
-
-      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <div className="flex items-center justify-between">
-          <p className="text-[11px] font-semibold text-white/50">Revenue · this week</p>
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#34d399]/10 px-2 py-0.5 text-[10px] font-bold text-[#34d399]">
-            <TrendingUp className="h-3 w-3" /> 18%
-          </span>
-        </div>
-        <p className="mt-1 text-2xl font-extrabold tracking-tight text-white">₦2,480,900</p>
-        <div className="mt-4 flex h-20 items-end gap-2">
-          {bars.map((h, i) => (
-            <motion.div
-              key={i}
-              initial={{ height: 0 }}
-              whileInView={{ height: `${h}%` }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.06, duration: 0.5, ease: "easeOut" }}
-              className={`flex-1 rounded-md ${i === 5 ? "bg-[#ffb74d]" : "bg-white/15"}`}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-3 space-y-2">
-        {[
-          { name: "Deep clean · VI", tag: "In progress", tone: "text-[#ffb74d] bg-[#ffb74d]/10" },
-          { name: "Catering · Lekki", tag: "Confirmed", tone: "text-[#34d399] bg-[#34d399]/10" },
-        ].map((r) => (
-          <div key={r.name} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
-            <div className="flex items-center gap-2.5">
-              <span className="h-7 w-7 rounded-lg bg-white/10" />
-              <span className="text-[13px] font-semibold text-white/85">{r.name}</span>
-            </div>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${r.tone}`}>{r.tag}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Hero                                                                */
+/*  1 · Hero — "Joining The Guild"  (Doubt → Trust)                    */
 /* ------------------------------------------------------------------ */
 
 function Hero() {
@@ -192,7 +98,7 @@ function Hero() {
       <motion.div style={{ y: yB }} className="pointer-events-none absolute -right-32 top-40 h-[28rem] w-[28rem] rounded-full bg-[#00695c]/25 blur-[120px]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(57,73,171,0.25),transparent_60%)]" />
 
-      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
+      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           <Reveal>
             <Eyebrow>
@@ -201,25 +107,31 @@ function Hero() {
           </Reveal>
 
           <Reveal delay={0.05}>
-            <h1 className="mt-6 text-[clamp(2.6rem,6vw,4.5rem)] font-extrabold leading-[1.02] tracking-tight text-white">
-              The verified marketplace,
+            <h1 className="mt-6 text-[clamp(2.5rem,5.6vw,4.3rem)] font-extrabold leading-[1.03] tracking-tight text-white">
+              Trust shouldn&apos;t be a gamble.
               <br />
               <span className="bg-gradient-to-r from-white via-[#c5cae9] to-[#ffb74d] bg-clip-text text-transparent">
-                installed on your device.
+                Join The Guild.
               </span>
             </h1>
           </Reveal>
 
           <Reveal delay={0.1}>
             <p className="mt-6 max-w-xl text-lg font-medium leading-relaxed text-white/55">
-              Book trusted pros, run your business, and move money — in a fast,
-              offline-ready app that lives on your home screen. No browser tabs.
-              No friction.
+              The informal market is scattered and uncertain. The Guild verifies
+              every professional, so you book with confidence — in a fast,
+              offline-ready app that lives on your home screen.
             </p>
           </Reveal>
 
-          <Reveal delay={0.15}>
-            <div className="mt-9 flex flex-wrap items-center gap-4">
+          <Reveal delay={0.13}>
+            <div className="mt-6">
+              <TransitionTag from="Doubt" to="Trust" />
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.16}>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
               <InstallButton size="lg" />
               <WatchDemoButton />
             </div>
@@ -237,28 +149,9 @@ function Hero() {
           </Reveal>
         </div>
 
-        <Reveal delay={0.1} className="relative mx-auto">
-          <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
-            <AppPreview />
-          </motion.div>
-          <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -left-6 top-20 hidden rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur-xl sm:block"
-          >
-            <p className="flex items-center gap-2 text-xs font-bold text-white">
-              <BellRing className="h-4 w-4 text-[#ffb74d]" /> New booking
-            </p>
-          </motion.div>
-          <motion.div
-            animate={{ y: [0, -10, 0] }}
-            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -right-4 bottom-16 hidden rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur-xl sm:block"
-          >
-            <p className="flex items-center gap-2 text-xs font-bold text-white">
-              <ShieldCheck className="h-4 w-4 text-[#34d399]" /> Verified pro
-            </p>
-          </motion.div>
+        {/* The Guild Seal forms; verified providers organize, the rest fade. */}
+        <Reveal delay={0.1} className="relative">
+          <JoiningTheGuild />
         </Reveal>
       </div>
     </section>
@@ -266,7 +159,7 @@ function Hero() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Product preview section                                            */
+/*  2 · Product preview                                                */
 /* ------------------------------------------------------------------ */
 
 function PreviewTile({ title, icon: Icon, accent, children }: { title: string; icon: typeof Search; accent: string; children: ReactNode }) {
@@ -354,47 +247,7 @@ function PreviewSection() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Why install                                                        */
-/* ------------------------------------------------------------------ */
-
-function WhyInstall() {
-  const reasons = [
-    { icon: WifiOff, title: "Works offline", body: "Your bookings, wallet and chats stay available even with no signal — synced the moment you reconnect." },
-    { icon: Gauge, title: "Instantly fast", body: "Cached and compiled to your device. Opens in a tap, no page loads, no spinners." },
-    { icon: BellRing, title: "Push notifications", body: "Real-time alerts for bookings, payments and messages — even when the app is closed." },
-    { icon: Smartphone, title: "Home-screen native", body: "Full-screen, no browser chrome. It looks and feels like software you own." },
-    { icon: Fingerprint, title: "Secure by design", body: "httpOnly sessions and device-bound auth. Nothing sensitive ever lives in the browser." },
-    { icon: Zap, title: "Device integration", body: "Camera for verification, location for discovery, share targets — wired into your OS." },
-  ];
-  return (
-    <section id="why" className="relative px-6 py-28">
-      <div className="mx-auto max-w-6xl">
-        <Reveal className="max-w-2xl">
-          <Eyebrow>Installation is the upgrade</Eyebrow>
-          <h2 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            The browser is the demo. The app is the product.
-          </h2>
-        </Reveal>
-        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {reasons.map((r, i) => (
-            <Reveal key={r.title} delay={i * 0.05}>
-              <div className="group h-full rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.04]">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1a237e]/40 text-[#9fa8da] transition-colors group-hover:bg-[#ffb74d]/15 group-hover:text-[#ffb74d]">
-                  <r.icon className="h-5 w-5" />
-                </span>
-                <h3 className="mt-5 text-lg font-extrabold text-white">{r.title}</h3>
-                <p className="mt-2 text-sm font-medium leading-relaxed text-white/55">{r.body}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Workflow demonstration                                             */
+/*  3 · Workflow                                                       */
 /* ------------------------------------------------------------------ */
 
 function Workflow() {
@@ -433,35 +286,31 @@ function Workflow() {
             ))}
           </div>
         </div>
-
-        <Reveal className="mt-12 flex justify-center">
-          <InstallButton size="md" />
-        </Reveal>
       </div>
     </section>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  AI layer                                                           */
+/*  5 · Why install                                                    */
 /* ------------------------------------------------------------------ */
 
-function AILayer() {
-  const lines = [
-    { from: "user", text: "Find a verified caterer in Lekki for Saturday, under ₦150k." },
-    { from: "ai", text: "3 verified matches. Prestige Catering has a 2 PM slot and 4.9★. Hold it?" },
-    { from: "user", text: "Yes, lock the slot and pay into escrow." },
-    { from: "ai", text: "Done. Slot held, ₦120k in escrow, receipt saved. I'll remind you Friday." },
+function WhyInstall() {
+  const reasons = [
+    { icon: WifiOff, title: "Works offline", body: "Your bookings, wallet and chats stay available even with no signal — synced the moment you reconnect." },
+    { icon: Gauge, title: "Instantly fast", body: "Cached and compiled to your device. Opens in a tap, no page loads, no spinners." },
+    { icon: BellRing, title: "Push notifications", body: "Real-time alerts for bookings, payments and messages — even when the app is closed." },
+    { icon: Smartphone, title: "Home-screen native", body: "Full-screen, no browser chrome. It looks and feels like software you own." },
+    { icon: Fingerprint, title: "Secure by design", body: "httpOnly sessions and device-bound auth. Nothing sensitive ever lives in the browser." },
+    { icon: Zap, title: "Device integration", body: "Camera for verification, location for discovery, share targets — wired into your OS." },
   ];
   return (
-    <section id="ai" className="relative px-6 py-28">
-      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
-        <Reveal>
-          <Eyebrow>
-            <Sparkles className="h-3.5 w-3.5 text-[#ffb74d]" /> Maestro · native intelligence
-          </Eyebrow>
+    <section id="why" className="relative px-6 py-28">
+      <div className="mx-auto max-w-6xl">
+        <Reveal className="max-w-2xl">
+          <Eyebrow>Installation is the upgrade</Eyebrow>
           <h2 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            An assistant that runs the workflow, not just the chat.
+            The browser is the demo. The app is the product.
           </h2>
           <p className="mt-4 text-lg font-medium leading-relaxed text-white/55">
             Maestro understands intent, ranks verified providers, books, and moves
@@ -504,13 +353,26 @@ function AILayer() {
             </div>
           </div>
         </Reveal>
+        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {reasons.map((r, i) => (
+            <Reveal key={r.title} delay={i * 0.05}>
+              <div className="group h-full rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.04]">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1a237e]/40 text-[#9fa8da] transition-colors group-hover:bg-[#ffb74d]/15 group-hover:text-[#ffb74d]">
+                  <r.icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-5 text-lg font-extrabold text-white">{r.title}</h3>
+                <p className="mt-2 text-sm font-medium leading-relaxed text-white/55">{r.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
 /* ------------------------------------------------------------------ */
-/*  Social proof (metrics)                                             */
+/*  Social proof                                                       */
 /* ------------------------------------------------------------------ */
 
 function Metrics() {
@@ -537,24 +399,39 @@ function Metrics() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Final conversion                                                   */
+/*  8 · Final conversion — every story, unified under the Seal         */
 /* ------------------------------------------------------------------ */
 
 function FinalCTA() {
+  const pillars = [
+    { icon: ShieldCheck, label: "Verified" },
+    { icon: Sparkles, label: "Matched" },
+    { icon: Lock, label: "Protected" },
+    { icon: TrendingUp, label: "Growing" },
+  ];
   return (
     <section className="relative overflow-hidden px-6 py-32">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(57,73,171,0.5),transparent_55%)]" />
       <Reveal className="relative mx-auto max-w-3xl text-center">
-        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white/10 ring-1 ring-white/15">
-          <Smartphone className="h-7 w-7 text-white" />
-        </span>
-        <h2 className="mt-7 text-[clamp(2.4rem,5.5vw,4rem)] font-extrabold leading-[1.05] tracking-tight text-white">
+        <div className="flex justify-center">
+          <GuildSeal size={104} active />
+        </div>
+        <h2 className="mt-8 text-[clamp(2.4rem,5.5vw,4rem)] font-extrabold leading-[1.05] tracking-tight text-white">
           Install to continue.
         </h2>
         <p className="mx-auto mt-5 max-w-xl text-lg font-medium text-white/60">
-          The Guild lives on your home screen — verified, offline-ready and built for
-          how you actually work. One tap is all it takes.
+          Verified professionals, intelligent matching, protected payments and
+          businesses that grow — unified under one seal, on your home screen.
         </p>
+
+        <div className="mx-auto mt-8 flex max-w-md flex-wrap items-center justify-center gap-2">
+          {pillars.map((p) => (
+            <span key={p.label} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[12px] font-bold text-white/70">
+              <p.icon className="h-3.5 w-3.5 text-[#ffb74d]" /> {p.label}
+            </span>
+          ))}
+        </div>
+
         <div className="mt-10 flex justify-center">
           <InstallButton size="lg" />
         </div>
@@ -564,7 +441,7 @@ function FinalCTA() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Minimal footer (no competing CTAs)                                 */
+/*  Footer + sticky install                                            */
 /* ------------------------------------------------------------------ */
 
 function MiniFooter() {
@@ -586,10 +463,6 @@ function MiniFooter() {
     </footer>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/*  Sticky mobile install bar (persistent reminder)                    */
-/* ------------------------------------------------------------------ */
 
 function StickyInstallBar() {
   const { isInstalled } = useInstallPrompt();
@@ -618,7 +491,7 @@ function StickyInstallBar() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Page                                                               */
+/*  Page — the narrative: Trust → Discovery → Protection → Growth      */
 /* ------------------------------------------------------------------ */
 
 export default function LandingPage() {
@@ -627,13 +500,15 @@ export default function LandingPage() {
       <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
       <div className="relative z-10">
         <Nav />
-        <Hero />
-        <PreviewSection />
-        <WhyInstall />
-        <Workflow />
-        <AILayer />
-        <Metrics />
-        <FinalCTA />
+        <Hero />            {/* Joining The Guild — Doubt → Trust */}
+        <PreviewSection />  {/* Product preview */}
+        <Workflow />        {/* Problem → Outcome */}
+        <MaestroMatch />    {/* Intelligence — Confusion → Clarity */}
+        <WhyInstall />      {/* Why install */}
+        <EscrowVault />     {/* Trust & Protection — Risk → Security */}
+        <SoloToTeam />      {/* Provider Growth — Freelancer → Owner */}
+        <Metrics />         {/* Social proof */}
+        <FinalCTA />        {/* Install — the story's conclusion */}
         <MiniFooter />
         <StickyInstallBar />
       </div>

@@ -269,7 +269,7 @@ export default function CustomerDashboard() {
                           <Button
                             onClick={() => setIsRescheduleModalOpen(true)}
                             variant="outline"
-                            className="flex-1 border-glass-border bg-white/50 text-primary rounded-xl h-12 px-6 font-bold hover:bg-white text-sm"
+                            className="flex-1 border-glass-border bg-white/50 text-primary rounded-xl h-12 px-6 font-bold hover:bg-card text-sm"
                           >
                             Modify Booking
                           </Button>
@@ -317,7 +317,7 @@ export default function CustomerDashboard() {
                           <Button
                             onClick={handleReschedule}
                             variant="outline"
-                            className="border-glass-border text-primary rounded-xl h-11 px-6 font-bold text-sm hover:bg-white"
+                            className="border-glass-border text-primary rounded-xl h-11 px-6 font-bold text-sm hover:bg-card"
                           >
                             Reschedule
                           </Button>
