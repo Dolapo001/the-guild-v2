@@ -6,6 +6,7 @@ import { MobileBottomNav } from "@/components/shared/mobile-bottom-nav";
 import { MaestroChatWidget } from "@/components/ui/maestro-chat-widget";
 import { CartDrawer } from "@/components/shared/cart-drawer";
 import { CommandPalette } from "@/components/shared/command-palette";
+import { AppModeGuard } from "@/components/pwa/app-mode-guard";
 import { useAuth } from "@/contexts/AuthContext";
 
 import { useEffect } from "react";
@@ -56,6 +57,7 @@ export default function DashboardLayout({
   }
 
   return (
+ <AppModeGuard>
  <div className="min-h-screen bg-mesh-gradient flex flex-col lg:flex-row">
  <Sidebar />
  <div className="flex-1 flex flex-col min-h-screen pb-20 lg:pb-0 lg:pl-64">
@@ -69,5 +71,6 @@ export default function DashboardLayout({
  <CommandPalette />
  {user?.role === "customer" && <MaestroChatWidget />}
  </div>
+ </AppModeGuard>
  );
 }

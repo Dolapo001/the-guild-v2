@@ -8,6 +8,8 @@ import { NotificationProvider } from "@/contexts/NotificationContext";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/lib/query-provider";
 import { PWARegister } from "@/components/pwa-register";
+import { PWAModeSync } from "@/components/pwa/pwa-mode-sync";
+import { InstallBanner } from "@/components/pwa/install-banner";
 import { Toaster } from "sonner";
 
 const inter = { variable: "" };
@@ -69,6 +71,8 @@ export default function RootLayout({
                   <FavoritesProvider>
                     <NotificationProvider>{children}</NotificationProvider>
                     <PWARegister />
+                    <PWAModeSync />
+                    <InstallBanner />
                     <Toaster
                       position="top-right"
                       richColors
