@@ -1,743 +1,645 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
- ShieldCheck,
- Sparkles,
- ArrowRight,
- Smartphone,
- Lock,
- CheckCircle,
- Wallet,
- Users,
- Menu,
- Star,
- History,
- PlayCircle,
- MessageSquare,
- Heart,
- UserCircle,
- ChevronRight,
- Clock,
- Info,
- AlertCircle,
- X,
- LayoutDashboard,
- Package,
- Settings,
- Briefcase,
- ShieldAlert,
- CheckCircle2,
- Search,
- Zap
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+  type Variants,
+} from "framer-motion";
+import {
+  ShieldCheck,
+  WifiOff,
+  Zap,
+  BellRing,
+  Smartphone,
+  Gauge,
+  Fingerprint,
+  Sparkles,
+  CheckCircle2,
+  TrendingUp,
+  Wallet,
+  CalendarCheck,
+  Search,
+  Star,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { GlassCard } from "@/components/ui/glass-card";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { InstallButton, WatchDemoButton } from "@/components/landing/install-button";
+import { useInstallPrompt } from "@/hooks/use-install-prompt";
 
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { AmbientBackground } from "@/components/shared/ambient-background";
-import { Footer } from "@/components/shared/footer";
-import { PWARedirect } from "@/components/shared/pwa-redirect";
-import { cn } from "@/lib/utils";
+/* ------------------------------------------------------------------ */
+/*  Motion helpers                                                      */
+/* ------------------------------------------------------------------ */
 
-// --- Components ---
-
-const Navbar = () => {
- const [isScrolled, setIsScrolled] = useState(false);
-
- useEffect(() => {
- const handleScroll = () => setIsScrolled(window.scrollY > 20);
- window.addEventListener("scroll", handleScroll);
- return () => window.removeEventListener("scroll", handleScroll);
- }, []);
-
- return (
- <motion.nav
- initial={{ y: -100 }}
- animate={{ y: 0 }}
- className={cn(
- "fixed top-0 w-full z-50 transition-all duration-500 px-6 py-4",
- isScrolled
- ? "bg-white/70 backdrop-blur-xl border-b border-black/5 "
- : "bg-transparent"
- )}
- >
- <div className="max-w-7xl mx-auto flex items-center justify-between">
- <Link href="/" className="flex items-center gap-2.5 group">
- <div className="h-10 w-10 rounded-xl bg-primary overflow-hidden flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
- <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
- </div>
- <span className="text-2xl font-extrabold tracking-tight text-slate-900 ">The Guild</span>
- </Link>
-
- <div className="hidden md:flex items-center gap-8">
- {["Features", "For Business", "Marketplace"].map((item) => (
- <Link
- key={item}
- href={item === "For Business" ? "/register?role=ceo" : `/${item.toLowerCase().replace(' ', '-')}`}
- className="text-sm font-bold text-slate-500 hover:text-primary transition-colors"
- >
- {item}
- </Link>
- ))}
- </div>
-
- <div className="flex items-center gap-4">
-
- <Link href="/register" className="hidden md:block">
- <Button className="bg-gradient-to-r from-primary to-primary/80 text-white font-bold rounded-full px-8 shadow-lg shadow-primary/20 hover:scale-105 transition-transform">
- Get Started
- </Button>
- </Link>
- <Sheet>
- <SheetTrigger asChild>
- <Button variant="ghost" size="icon" className="md:hidden text-slate-900 ">
- <Menu className="h-6 w-6" />
- </Button>
- </SheetTrigger>
- <SheetContent side="right" className="bg-white border-black/5 ">
- <div className="flex flex-col gap-8 mt-12">
- <div className="flex flex-col gap-6">
- {["Features", "For Business", "Marketplace"].map((item) => (
- <Link
- key={item}
- href={item === "For Business" ? "/register?role=ceo" : `/${item.toLowerCase().replace(' ', '-')}`}
- className="text-xl font-bold text-slate-900 "
- >
- {item}
- </Link>
- ))}
- </div>
- <div className="pt-8 border-t border-black/5 space-y-4">
- <Button variant="ghost" className="w-full justify-start font-bold text-slate-900 text-lg px-0">Login</Button>
- <Link href="/register" className="block">
- <Button className="w-full bg-primary text-white font-bold h-14 rounded-2xl">Get Started</Button>
- </Link>
- </div>
- </div>
- </SheetContent>
- </Sheet>
- </div>
- </div>
- </motion.nav>
- );
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
 };
 
-const PhoneHero = () => {
- const [step, setStep] = useState(0);
+function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+  return (
+    <motion.div
+      variants={fadeUp}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
- useEffect(() => {
- const timer = setInterval(() => {
- setStep((prev) => (prev + 1) % 4);
- }, 3000);
- return () => clearInterval(timer);
- }, []);
+function Eyebrow({ children }: { children: ReactNode }) {
+  return (
+    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white/60">
+      {children}
+    </span>
+  );
+}
 
- return (
- <div className="relative w-[320px] h-[640px] mx-auto">
- {/* Phone Frame */}
- <div className="absolute inset-0 bg-slate-900 rounded-[3rem] border-[8px] border-slate-800 shadow-2xl overflow-hidden z-10">
- {/* Screen Content */}
- <div className="relative h-full w-full bg-[#020617] p-6 pt-12">
- {/* Status Bar */}
- <div className="flex justify-between items-center mb-8">
- <div className="h-4 w-12 bg-white/10 rounded-full" />
- <div className="flex gap-1.5">
- <div className="h-2 w-2 rounded-full bg-white/20" />
- <div className="h-2 w-2 rounded-full bg-white/20" />
- <div className="h-2 w-4 rounded-full bg-emerald-500" />
- </div>
- </div>
+/* ------------------------------------------------------------------ */
+/*  Navigation (glass, persistent Install CTA)                         */
+/* ------------------------------------------------------------------ */
 
- {/* App Interface */}
- <div className="space-y-6">
- <div className="flex items-center justify-between">
- <div className="h-10 w-10 rounded-xl bg-primary flex items-center justify-center text-white">
- <ShieldCheck className="h-6 w-6" />
- </div>
- <div className="h-10 w-10 rounded-full bg-white/5 border border-white/10" />
- </div>
+function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
- <div className="space-y-2">
- <div className="h-4 w-24 bg-white/10 rounded-full" />
- <div className="h-8 w-48 bg-white/20 rounded-full" />
- </div>
+  return (
+    <header className="fixed inset-x-0 top-0 z-50 flex justify-center px-4 pt-3">
+      <nav
+        className={`flex w-full max-w-6xl items-center justify-between gap-4 rounded-2xl px-4 py-2.5 transition-all duration-300 ${
+          scrolled
+            ? "border border-white/10 bg-[#0a0e1c]/80 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.4)]"
+            : "border border-transparent"
+        }`}
+      >
+        <Link href="/" className="flex items-center gap-2.5">
+          <span className="h-9 w-9 overflow-hidden rounded-xl bg-white/10 ring-1 ring-white/10">
+            <img src="/logo.png" alt="The Guild" className="h-full w-full object-cover" />
+          </span>
+          <span className="text-[17px] font-extrabold tracking-tight text-white">The Guild</span>
+        </Link>
 
- {/* Search Bar Animation */}
- <motion.div
- animate={{ scale: step === 0 ? 1.05 : 1 }}
- className="h-14 bg-white/5 border border-white/10 rounded-2xl flex items-center px-4 gap-3"
- >
- <Search className="h-4 w-4 text-slate-500" />
- <div className="h-3 w-32 bg-white/10 rounded-full" />
- </motion.div>
+        <div className="hidden items-center gap-7 md:flex">
+          {[
+            ["Preview", "#preview"],
+            ["Why install", "#why"],
+            ["Workflow", "#workflow"],
+            ["Intelligence", "#ai"],
+          ].map(([label, href]) => (
+            <a key={href} href={href} className="text-sm font-semibold text-white/55 transition-colors hover:text-white">
+              {label}
+            </a>
+          ))}
+        </div>
 
- {/* Category Grid */}
- <div className="grid grid-cols-2 gap-3">
- {[1, 2, 3, 4].map((i) => (
- <motion.div
- key={i}
- animate={{ opacity: step >= 1 ? 1 : 0.3 }}
- className="h-24 bg-white/5 border border-white/10 rounded-2xl p-3 space-y-2"
- >
- <div className="h-8 w-8 rounded-lg bg-white/10" />
- <div className="h-2 w-12 bg-white/10 rounded-full" />
- </motion.div>
- ))}
- </div>
+        <InstallButton size="sm" />
+      </nav>
+    </header>
+  );
+}
 
- {/* Result Card Animation */}
- <AnimatePresence mode="wait">
- {step >= 2 && (
- <motion.div
- initial={{ opacity: 0, y: 30 }}
- animate={{ opacity: 1, y: 0 }}
- className="space-y-6"
- >
- <GlassCard className="p-4 border-white/10 bg-white/5 backdrop-blur-2xl">
- <div className="flex items-center gap-4">
- <div className="h-12 w-12 rounded-xl bg-slate-800 overflow-hidden border border-white/10">
- <img src="/images/landing/avatar_1.png" alt="Sarah" className="object-cover h-full w-full" />
- </div>
- <div className="flex-1">
- <div className="flex items-center gap-1.5">
- <p className="text-xs font-bold text-white">Sarah Johnson</p>
- <ShieldCheck className="h-3 w-3 text-emerald-500" />
- </div>
- <p className="text-[10px] text-slate-500 font-medium">Deep Tissue Specialist</p>
- </div>
- <div className="text-right">
- <p className="text-xs font-bold text-white">₦15,000</p>
- <div className="flex items-center gap-1 justify-end">
- <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
- <span className="text-[10px] text-slate-400 font-bold">4.9</span>
- </div>
- </div>
- </div>
- </GlassCard>
+/* ------------------------------------------------------------------ */
+/*  App-preview mock (real-UI feel, built from primitives)             */
+/* ------------------------------------------------------------------ */
 
- {step === 3 && (
- <motion.div
- initial={{ scale: 0, rotate: -10 }}
- animate={{ scale: 1, rotate: 0 }}
- className="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 flex items-center justify-center gap-3 shadow-[0_0_30px_rgba(16,185,129,0.1)]"
- >
- <div className="h-8 w-8 rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
- <CheckCircle2 className="h-5 w-5" />
- </div>
- <span className="text-xs font-extrabold text-emerald-500 uppercase tracking-widest">Booking Confirmed</span>
- </motion.div>
- )}
- </motion.div>
- )}
- </AnimatePresence>
+function AppPreview() {
+  const bars = [38, 62, 45, 78, 56, 90, 70];
+  return (
+    <div className="relative w-full max-w-sm rounded-[28px] border border-white/10 bg-[#0c1022]/90 p-4 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.7)] backdrop-blur-xl">
+      <div className="mb-3 flex items-center justify-between px-1 text-[10px] font-bold text-white/40">
+        <span>9:41</span>
+        <span className="flex items-center gap-1">
+          <WifiOff className="h-3 w-3 text-[#34d399]" /> Offline ready
+        </span>
+      </div>
 
- {/* UI Placeholders */}
- <div className="space-y-4 pt-4 opacity-20">
- <div className="h-2 w-2/3 bg-white rounded-full" />
- <div className="h-2 w-full bg-white rounded-full" />
- <div className="h-2 w-1/2 bg-white rounded-full" />
- </div>
- </div>
- </div>
- </div>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <p className="text-[11px] font-semibold text-white/40">Good morning</p>
+          <p className="text-base font-extrabold text-white">Your business pulse</p>
+        </div>
+        <span className="h-9 w-9 rounded-xl bg-gradient-to-br from-[#3949ab] to-[#1a237e]" />
+      </div>
 
- {/* Success Confetti Effect (Behind Phone) */}
- <AnimatePresence>
- {step === 3 && (
- <motion.div
- initial={{ opacity: 0 }}
- animate={{ opacity: 1 }}
- exit={{ opacity: 0 }}
- className="absolute -inset-20 pointer-events-none z-[-1]"
- >
- {[...Array(20)].map((_, i) => (
- <motion.div
- key={i}
- initial={{
- x: 0,
- y: 0,
- scale: 0,
- rotate: 0
- }}
- animate={{
- x: (Math.random() - 0.5) * 400,
- y: (Math.random() - 0.5) * 400,
- scale: Math.random() * 1.5,
- rotate: Math.random() * 360
- }}
- transition={{ duration: 1, ease: "easeOut" }}
- className={cn(
- "absolute top-1/2 left-1/2 h-2 w-2 rounded-sm",
- ["bg-violet-500", "bg-amber-500", "bg-emerald-500", "bg-blue-500"][i % 4]
- )}
- />
- ))}
- </motion.div>
- )}
- </AnimatePresence>
- </div>
- );
-};
+      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="flex items-center justify-between">
+          <p className="text-[11px] font-semibold text-white/50">Revenue · this week</p>
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#34d399]/10 px-2 py-0.5 text-[10px] font-bold text-[#34d399]">
+            <TrendingUp className="h-3 w-3" /> 18%
+          </span>
+        </div>
+        <p className="mt-1 text-2xl font-extrabold tracking-tight text-white">₦2,480,900</p>
+        <div className="mt-4 flex h-20 items-end gap-2">
+          {bars.map((h, i) => (
+            <motion.div
+              key={i}
+              initial={{ height: 0 }}
+              whileInView={{ height: `${h}%` }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.06, duration: 0.5, ease: "easeOut" }}
+              className={`flex-1 rounded-md ${i === 5 ? "bg-[#ffb74d]" : "bg-white/15"}`}
+            />
+          ))}
+        </div>
+      </div>
 
-const HowItWorksCarousel = () => {
- const [activeStep, setActiveStep] = useState(0);
- const steps = [
- {
- title: "Book Instantly",
- desc: "Choose a verified pro or product from our curated marketplace.",
- icon: Smartphone,
- color: "text-primary",
- bg: "bg-primary/10",
- glow: "shadow-primary/20",
- accent: "from-primary to-primary/80"
- },
- {
- title: "Escrow Protection",
- desc: "Funds held safely in escrow until the job is completed to your satisfaction.",
- icon: Lock,
- color: "text-secondary",
- bg: "bg-secondary/10",
- glow: "shadow-secondary/20",
- accent: "from-secondary to-secondary/80"
- },
- {
- title: "Service Completed",
- desc: "Pro finishes the work, and you confirm your happiness with the result.",
- icon: CheckCircle,
- color: "text-emerald-500",
- bg: "bg-emerald-500/10",
- glow: "shadow-emerald-500/20",
- accent: "from-emerald-500 to-teal-600"
- },
- {
- title: "Pro Paid",
- desc: "Funds are released instantly to the pro's wallet. Everyone wins.",
- icon: Wallet,
- color: "text-blue-600",
- bg: "bg-blue-600/10",
- glow: "shadow-blue-600/20",
- accent: "from-blue-600 to-cyan-600"
- }
- ];
+      <div className="mt-3 space-y-2">
+        {[
+          { name: "Deep clean · VI", tag: "In progress", tone: "text-[#ffb74d] bg-[#ffb74d]/10" },
+          { name: "Catering · Lekki", tag: "Confirmed", tone: "text-[#34d399] bg-[#34d399]/10" },
+        ].map((r) => (
+          <div key={r.name} className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2.5">
+            <div className="flex items-center gap-2.5">
+              <span className="h-7 w-7 rounded-lg bg-white/10" />
+              <span className="text-[13px] font-semibold text-white/85">{r.name}</span>
+            </div>
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${r.tone}`}>{r.tag}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
- useEffect(() => {
- const timer = setInterval(() => {
- setActiveStep((prev) => (prev + 1) % steps.length);
- }, 4000);
- return () => clearInterval(timer);
- }, []);
+/* ------------------------------------------------------------------ */
+/*  Hero                                                                */
+/* ------------------------------------------------------------------ */
 
- const step = steps[activeStep];
+function Hero() {
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
+  const yA = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const yB = useTransform(scrollYProgress, [0, 1], [0, 80]);
 
- return (
- <div className="max-w-5xl mx-auto px-4 md:px-6">
- <GlassCard className="p-6 md:p-16 border-white/10 relative overflow-hidden shadow-2xl bg-white/5 backdrop-blur-3xl rounded-[32px] md:rounded-[40px]">
- {/* Background Glow */}
- <div className={cn(
- "absolute -top-24 -right-24 w-64 h-64 blur-[100px] rounded-full transition-all duration-1000 opacity-20",
- step.bg.replace('/10', '/40')
- )} />
+  const trust = [
+    { icon: WifiOff, label: "Works offline" },
+    { icon: Zap, label: "Lightning fast" },
+    { icon: ShieldCheck, label: "Secure by design" },
+  ];
 
- <div className="grid md:grid-cols-2 gap-16 items-center relative z-10">
- <div className="flex justify-center">
- <AnimatePresence mode="wait">
- <motion.div
- key={activeStep}
- initial={{ scale: 0.8, opacity: 0, rotate: -15 }}
- animate={{ scale: 1, opacity: 1, rotate: 0 }}
- exit={{ scale: 0.8, opacity: 0, rotate: 15 }}
- className={cn(
- "h-40 w-40 md:h-64 md:w-64 rounded-[3rem] flex items-center justify-center shadow-2xl transition-all duration-700 relative group",
- step.bg, step.glow
- )}
- >
- <div className={cn("absolute inset-0 rounded-[3rem] bg-gradient-to-br opacity-20 group-hover:opacity-40 transition-opacity", step.accent)} />
- <step.icon className={cn("h-20 w-20 md:h-32 md:w-32 relative z-10", step.color)} />
+  return (
+    <section ref={ref} className="relative flex min-h-screen items-center overflow-hidden px-6 pt-28 pb-16">
+      <motion.div style={{ y: yA }} className="pointer-events-none absolute -left-40 top-10 h-[34rem] w-[34rem] rounded-full bg-[#1a237e]/40 blur-[120px]" />
+      <motion.div style={{ y: yB }} className="pointer-events-none absolute -right-32 top-40 h-[28rem] w-[28rem] rounded-full bg-[#00695c]/25 blur-[120px]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-10%,rgba(57,73,171,0.25),transparent_60%)]" />
 
- {/* Floating Particles */}
- <motion.div
- animate={{ y: [0, -10, 0] }}
- transition={{ duration: 2, repeat: Infinity }}
- className="absolute -top-4 -right-4 h-12 w-12 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 flex items-center justify-center"
- >
- <Sparkles className={cn("h-6 w-6", step.color)} />
- </motion.div>
- </motion.div>
- </AnimatePresence>
- </div>
+      <div className="relative mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
+        <div>
+          <Reveal>
+            <Eyebrow>
+              <Sparkles className="h-3.5 w-3.5 text-[#ffb74d]" /> Install-first · PWA
+            </Eyebrow>
+          </Reveal>
 
- <div className="space-y-8">
- <AnimatePresence mode="wait">
- <motion.div
- key={activeStep}
- initial={{ x: 30, opacity: 0 }}
- animate={{ x: 0, opacity: 1 }}
- exit={{ x: -30, opacity: 0 }}
- className="space-y-6"
- >
- <div className="space-y-2">
- <p className={cn("text-sm font-extrabold uppercase tracking-[0.3em]", step.color)}>Step 0{activeStep + 1}</p>
- <h3 className="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">{step.title}</h3>
- </div>
- <p className="text-xl text-slate-500 font-medium leading-relaxed">
- {step.desc}
- </p>
- </motion.div>
- </AnimatePresence>
+          <Reveal delay={0.05}>
+            <h1 className="mt-6 text-[clamp(2.6rem,6vw,4.5rem)] font-extrabold leading-[1.02] tracking-tight text-white">
+              The verified marketplace,
+              <br />
+              <span className="bg-gradient-to-r from-white via-[#c5cae9] to-[#ffb74d] bg-clip-text text-transparent">
+                installed on your device.
+              </span>
+            </h1>
+          </Reveal>
 
- {/* Progress Bar */}
- <div className="space-y-4">
- <div className="flex gap-3">
- {steps.map((_, i) => (
- <div
- key={i}
- className="flex-1 h-2 rounded-full bg-black/5 overflow-hidden cursor-pointer"
- onClick={() => setActiveStep(i)}
- >
- <motion.div
- initial={{ width: 0 }}
- animate={{ width: activeStep === i ? "100%" : activeStep > i ? "100%" : "0%" }}
- transition={{ duration: activeStep === i ? 4 : 0.5, ease: "linear" }}
- className={cn("h-full bg-gradient-to-r", steps[i].accent)}
- />
- </div>
- ))}
- </div>
- <div className="flex justify-between items-center">
- <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">The Guild Workflow</p>
- <p className="text-xs font-extrabold text-slate-900 uppercase tracking-widest">0{activeStep + 1} / 04</p>
- </div>
- </div>
- </div>
- </div>
- </GlassCard>
- </div>
- );
-};
+          <Reveal delay={0.1}>
+            <p className="mt-6 max-w-xl text-lg font-medium leading-relaxed text-white/55">
+              Book trusted pros, run your business, and move money — in a fast,
+              offline-ready app that lives on your home screen. No browser tabs.
+              No friction.
+            </p>
+          </Reveal>
 
-const MaestroShowcase = () => {
- return (
- <section className="py-48 px-6 relative overflow-hidden">
- {/* Background Decorative Elements */}
- <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-amber-500/5 blur-[160px] rounded-full -z-10" />
+          <Reveal delay={0.15}>
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <InstallButton size="lg" />
+              <WatchDemoButton />
+            </div>
+          </Reveal>
 
- <div className="max-w-5xl mx-auto text-center space-y-20">
- <motion.div
- initial={{ scale: 0.8, opacity: 0 }}
- whileInView={{ scale: 1, opacity: 1 }}
- viewport={{ once: true }}
- className="relative inline-block"
- >
- {/* Pulsing Orb with multiple layers */}
- <div className="absolute inset-0 bg-secondary/30 blur-[120px] rounded-full animate-pulse" />
- <div className="absolute inset-0 bg-secondary/20 blur-[80px] rounded-full animate-ping" />
+          <Reveal delay={0.2}>
+            <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
+              {trust.map((t) => (
+                <span key={t.label} className="inline-flex items-center gap-2 text-sm font-semibold text-white/50">
+                  <t.icon className="h-4 w-4 text-[#34d399]" />
+                  {t.label}
+                </span>
+              ))}
+            </div>
+          </Reveal>
+        </div>
 
- <div className="relative h-40 w-40 md:h-64 md:w-64 rounded-full bg-gradient-to-br from-secondary/80 via-secondary to-secondary/60 flex items-center justify-center shadow-[0_0_80px_rgba(255,183,77,0.4)] border-4 border-white/20">
- <motion.div
- animate={{
- rotate: 360,
- scale: [1, 1.1, 1]
- }}
- transition={{
- rotate: { duration: 15, repeat: Infinity, ease: "linear" },
- scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
- }}
- className="relative z-10"
- >
- <Sparkles className="h-20 w-20 md:h-32 md:w-32 text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.5)]" />
- </motion.div>
+        <Reveal delay={0.1} className="relative mx-auto">
+          <motion.div animate={{ y: [0, -12, 0] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}>
+            <AppPreview />
+          </motion.div>
+          <motion.div
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -left-6 top-20 hidden rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur-xl sm:block"
+          >
+            <p className="flex items-center gap-2 text-xs font-bold text-white">
+              <BellRing className="h-4 w-4 text-[#ffb74d]" /> New booking
+            </p>
+          </motion.div>
+          <motion.div
+            animate={{ y: [0, -10, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -right-4 bottom-16 hidden rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur-xl sm:block"
+          >
+            <p className="flex items-center gap-2 text-xs font-bold text-white">
+              <ShieldCheck className="h-4 w-4 text-[#34d399]" /> Verified pro
+            </p>
+          </motion.div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
 
- {/* Orbiting Particles */}
- {[...Array(8)].map((_, i) => (
- <motion.div
- key={i}
- animate={{ rotate: 360 }}
- transition={{ duration: 10 + i * 2, repeat: Infinity, ease: "linear" }}
- className="absolute inset-0"
- >
- <div
- className="h-3 w-3 rounded-full bg-white shadow-[0_0_10px_white] absolute top-0 left-1/2 -translate-x-1/2"
- style={{ opacity: 0.3 + (i * 0.1) }}
- />
- </motion.div>
- ))}
- </div>
- </motion.div>
+/* ------------------------------------------------------------------ */
+/*  Product preview section                                            */
+/* ------------------------------------------------------------------ */
 
- <div className="space-y-8">
- <motion.div
- initial={{ opacity: 0, y: 20 }}
- whileInView={{ opacity: 1, y: 0 }}
- viewport={{ once: true }}
- className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-extrabold uppercase tracking-[0.3em]"
- >
- <Zap className="h-4 w-4 fill-current" />
- Maestro Intelligence
- </motion.div>
+function PreviewTile({ title, icon: Icon, accent, children }: { title: string; icon: typeof Search; accent: string; children: ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
+      <div className="mb-4 flex items-center gap-2">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg" style={{ backgroundColor: `${accent}33` }}>
+          <Icon className="h-4 w-4" style={{ color: accent === "#1a237e" ? "#7986cb" : accent }} />
+        </span>
+        <span className="text-sm font-bold text-white">{title}</span>
+      </div>
+      {children}
+    </div>
+  );
+}
 
- <h2 className="text-4xl sm:text-5xl md:text-8xl font-extrabold tracking-tight text-slate-900 leading-[1.1]">
- Smart Matching. <br />
- <span className="text-transparent bg-clip-text bg-gradient-to-r from-secondary/80 via-secondary to-secondary/60 text-glow-amber">Zero Guesswork.</span>
- </h2>
+function PreviewSection() {
+  return (
+    <section id="preview" className="relative px-6 py-28">
+      <div className="mx-auto max-w-6xl">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <Eyebrow>Real product · not a mockup</Eyebrow>
+          <h2 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            See the app before you install it.
+          </h2>
+          <p className="mt-4 text-lg font-medium text-white/55">
+            Every screen below is the real interface — the same one that lands on your home screen.
+          </p>
+        </Reveal>
 
- <p className="text-xl md:text-2xl text-slate-500 font-medium leading-relaxed max-w-3xl mx-auto">
- Maestro AI analyzes thousands of data points—from location and availability to verified skill scores—to find your perfect match in seconds.
- </p>
+        <Reveal delay={0.1}>
+          <div className="mt-14 overflow-hidden rounded-[32px] border border-white/10 bg-gradient-to-b from-white/[0.06] to-transparent p-2 shadow-[0_40px_120px_-30px_rgba(26,35,126,0.6)]">
+            <div className="grid gap-2 rounded-[26px] bg-[#0a0e1c] p-6 md:grid-cols-3">
+              <PreviewTile title="Discover" icon={Search} accent="#3949ab">
+                <div className="space-y-2">
+                  {["Glow Spa", "Prestige Catering", "SwiftClean"].map((n, i) => (
+                    <div key={n} className="flex items-center justify-between rounded-xl bg-white/[0.04] px-3 py-2.5">
+                      <span className="flex items-center gap-2 text-[13px] font-semibold text-white/85">
+                        <span className="h-6 w-6 rounded-md bg-white/10" />
+                        {n}
+                      </span>
+                      <span className="flex items-center gap-0.5 text-[11px] font-bold text-[#ffb74d]">
+                        <Star className="h-3 w-3 fill-current" /> {(4.7 + i * 0.1).toFixed(1)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </PreviewTile>
 
- <div className="grid md:grid-cols-3 gap-8 pt-12">
- {[
- { label: "Real-time Capacity Verification", icon: CheckCircle2 },
- { label: "Location-Optimized Matching", icon: CheckCircle2 },
- { label: "Quality-First Selection Logic", icon: CheckCircle2 }
- ].map((item, i) => (
- <div key={i} className="flex items-center justify-center gap-3 text-slate-700 font-bold">
- <item.icon className="h-6 w-6 text-emerald-500" />
- <span>{item.label}</span>
- </div>
- ))}
- </div>
- </div>
- </div>
- </section>
- );
-};
+              <PreviewTile title="Book" icon={CalendarCheck} accent="#00695c">
+                <div className="grid grid-cols-4 gap-1.5">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`flex h-9 items-center justify-center rounded-lg text-[11px] font-bold ${
+                        i === 5 ? "bg-[#ffb74d] text-[#0b0f1f]" : "bg-white/[0.04] text-white/50"
+                      }`}
+                    >
+                      {9 + i}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-3 rounded-xl bg-[#34d399]/10 px-3 py-2 text-[12px] font-bold text-[#34d399]">
+                  Slot held · 2:00 PM
+                </div>
+              </PreviewTile>
+
+              <PreviewTile title="Pay" icon={Wallet} accent="#1a237e">
+                <p className="text-[11px] font-semibold text-white/45">Escrow balance</p>
+                <p className="text-xl font-extrabold text-white">₦184,500</p>
+                <div className="mt-3 space-y-2">
+                  {["Escrow locked", "Released to pro"].map((t, i) => (
+                    <div key={t} className="flex items-center justify-between rounded-lg bg-white/[0.04] px-3 py-2 text-[12px]">
+                      <span className="font-semibold text-white/70">{t}</span>
+                      <span className={`font-bold ${i ? "text-[#34d399]" : "text-white/50"}`}>{i ? "+₦42k" : "₦42k"}</span>
+                    </div>
+                  ))}
+                </div>
+              </PreviewTile>
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Why install                                                        */
+/* ------------------------------------------------------------------ */
+
+function WhyInstall() {
+  const reasons = [
+    { icon: WifiOff, title: "Works offline", body: "Your bookings, wallet and chats stay available even with no signal — synced the moment you reconnect." },
+    { icon: Gauge, title: "Instantly fast", body: "Cached and compiled to your device. Opens in a tap, no page loads, no spinners." },
+    { icon: BellRing, title: "Push notifications", body: "Real-time alerts for bookings, payments and messages — even when the app is closed." },
+    { icon: Smartphone, title: "Home-screen native", body: "Full-screen, no browser chrome. It looks and feels like software you own." },
+    { icon: Fingerprint, title: "Secure by design", body: "httpOnly sessions and device-bound auth. Nothing sensitive ever lives in the browser." },
+    { icon: Zap, title: "Device integration", body: "Camera for verification, location for discovery, share targets — wired into your OS." },
+  ];
+  return (
+    <section id="why" className="relative px-6 py-28">
+      <div className="mx-auto max-w-6xl">
+        <Reveal className="max-w-2xl">
+          <Eyebrow>Installation is the upgrade</Eyebrow>
+          <h2 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            The browser is the demo. The app is the product.
+          </h2>
+        </Reveal>
+        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {reasons.map((r, i) => (
+            <Reveal key={r.title} delay={i * 0.05}>
+              <div className="group h-full rounded-2xl border border-white/10 bg-white/[0.02] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.04]">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#1a237e]/40 text-[#9fa8da] transition-colors group-hover:bg-[#ffb74d]/15 group-hover:text-[#ffb74d]">
+                  <r.icon className="h-5 w-5" />
+                </span>
+                <h3 className="mt-5 text-lg font-extrabold text-white">{r.title}</h3>
+                <p className="mt-2 text-sm font-medium leading-relaxed text-white/55">{r.body}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Workflow demonstration                                             */
+/* ------------------------------------------------------------------ */
+
+function Workflow() {
+  const steps = [
+    { tag: "Problem", title: "You need a verified pro — fast.", body: "Search by service and location. Only KYC-verified businesses surface.", icon: Search },
+    { tag: "Action", title: "Book and lock funds in escrow.", body: "Pick a slot, pay into escrow. The pro is notified instantly via push.", icon: CalendarCheck },
+    { tag: "Response", title: "The system coordinates everything.", body: "Status updates, staff assignment and live chat — all in real time.", icon: Zap },
+    { tag: "Outcome", title: "Job done, funds released.", body: "Confirm completion and escrow releases automatically. Leave a review.", icon: CheckCircle2 },
+  ];
+  return (
+    <section id="workflow" className="relative px-6 py-28">
+      <div className="mx-auto max-w-5xl">
+        <Reveal className="mx-auto max-w-2xl text-center">
+          <Eyebrow>A real journey · start to finish</Eyebrow>
+          <h2 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            From problem to outcome, in one app.
+          </h2>
+        </Reveal>
+
+        <div className="relative mt-16">
+          <div className="absolute left-[27px] top-2 bottom-2 hidden w-px bg-gradient-to-b from-[#3949ab] via-white/10 to-transparent md:block" />
+          <div className="space-y-4">
+            {steps.map((s, i) => (
+              <Reveal key={s.tag} delay={i * 0.08}>
+                <div className="flex gap-5 rounded-2xl border border-white/10 bg-white/[0.02] p-5 md:p-6">
+                  <span className="relative z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#0c1022] ring-1 ring-white/10">
+                    <s.icon className="h-6 w-6 text-[#ffb74d]" />
+                  </span>
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#9fa8da]">{s.tag}</span>
+                    <h3 className="mt-1 text-xl font-extrabold text-white">{s.title}</h3>
+                    <p className="mt-1.5 text-sm font-medium leading-relaxed text-white/55">{s.body}</p>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+
+        <Reveal className="mt-12 flex justify-center">
+          <InstallButton size="md" />
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  AI layer                                                           */
+/* ------------------------------------------------------------------ */
+
+function AILayer() {
+  const lines = [
+    { from: "user", text: "Find a verified caterer in Lekki for Saturday, under ₦150k." },
+    { from: "ai", text: "3 verified matches. Prestige Catering has a 2 PM slot and 4.9★. Hold it?" },
+    { from: "user", text: "Yes, lock the slot and pay into escrow." },
+    { from: "ai", text: "Done. Slot held, ₦120k in escrow, receipt saved. I'll remind you Friday." },
+  ];
+  return (
+    <section id="ai" className="relative px-6 py-28">
+      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
+        <Reveal>
+          <Eyebrow>
+            <Sparkles className="h-3.5 w-3.5 text-[#ffb74d]" /> Maestro · native intelligence
+          </Eyebrow>
+          <h2 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            An assistant that runs the workflow, not just the chat.
+          </h2>
+          <p className="mt-4 text-lg font-medium leading-relaxed text-white/55">
+            Maestro understands intent, ranks verified providers, books, and moves
+            money for you — embedded in the app, working even as you switch screens.
+          </p>
+          <ul className="mt-6 space-y-3">
+            {["Intent-aware provider ranking", "Automated booking & escrow", "Proactive reminders & follow-ups"].map((t) => (
+              <li key={t} className="flex items-center gap-3 text-sm font-semibold text-white/70">
+                <CheckCircle2 className="h-5 w-5 text-[#34d399]" /> {t}
+              </li>
+            ))}
+          </ul>
+        </Reveal>
+
+        <Reveal delay={0.1}>
+          <div className="rounded-[28px] border border-white/10 bg-[#0c1022]/90 p-5 shadow-[0_30px_80px_-25px_rgba(0,0,0,0.7)] backdrop-blur-xl">
+            <div className="mb-4 flex items-center gap-2">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#3949ab] to-[#1a237e]">
+                <Sparkles className="h-4 w-4 text-white" />
+              </span>
+              <span className="text-sm font-bold text-white">Maestro</span>
+              <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-[#34d399]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#34d399]" /> online
+              </span>
+            </div>
+            <div className="space-y-2.5">
+              {lines.map((l, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 8 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.25 }}
+                  className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-[13px] font-medium leading-snug ${
+                    l.from === "ai" ? "bg-white/[0.05] text-white/85" : "ml-auto bg-[#3949ab] text-white"
+                  }`}
+                >
+                  {l.text}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Social proof (metrics)                                             */
+/* ------------------------------------------------------------------ */
+
+function Metrics() {
+  const stats = [
+    { value: "12k+", label: "Verified providers" },
+    { value: "98%", label: "Jobs completed on time" },
+    { value: "₦1.4B", label: "Secured in escrow" },
+    { value: "4.9★", label: "Average app rating" },
+  ];
+  return (
+    <section className="relative px-6 py-20">
+      <div className="mx-auto max-w-6xl rounded-[32px] border border-white/10 bg-white/[0.02] px-6 py-12">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          {stats.map((s, i) => (
+            <Reveal key={s.label} delay={i * 0.06} className="text-center">
+              <p className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">{s.value}</p>
+              <p className="mt-2 text-xs font-bold uppercase tracking-[0.14em] text-white/45">{s.label}</p>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Final conversion                                                   */
+/* ------------------------------------------------------------------ */
+
+function FinalCTA() {
+  return (
+    <section className="relative overflow-hidden px-6 py-32">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(57,73,171,0.5),transparent_55%)]" />
+      <Reveal className="relative mx-auto max-w-3xl text-center">
+        <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl bg-white/10 ring-1 ring-white/15">
+          <Smartphone className="h-7 w-7 text-white" />
+        </span>
+        <h2 className="mt-7 text-[clamp(2.4rem,5.5vw,4rem)] font-extrabold leading-[1.05] tracking-tight text-white">
+          Install to continue.
+        </h2>
+        <p className="mx-auto mt-5 max-w-xl text-lg font-medium text-white/60">
+          The Guild lives on your home screen — verified, offline-ready and built for
+          how you actually work. One tap is all it takes.
+        </p>
+        <div className="mt-10 flex justify-center">
+          <InstallButton size="lg" />
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Minimal footer (no competing CTAs)                                 */
+/* ------------------------------------------------------------------ */
+
+function MiniFooter() {
+  return (
+    <footer className="border-t border-white/10 px-6 py-10">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
+        <Link href="/" className="flex items-center gap-2.5">
+          <span className="h-8 w-8 overflow-hidden rounded-lg bg-white/10">
+            <img src="/logo.png" alt="The Guild" className="h-full w-full object-cover" />
+          </span>
+          <span className="text-sm font-extrabold text-white">The Guild</span>
+        </Link>
+        <p className="text-xs font-bold uppercase tracking-[0.14em] text-white/35">© 2026 The Guild</p>
+        <div className="flex gap-6">
+          <Link href="/legal/privacy" className="text-xs font-bold uppercase tracking-[0.14em] text-white/35 hover:text-white/70">Privacy</Link>
+          <Link href="/legal/terms" className="text-xs font-bold uppercase tracking-[0.14em] text-white/35 hover:text-white/70">Terms</Link>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Sticky mobile install bar (persistent reminder)                    */
+/* ------------------------------------------------------------------ */
+
+function StickyInstallBar() {
+  const { isInstalled } = useInstallPrompt();
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShow(window.scrollY > 700);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  if (isInstalled) return null;
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          initial={{ y: 80, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 80, opacity: 0 }}
+          className="fixed inset-x-3 bottom-3 z-50 flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-[#0a0e1c]/90 p-3 pl-4 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] md:hidden"
+        >
+          <p className="text-sm font-bold text-white">Get the full experience</p>
+          <InstallButton size="sm" />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Page                                                               */
+/* ------------------------------------------------------------------ */
 
 export default function LandingPage() {
- const { user, isLoading } = useAuth();
- const router = useRouter();
- const [activeTab, setActiveTab] = useState<"customers" | "solo" | "teams">("customers");
-
- useEffect(() => {
-  if (!isLoading && user) {
-   const path = user.role === "ceo" ? "/home" 
-              : user.role === "staff" ? "/staff-portal" 
-              : user.role === "admin" ? "/admin" 
-              : "/customer";
-   router.replace(path);
-  }
- }, [user, isLoading, router]);
-
- const tabContent = {
- customers: {
- title: "For Customers",
- subtitle: "The safest way to hire.",
- desc: "Access a curated guild of verified professionals. From home services to high-end consulting, every transaction is protected by our secure escrow system.",
- features: ["CAC Verified Pros", "Secure Escrow Payments", "AI-Powered Matching"],
- image: "/images/landing/customers.png"
- },
- solo: {
- title: "For Solo Pros",
- subtitle: "Your business, amplified.",
- desc: "Focus on your craft while we handle the rest. Get instant payouts, manage your schedule with an active job timer, and build a verified reputation.",
- features: ["Instant Payouts", "Active Job Timer", "Verified Badge"],
- image: "/images/landing/solo.png"
- },
- teams: {
- title: "For Teams & Agencies",
- subtitle: "Scale with precision.",
- desc: "Manage your entire workforce from one dashboard. Track staff performance, automate payroll, and handle complex logistics with ease.",
- features: ["Staff Management", "Automated Payroll", "Logistics Tracking"],
- image: "/images/landing/teams.png"
- }
- };
-
- return (
- <div className="min-h-screen transition-colors duration-700 overflow-x-hidden">
- <PWARedirect />
- <AmbientBackground />
- <Navbar />
-
- <main>
- {/* Hero Section */}
- <section className="relative pt-32 lg:pt-48 pb-24 px-6">
- {/* Floating Decorative Elements */}
- <div className="absolute top-1/4 left-10 w-12 h-12 bg-primary/10 rounded-xl border border-primary/20 backdrop-blur-3xl animate-bounce -z-10" />
- <div className="absolute bottom-1/4 right-10 w-16 h-16 bg-secondary/10 rounded-full border border-secondary/20 backdrop-blur-3xl animate-pulse -z-10" />
-
- <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
- <div className="space-y-10">
- <motion.div
- initial={{ opacity: 0, y: 20 }}
- animate={{ opacity: 1, y: 0 }}
- className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-extrabold uppercase tracking-[0.2em] shadow-premium-violet"
- >
- <Sparkles className="h-4 w-4 animate-pulse" />
- Nigeria's Premium Verified Marketplace
- </motion.div>
-
- <div className="space-y-6">
- <h1 className="text-4xl sm:text-6xl lg:text-8xl font-extrabold leading-[1.05] tracking-tight text-slate-900 ">
- <span className="block">Verified</span>
- <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary/60 text-glow">Excellence.</span>
- <span className="block text-slate-400 ">Delivered.</span>
- </h1>
-
- <p className="text-xl md:text-2xl text-slate-500 font-medium leading-relaxed max-w-xl">
- The safest way to book top-tier artisans and buy premium products in Nigeria. <span className="text-secondary font-bold">Powered by Maestro AI.</span>
- </p>
- </div>
-
- <div className="flex flex-col sm:flex-row gap-6 pt-4">
- <Link href="/search">
- <Button className="h-16 px-12 bg-primary text-white text-xl font-bold rounded-full shadow-[0_20px_40px_-10px_rgba(26,35,126,0.5)] hover:scale-105 transition-all group">
- Find a Pro <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />
- </Button>
- </Link>
- <Link href="/register?role=ceo">
- <Button variant="outline" className="h-16 px-10 border-black/10 bg-white/5 text-lg font-bold rounded-full hover:bg-black/5 transition-all text-slate-900 backdrop-blur-xl">
- Become a Vendor
- </Button>
- </Link>
- </div>
-
- <div className="flex items-center gap-8 pt-8">
- <div className="flex -space-x-4">
- {[1, 2, 3, 4].map((i) => (
- <div key={i} className="h-14 w-14 rounded-full border-4 border-slate-50 bg-slate-200 overflow-hidden shadow-xl">
- <img src={`/images/landing/avatar_${i}.png`} alt="User" className="h-full w-full object-cover" />
- </div>
- ))}
- </div>
- <div>
- <div className="flex items-center gap-1 mb-1">
- {[1, 2, 3, 4, 5].map((i) => <Star key={i} className="h-3 w-3 text-secondary fill-secondary" />)}
- </div>
- <p className="text-sm font-bold text-slate-500 uppercase tracking-widest">Trusted by 12,000+ Nigerians</p>
- </div>
- </div>
- </div>
-
- <div className="relative">
- {/* Maestro AI Floating Badge */}
- <motion.div
- initial={{ opacity: 0, x: 20 }}
- animate={{ opacity: 1, x: 0 }}
- transition={{ delay: 0.5 }}
- className="absolute -top-12 -left-12 z-20 p-4 rounded-2xl bg-slate-900/80 backdrop-blur-2xl border border-secondary/30 shadow-[0_0_30px_rgba(255,183,77,0.2)] hidden lg:flex items-center gap-3"
- >
- <div className="h-10 w-10 rounded-xl bg-secondary/20 flex items-center justify-center">
- <Sparkles className="h-6 w-6 text-secondary" />
- </div>
- <div>
- <p className="text-[10px] font-extrabold text-secondary uppercase tracking-widest">Maestro AI</p>
- <p className="text-xs font-bold text-white">Smart Match Active</p>
- </div>
- </motion.div>
-
- <PhoneHero />
- </div>
- </div>
- </section>
-
- {/* How It Works Section */}
- <section className="py-32 bg-white/30 border-y border-black/5 ">
- <div className="max-w-7xl mx-auto px-6 space-y-16">
- <div className="text-center space-y-4">
- <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 ">The Living Story</h2>
- <p className="text-slate-500 font-medium max-w-2xl mx-auto">Experience a seamless journey from booking to payout.</p>
- </div>
- <HowItWorksCarousel />
- </div>
- </section>
-
- {/* Choose Your Path Section */}
- <section className="py-32 px-6">
- <div className="max-w-7xl mx-auto space-y-16">
- <div className="text-center space-y-4">
- <h2 className="text-4xl font-extrabold tracking-tight text-slate-900 ">Choose Your Path</h2>
- <p className="text-slate-500 font-medium max-w-2xl mx-auto">Tailored experiences for every role in the ecosystem.</p>
- </div>
-
- <div className="flex flex-wrap justify-center gap-4">
- {(["customers", "solo", "teams"] as const).map((tab) => (
- <button
- key={tab}
- onClick={() => setActiveTab(tab)}
- className={cn(
- "px-8 py-4 rounded-2xl text-sm font-extrabold uppercase tracking-widest transition-all",
- activeTab === tab
- ? "bg-primary text-white shadow-xl shadow-primary/20 scale-105"
- : "text-slate-500 hover:text-slate-900 "
- )}
- >
- {tabContent[tab].title}
- </button>
- ))}
- </div>
-
- <AnimatePresence mode="wait">
- <motion.div
- key={activeTab}
- initial={{ opacity: 0, y: 20 }}
- animate={{ opacity: 1, y: 0 }}
- exit={{ opacity: 0, y: -20 }}
- className="grid lg:grid-cols-2 gap-12 items-center"
- >
- <div className="space-y-8">
- <div className="space-y-4">
- <p className="text-primary font-extrabold uppercase tracking-[0.3em] text-xs">{tabContent[activeTab].subtitle}</p>
- <h3 className="text-3xl font-extrabold text-slate-900 mb-2">{tabContent[activeTab].title}</h3>
- <p className="text-xl text-slate-500 leading-relaxed">
- {tabContent[activeTab].desc}
- </p>
- </div>
-
- <div className="space-y-4">
- {tabContent[activeTab].features.map((feature, i) => (
- <div key={i} className="flex items-center gap-3">
- <div className="h-6 w-6 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-500">
- <CheckCircle2 className="h-4 w-4" />
- </div>
- <span className="font-bold text-slate-700 ">{feature}</span>
- </div>
- ))}
- </div>
-
- <Button className="h-14 px-10 bg-slate-900 text-white font-bold rounded-2xl hover:scale-105 transition-transform">
- Get Started as {tabContent[activeTab].title.split(' ')[1]}
- </Button>
- </div>
-
- <div className="relative aspect-video rounded-[40px] overflow-hidden border border-black/5 shadow-2xl">
- <img src={tabContent[activeTab].image} alt={activeTab} className="object-cover w-full h-full" />
- <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
- </div>
- </motion.div>
- </AnimatePresence>
- </div>
- </section>
-
- <MaestroShowcase />
-
- {/* Final CTA */}
- <section className="py-48 px-6">
- <div className="max-w-4xl mx-auto text-center space-y-12">
- <div className="space-y-6">
- <h2 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 ">Ready to experience the gold standard?</h2>
- <p className="text-xl text-slate-500 font-medium">Join the guild of excellence today. Whether you're booking or building, we've got you covered.</p>
- </div>
- <div className="flex flex-col sm:flex-row justify-center gap-6">
- <Link href="/register">
- <Button className="h-16 px-12 bg-primary text-white text-xl font-bold rounded-full shadow-2xl shadow-primary/20 hover:scale-105 transition-transform">
- Join The Guild Now
- </Button>
- </Link>
- <Link href="/marketplace">
- <Button variant="outline" className="h-14 px-10 border-black/10 bg-white/5 text-lg font-bold rounded-2xl hover:bg-black/5 transition-colors text-slate-900 ">
- Browse Marketplace
- </Button>
- </Link>
- </div>
- </div>
- </section>
- </main>
-
- <Footer />
- </div>
- );
+  return (
+    <main className="relative min-h-screen overflow-x-hidden bg-[#05070f] text-white antialiased">
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[linear-gradient(rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
+      <div className="relative z-10">
+        <Nav />
+        <Hero />
+        <PreviewSection />
+        <WhyInstall />
+        <Workflow />
+        <AILayer />
+        <Metrics />
+        <FinalCTA />
+        <MiniFooter />
+        <StickyInstallBar />
+      </div>
+    </main>
+  );
 }

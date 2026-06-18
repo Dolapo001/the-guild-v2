@@ -7,17 +7,31 @@ import { FavoritesProvider } from "@/contexts/FavoritesContext";
 import { NotificationProvider } from "@/contexts/NotificationContext";
 import { ThemeProvider } from "@/components/theme-provider";
 import { QueryProvider } from "@/lib/query-provider";
+import { PWARegister } from "@/components/pwa-register";
 import { Toaster } from "sonner";
 
 const inter = { variable: "" };
 const plusJakarta = { variable: "" };
 
 export const metadata: Metadata = {
-  title: "The Guild | Verified Service Marketplace",
-  description: "Connect with verified service providers in Nigeria.",
+  title: "The Guild — Install the Verified Marketplace App",
+  description:
+    "An install-first app for Nigeria's verified service & product marketplace. Works offline, lightning fast, secure by design. Install to continue.",
+  applicationName: "The Guild",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "The Guild",
+  },
   icons: {
     icon: "/logo.png",
-    apple: "/logo.png",
+    apple: "/icons/icon-192x192.png",
+  },
+  openGraph: {
+    title: "The Guild — Install the Verified Marketplace App",
+    description: "An install-first app. Works offline, lightning fast, secure by design.",
+    type: "website",
   },
 };
 
@@ -54,6 +68,7 @@ export default function RootLayout({
                 <CartProvider>
                   <FavoritesProvider>
                     <NotificationProvider>{children}</NotificationProvider>
+                    <PWARegister />
                     <Toaster
                       position="top-right"
                       richColors
