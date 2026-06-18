@@ -153,14 +153,14 @@ export default function BookingDetailPage() {
                     <GlassCard className="p-8 border-white/40">
                         <div className="flex justify-between items-start mb-8">
                             <div>
-                                <h1 className="text-3xl font-black text-primary mb-2">{booking.service_name || booking.service}</h1>
+                                <h1 className="text-3xl font-black text-primary mb-2">{booking.serviceName || booking.service}</h1>
                                 <p className="text-foreground/50 font-bold flex items-center gap-2">
-                                    <Calendar className="h-4 w-4" /> {booking.date} • <Clock className="h-4 w-4" /> {booking.start_time}
+                                    <Calendar className="h-4 w-4" /> {booking.date} • <Clock className="h-4 w-4" /> {booking.startTime}
                                 </p>
                             </div>
                             <div className="text-right">
                                 <p className="text-sm font-bold text-foreground/40 uppercase tracking-widest mb-1">Total Fee</p>
-                                <p className="text-3xl font-black text-primary">₦{(Number(booking.total_price) || 0).toLocaleString()}</p>
+                                <p className="text-3xl font-black text-primary">₦{(Number(booking.totalPrice) || 0).toLocaleString()}</p>
                             </div>
                         </div>
 
@@ -174,7 +174,7 @@ export default function BookingDetailPage() {
                                     <div>
                                         <p className="font-bold text-primary/80">Premium Session</p>
                                         <p className="text-sm font-medium text-foreground/50 leading-relaxed">
-                                            {booking.location_name || "Lagos Island, Nigeria"}
+                                            {booking.locationName || "Lagos Island, Nigeria"}
                                         </p>
                                     </div>
                                 </div>
@@ -186,7 +186,7 @@ export default function BookingDetailPage() {
                                         <FileText className="h-5 w-5" />
                                     </div>
                                     <p className="text-sm font-medium text-foreground/50 leading-relaxed italic">
-                                        "{booking.special_note || "Standard service request with no additional special instructions provided by the customer."}"
+                                        "{booking.specialNote || "Standard service request with no additional special instructions provided by the customer."}"
                                     </p>
                                 </div>
                             </div>
@@ -241,30 +241,30 @@ export default function BookingDetailPage() {
                         <h3 className="text-[10px] font-black text-foreground/30 uppercase tracking-[0.2em] mb-6">Customer</h3>
                         <div className="flex items-center gap-4 mb-6">
                             <Avatar className="h-16 w-16 rounded-2xl border-2 border-white shadow-xl">
-                                <AvatarFallback className="bg-primary/5 text-primary text-xl font-black">{(booking.customer_name || "C")[0]}</AvatarFallback>
+                                <AvatarFallback className="bg-primary/5 text-primary text-xl font-black">{(booking.customerName || "C")[0]}</AvatarFallback>
                             </Avatar>
                             <div>
-                                <p className="text-lg font-black text-primary">{booking.customer_name || "Customer"}</p>
-                                <p className="text-xs font-bold text-foreground/40">{booking.walkin_name ? "Walk-in Guest" : "Verified Member"}</p>
+                                <p className="text-lg font-black text-primary">{booking.customerName || "Customer"}</p>
+                                <p className="text-xs font-bold text-foreground/40">{booking.walkinName ? "Walk-in Guest" : "Verified Member"}</p>
                             </div>
                         </div>
                         
-                        {(booking.walkin_phone || (booking as any).customer_details?.phone) && (
+                        {(booking.walkinPhone || (booking as any).customerDetails?.phone) && (
                             <div className="mb-6 p-4 rounded-xl bg-primary/5 border border-primary/10">
                                 <p className="text-[10px] font-black text-foreground/30 uppercase tracking-widest mb-1">Contact Info</p>
-                                <p className="text-sm font-bold text-primary">{booking.walkin_phone || (booking as any).customer_details?.phone}</p>
-                                {((booking as any).customer_details?.email) && (
-                                    <p className="text-xs font-medium text-foreground/50 mt-1">{(booking as any).customer_details?.email}</p>
+                                <p className="text-sm font-bold text-primary">{booking.walkinPhone || (booking as any).customerDetails?.phone}</p>
+                                {((booking as any).customerDetails?.email) && (
+                                    <p className="text-xs font-medium text-foreground/50 mt-1">{(booking as any).customerDetails?.email}</p>
                                 )}
                             </div>
                         )}
 
                         <Button 
-                            disabled={!!booking.walkin_name}
+                            disabled={!!booking.walkinName}
                             className="w-full bg-primary text-white font-bold h-12 rounded-xl shadow-lg shadow-primary/10 flex items-center justify-center gap-2 group-disabled:opacity-50"
                         >
                             <MessageCircle className="h-5 w-5" />
-                            {booking.walkin_name ? "Chat Unavailable" : "Open Chat"}
+                            {booking.walkinName ? "Chat Unavailable" : "Open Chat"}
                         </Button>
                     </GlassCard>
 
@@ -278,12 +278,12 @@ export default function BookingDetailPage() {
                                     className="flex items-center gap-4 group cursor-pointer hover:no-underline"
                                 >
                                     <Avatar className="h-16 w-16 rounded-2xl border-2 border-white shadow-xl transition-transform group-hover:scale-105">
-                                        <AvatarImage src={(booking as any).staff_avatar} />
-                                        <AvatarFallback className="bg-primary text-white text-xl font-black">{(booking.staff_name || "P")[0]}</AvatarFallback>
+                                        <AvatarImage src={(booking as any).staffAvatar} />
+                                        <AvatarFallback className="bg-primary text-white text-xl font-black">{(booking.staffName || "P")[0]}</AvatarFallback>
                                     </Avatar>
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
-                                            <p className="text-lg font-black text-primary group-hover:underline underline-offset-4">{booking.staff_name || "Professional"}</p>
+                                            <p className="text-lg font-black text-primary group-hover:underline underline-offset-4">{booking.staffName || "Professional"}</p>
                                             <ArrowRight className="h-4 w-4 text-primary/40 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
                                         </div>
                                         <div className="flex items-center gap-3">
@@ -322,7 +322,7 @@ export default function BookingDetailPage() {
                                             
                                             <div className="space-y-4">
                                                 <div 
-                                                    onClick={() => handleAssignStaff(booking.business_owner_uid || '')}
+                                                    onClick={() => handleAssignStaff(booking.businessOwnerUid || '')}
                                                     className="p-4 rounded-2xl border-2 border-primary/20 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-all flex items-center gap-4 group"
                                                 >
                                                     <Avatar className="h-12 w-12 rounded-xl border-2 border-primary/20">

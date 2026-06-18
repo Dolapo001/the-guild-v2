@@ -11,9 +11,9 @@ interface Notification {
   title: string;
   message: string;
   type: string;
-  created_at: string;
+  createdAt: string;
   metadata: any;
-  is_read?: boolean;
+  isRead?: boolean;
 }
 
 interface NotificationContextType {
@@ -35,9 +35,9 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
     if (!user) return;
     try {
       const { api } = await import("@/lib/api-client");
-      const data = await api.get<Notification[]>("/auth/notifications/");
+      const data = await api.get<Notification[]>("/core/notifications/");
       setNotifications(data || []);
-      setUnreadCount((data || []).filter((n) => !n.is_read).length);
+      setUnreadCount((data || []).filter((n) => !n.isRead).length);
     } catch (err) {
       console.error("Failed to fetch notifications", err);
     }
@@ -67,12 +67,12 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const markAsRead = async (uid: string) => {
     try {
       const { api } = await import("@/lib/api-client");
-      await api.post("/auth/notifications/", { uid });
+      await api.post("/core/notifications/", { uid });
       setNotifications((prev) =>
         prev.map((n) => {
           if (n.uid !== uid) return n;
-          if (!n.is_read) setUnreadCount((c) => Math.max(0, c - 1));
-          return { ...n, is_read: true };
+          if (!n.isRead) setUnreadCount((c) => Math.max(0, c - 1));
+          return { ...n, isRead: true };
         }),
       );
     } catch (err) {
@@ -83,8 +83,8 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const markAllAsRead = async () => {
     try {
       const { api } = await import("@/lib/api-client");
-      await api.post("/auth/notifications/", { all: true });
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+      await api.post("/core/notifications/", { all: true });
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
       setUnreadCount(0);
     } catch (err) {
       console.error("Failed to mark all notifications as read", err);

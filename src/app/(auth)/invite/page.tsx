@@ -162,7 +162,7 @@ export default function InviteValidationPage() {
                     </div>
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Organization</p>
-                      <p className="text-lg font-black text-slate-900">{invitationData.business_name}</p>
+                      <p className="text-lg font-black text-slate-900">{invitationData.businessName}</p>
                     </div>
                   </div>
                   <div className="h-px bg-slate-100 w-full" />
@@ -172,7 +172,7 @@ export default function InviteValidationPage() {
                     </div>
                     <div>
                       <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Designated Role</p>
-                      <p className="text-lg font-black text-slate-900">{invitationData.job_title}</p>
+                      <p className="text-lg font-black text-slate-900">{invitationData.jobTitle}</p>
                     </div>
                   </div>
                 </div>

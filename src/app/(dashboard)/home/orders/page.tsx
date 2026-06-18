@@ -101,11 +101,11 @@ export default function VendorOrdersPage() {
    const mappedOrders = ordersData.map((o: any) => ({
     ...o,
     displayId: o.uid.substring(0, 8).toUpperCase(),
-    date: new Date(o.created_at).toLocaleDateString() + ", " + new Date(o.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    date: new Date(o.createdAt).toLocaleDateString() + ", " + new Date(o.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     uiStatus: DB_STATUS_MAP[o.status] || 'new',
-    customerName: o.customer?.full_name || "Nexus User",
-    itemsSummary: o.items.map((i: any) => i.product_name).join(", "),
-    totalPrice: parseFloat(o.total_items_price) + parseFloat(o.delivery_fee || 0),
+    customerName: o.customer?.fullName || "Nexus User",
+    itemsSummary: o.items.map((i: any) => i.productName).join(", "),
+    totalPrice: parseFloat(o.totalItemsPrice) + parseFloat(o.deliveryFee || 0),
     itemsCount: o.items.length
    }));
    setOrders(mappedOrders);
@@ -297,7 +297,7 @@ export default function VendorOrdersPage() {
            <td className="px-6 py-5">
             <div className="flex flex-col">
              <span className="text-sm font-bold text-foreground">{order.customerName}</span>
-             <span className="text-[10px] font-medium text-foreground/40 truncate max-w-[150px]">{order.shipping_address}</span>
+             <span className="text-[10px] font-medium text-foreground/40 truncate max-w-[150px]">{order.shippingAddress}</span>
             </div>
            </td>
            <td className="px-6 py-5">
@@ -423,7 +423,7 @@ export default function VendorOrdersPage() {
           </div>
           <div>
            <p className="text-xs font-extrabold text-foreground/40 uppercase tracking-widest">Delivery Address</p>
-           <p className="text-sm font-bold text-foreground mt-0.5">{selectedOrder.shipping_address}</p>
+           <p className="text-sm font-bold text-foreground mt-0.5">{selectedOrder.shippingAddress}</p>
           </div>
          </div>
          <div className="pt-4 border-t border-glass-border">
@@ -431,13 +431,13 @@ export default function VendorOrdersPage() {
           <div className="space-y-2">
            {selectedOrder.items.map((item: any, i: number) => (
             <div key={i} className="flex justify-between items-center text-sm">
-             <span className="font-bold text-foreground/70">{item.quantity}x {item.product_name}</span>
-             <span className="font-mono font-bold text-foreground/40">₦{parseFloat(item.price_at_order).toLocaleString()}</span>
+             <span className="font-bold text-foreground/70">{item.quantity}x {item.productName}</span>
+             <span className="font-mono font-bold text-foreground/40">₦{parseFloat(item.priceAtOrder).toLocaleString()}</span>
             </div>
            ))}
            <div className="pt-2 flex justify-between items-center border-t border-glass-border/50">
             <span className="text-sm font-extrabold text-foreground">Total (Excl. Fee)</span>
-            <span className="text-sm font-extrabold text-primary">₦{parseFloat(selectedOrder.total_items_price).toLocaleString()}</span>
+            <span className="text-sm font-extrabold text-primary">₦{parseFloat(selectedOrder.totalItemsPrice).toLocaleString()}</span>
            </div>
           </div>
          </div>

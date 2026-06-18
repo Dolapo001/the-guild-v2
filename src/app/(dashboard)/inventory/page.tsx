@@ -106,8 +106,8 @@ export default function InventoryPage() {
         name: newProduct.name,
         category: newProduct.category || "General",
         price: Number(newProduct.price),
-        stock_count: Number(newProduct.stock) || 0,
-        image_url: uploadedImage || (editingProduct?.image_url) || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=300&auto=format&fit=crop",
+        stockCount: Number(newProduct.stock) || 0,
+        imageUrl: uploadedImage || (editingProduct?.imageUrl) || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=300&auto=format&fit=crop",
         description: newProduct.description || (aiTags.length > 0 ? `Tags: ${aiTags.join(', ')}` : "Quality product."),
         city: newProduct.city || "Lagos"
       };
@@ -148,11 +148,11 @@ export default function InventoryPage() {
       name: product.name,
       category: product.category || "General",
       price: product.price.toString(),
-      stock: product.stock_count.toString(),
+      stock: product.stockCount.toString(),
       description: product.description || "",
       city: (product as any).city || "Lagos"
     });
-    setUploadedImage(product.image_url || null);
+    setUploadedImage(product.imageUrl || null);
     setIsAddModalOpen(true);
   };
 
@@ -338,7 +338,7 @@ export default function InventoryPage() {
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
                             <div className="h-11 w-11 rounded-lg overflow-hidden bg-gray-50 relative shrink-0 border border-gray-100">
-                              <Image src={item.image_url || "/placeholder-product.png"} alt={item.name} fill className="object-cover" />
+                              <Image src={item.imageUrl || "/placeholder-product.png"} alt={item.name} fill className="object-cover" />
                             </div>
                             <span className="font-extrabold text-primary">{item.name}</span>
                           </div>
@@ -346,8 +346,8 @@ export default function InventoryPage() {
                         <td className="px-6 py-4 text-foreground/60">{item.category}</td>
                         <td className="px-6 py-4 text-primary">₦{(Number(item.price) || 0).toLocaleString()}</td>
                         <td className="px-6 py-4">
-                          <span className={item.stock_count < 5 ? "text-red-500 font-black" : "text-green-600"}>
-                            {item.stock_count} units
+                          <span className={item.stockCount < 5 ? "text-red-500 font-black" : "text-green-600"}>
+                            {item.stockCount} units
                           </span>
                         </td>
                         <td className="px-6 py-4 text-blue-600">{(item as any).city}</td>
@@ -412,11 +412,11 @@ export default function InventoryPage() {
                   <p className="text-xs text-foreground/60 leading-relaxed line-clamp-3">{pkg.description}</p>
                 </div>
 
-                {pkg.services_details && pkg.services_details.length > 0 && (
+                {pkg.servicesDetails && pkg.servicesDetails.length > 0 && (
                   <div className="bg-gray-50/50 p-3 rounded-xl border border-gray-100">
                     <p className="text-[8px] font-bold text-foreground/40 uppercase tracking-widest mb-1">Included Services</p>
                     <ul className="space-y-1">
-                      {pkg.services_details.map((s: any, idx) => (
+                      {pkg.servicesDetails.map((s: any, idx) => (
                         <li key={idx} className="text-[10px] font-bold text-foreground/70 flex items-center gap-1.5">
                           <span className="h-1 w-1 bg-primary rounded-full" />
                           {s.name} (₦{Number(s.price).toLocaleString()})
@@ -455,7 +455,7 @@ export default function InventoryPage() {
                 <div className="space-y-3 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-mono text-xs font-bold text-primary bg-primary/5 px-2.5 py-1 rounded-lg">ID: {order.uid.substring(0, 8)}</span>
-                    <span className="text-xs font-bold text-foreground/40">Customer: {order.customer_name || "Guest Client"}</span>
+                    <span className="text-xs font-bold text-foreground/40">Customer: {order.customerName || "Guest Client"}</span>
                     <span className="h-1.5 w-1.5 bg-gray-300 rounded-full" />
                     <span className="text-xs font-bold text-foreground/40">City: {order.city}</span>
                   </div>
@@ -465,7 +465,7 @@ export default function InventoryPage() {
                     <p className="text-[8px] font-bold text-foreground/40 uppercase tracking-widest">Ordered Items</p>
                     <div className="flex flex-wrap gap-2">
                       {order.items.map((item: any, idx: number) => {
-                        const name = item.product_details?.name || item.package_details?.name || "Service Package";
+                        const name = item.productDetails?.name || item.packageDetails?.name || "Service Package";
                         return (
                           <span key={idx} className="bg-gray-100 text-[10px] font-bold text-gray-700 px-2 py-1 rounded-lg">
                             {name} (x{item.quantity})
@@ -477,7 +477,7 @@ export default function InventoryPage() {
 
                   <div className="flex items-center gap-2 text-xs font-bold text-foreground/60 pt-1">
                     <MapPin className="h-3.5 w-3.5 text-foreground/40 shrink-0" />
-                    <span>Deliver to: {order.delivery_address}</span>
+                    <span>Deliver to: {order.deliveryAddress}</span>
                   </div>
                 </div>
 
@@ -485,7 +485,7 @@ export default function InventoryPage() {
                 <div className="flex flex-col md:items-end gap-3 shrink-0 w-full md:w-auto pt-4 md:pt-0 border-t md:border-0 border-gray-100">
                   <div className="text-right">
                     <span className="text-[9px] font-bold text-foreground/40 uppercase block">Grand Total Sourced</span>
-                    <span className="text-lg font-black text-primary">₦{Number(order.total_price).toLocaleString()}</span>
+                    <span className="text-lg font-black text-primary">₦{Number(order.totalPrice).toLocaleString()}</span>
                   </div>
 
                   <div className="flex items-center gap-2">

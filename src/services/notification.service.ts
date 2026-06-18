@@ -4,10 +4,10 @@ export interface Notification {
   uid: string;
   title: string;
   message: string;
-  notification_type: 'info' | 'success' | 'warning' | 'error';
-  is_read: boolean;
-  action_url?: string;
-  created_at: string;
+  notificationType: 'info' | 'success' | 'warning' | 'error';
+  isRead: boolean;
+  actionUrl?: string;
+  createdAt: string;
 }
 
 class NotificationService {

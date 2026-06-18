@@ -46,5 +46,15 @@ export const maestroService = {
   uploadBusinessAssets: async (businessUid: string, data: FormData) =>
     api.post<{ logo?: string; banner?: string }>(`/maestro/portal/business/${businessUid}/upload-assets/`, data),
 
-  chatbot: async (message: string) => api.post<{ response: string }>('/maestro/chatbot/', { message }),
+  chatbot: async (message: string) => api.post<{ response: string }>('/maestro/chat/', { message }),
+
+  // Provider: AI staff matching for an open job (GET /maestro/staff-match/).
+  staffMatch: async (params: { service?: string; date?: string; lat?: number; lng?: number }) =>
+    api.get<any[]>('/maestro/staff-match/', { params: params as any }),
+
+  // Admin: business verification queue + decision.
+  getBusinessVerificationQueue: async () =>
+    api.get<any[]>('/maestro/admin/verification-queue/'),
+  verifyBusiness: async (businessUid: string, decision: 'verified' | 'rejected', reason?: string) =>
+    api.post(`/maestro/admin/verify-business/${businessUid}/`, { decision, reason }),
 };

@@ -20,14 +20,15 @@ import { socialService } from "@/services/social.service";
 
 interface Review {
  uid: string;
- customer_name: string;
+ customerName: string;
  avatar: string | null;
  rating: number;
  comment: string;
  reply: string | null;
  replied_at: string | null;
- created_at: string;
- service_name?: string;
+ createdAt: string;
+ serviceName?: string;
+ images?: string[];
 }
 
 export default function ReviewsPage() {
@@ -149,12 +150,12 @@ export default function ReviewsPage() {
     <div className="flex items-center gap-4">
     <Avatar className="h-12 w-12 rounded-xl border-2 border-white shadow-sm">
     <AvatarImage src={review.avatar || ""} />
-    <AvatarFallback>{review.customer_name[0]}</AvatarFallback>
+    <AvatarFallback>{review.customerName[0]}</AvatarFallback>
     </Avatar>
     <div>
-    <p className="font-bold text-primary">{review.customer_name}</p>
+    <p className="font-bold text-primary">{review.customerName}</p>
     <p className="text-xs font-medium text-foreground/40">
-        {new Date(review.created_at).toLocaleDateString()} {review.service_name ? `• ${review.service_name}` : ''}
+        {new Date(review.createdAt).toLocaleDateString()} {review.serviceName ? `• ${review.serviceName}` : ''}
     </p>
     </div>
     </div>
@@ -176,7 +177,7 @@ export default function ReviewsPage() {
       <div className="flex gap-2 overflow-x-auto pb-2">
         {review.images.map((img: any, idx: number) => (
           <div key={idx} className="relative h-20 w-20 rounded-xl overflow-hidden shrink-0 border border-glass-border shadow-sm">
-            <img src={img.image_url || img.image} alt="Review attachment" className="w-full h-full object-cover" />
+            <img src={img.imageUrl || img.image} alt="Review attachment" className="w-full h-full object-cover" />
           </div>
         ))}
       </div>

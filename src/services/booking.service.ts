@@ -26,7 +26,7 @@ export const bookingService = {
   createBooking: async (data: any): Promise<Booking> => api.post<Booking>('/bookings/', data),
 
   getAvailability: async (serviceId: string, date: string) =>
-    api.get<Array<{ start_time: string; end_time: string; is_available: boolean }>>(
+    api.get<Array<{ startTime: string; endTime: string; isAvailable: boolean }>>(
       '/bookings/availability/', { params: { service_id: serviceId, date } },
     ),
 
@@ -45,10 +45,10 @@ export const bookingService = {
     api.patch<Booking>(`/bookings/${id}/status/`, { status, reason }),
 
   assignStaff: async (id: string, staffUid: string) =>
-    api.patch<Booking>(`/bookings/${id}/assign-staff/`, { staff_uid: staffUid }),
+    api.patch<Booking>(`/bookings/${id}/assign-staff/`, { staffUid: staffUid }),
 
   acceptReplacement: async (id: string, staffUid: string) =>
-    api.post<Booking>(`/bookings/${id}/accept-replacement/`, { staff_uid: staffUid }),
+    api.post<Booking>(`/bookings/${id}/accept-replacement/`, { staffUid: staffUid }),
 
   updateSopChecklist: async (bookingId: string, checklist: any) =>
     api.patch(`/bookings/${bookingId}/sop-checklist/`, { checklist }),
@@ -57,7 +57,7 @@ export const bookingService = {
     api.post('/bookings/review/', data),
 
   getStaffSchedule: async (params: { month?: string; date?: string }) =>
-    api.get('/bookings/staff/schedule/', { params: params as any }),
+    api.get<Paginated<Booking> | Booking[]>('/bookings/staff/schedule/', { params: params as any }),
 
   getActiveJob: async () => api.get<Booking | null>('/bookings/active/'),
 
@@ -70,14 +70,24 @@ export const bookingService = {
   cancelAndRefund: async (id: string) => api.post<Booking>(`/bookings/${id}/cancel-refund/`, {}),
 
   contactLog: async (id: string) => api.post(`/bookings/${id}/contact-log/`, {}),
+
+  // Confirm a (manual/offline) payment was received for a booking.
+  confirmPayment: async (id: string, reference?: string) =>
+    api.post(`/bookings/${id}/payment-confirm/`, { reference }),
+
+  // Recurring bookings: list occurrences and mark one complete.
+  getOccurrences: async (id: string) =>
+    api.get<Booking[]>(`/bookings/${id}/occurrences/`),
+  completeOccurrence: async (occurrenceId: string) =>
+    api.post(`/bookings/occurrences/${occurrenceId}/complete/`, {}),
 };
 
 export interface Shift {
   uid: string;
   staff: string;
   business: string;
-  start_time: string;
-  end_time: string;
+  startTime: string;
+  endTime: string;
   status: 'SCHEDULED' | 'COMPLETED' | 'MISSED';
   notes?: string;
 }

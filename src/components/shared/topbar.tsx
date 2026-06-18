@@ -61,7 +61,7 @@ export function Topbar() {
  </div>
  </div>
  <Avatar className="h-10 w-10 border-2 border-white shadow-sm">
- <AvatarImage src={user?.profile?.business?.image_url || user?.avatar} alt={user?.profile?.business?.name} />
+ <AvatarImage src={user?.profile?.business?.imageUrl || user?.avatar} alt={user?.profile?.business?.name} />
  <AvatarFallback className="bg-primary text-white text-xs">{(user?.profile?.business?.name || user?.username || "GS").substring(0, 2).toUpperCase()}</AvatarFallback>
  </Avatar>
  </div>

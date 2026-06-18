@@ -104,14 +104,14 @@ export function TopNav() {
     return pathMap[pathname] || "Dashboard";
   };
 
-  const isVerified = user?.role === "ceo" && (user?.verification_status === "verified" || user?.verificationStatus === "verified");
+  const isVerified = user?.role === "ceo" && String(user?.verificationStatus).toLowerCase() === "verified";
   const displayName = user?.name ?? user?.username;
 
   const handleMarkRead = async (uid: string) => {
     try {
       await notificationService.markAsRead(uid);
       // Optimistic update
-      setNotifications(prev => prev.map(n => n.uid === uid ? { ...n, is_read: true } : n));
+      setNotifications(prev => prev.map(n => n.uid === uid ? { ...n, isRead: true } : n));
     } catch (err) {
       console.error("Failed to mark as read", err);
     }
@@ -120,7 +120,7 @@ export function TopNav() {
   const handleMarkAllRead = async () => {
     try {
       await notificationService.markAllAsRead();
-      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
     } catch (err) {
       console.error("Failed to mark all as read", err);
     }
@@ -133,7 +133,7 @@ export function TopNav() {
     }
   };
 
-  const unreadCount = notifications.filter(n => !n.is_read).length;
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const businessLogo = (user as any)?.profile?.business?.logo;
   const avatarUrl = user?.avatar || (user?.role === "ceo" && businessLogo ? businessLogo : null);
@@ -225,7 +225,7 @@ export function TopNav() {
                     onClick={() => handleMarkRead(n.uid)}
                     className={cn(
                       "flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-colors",
-                      n.is_read ? "opacity-50 grayscale-[0.5]" : "bg-primary/5 shadow-sm"
+                      n.isRead ? "opacity-50 grayscale-[0.5]" : "bg-primary/5 shadow-sm"
                     )}
                   >
                     <div className={cn("h-8 w-8 rounded-lg bg-muted flex items-center justify-center shadow-sm shrink-0")}>
@@ -234,9 +234,9 @@ export function TopNav() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs font-bold text-foreground">{n.title}</p>
                       <p className="text-[10px] font-medium text-foreground/50 mt-0.5">{n.message}</p>
-                      <p className="text-[10px] font-medium text-foreground/30 mt-1">{new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                      <p className="text-[10px] font-medium text-foreground/30 mt-1">{new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
-                    {!n.is_read && <div className="h-2 w-2 rounded-full bg-primary mt-1" />}
+                    {!n.isRead && <div className="h-2 w-2 rounded-full bg-primary mt-1" />}
                   </DropdownMenuItem>
                 ))
               )}

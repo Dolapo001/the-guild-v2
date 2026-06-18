@@ -30,10 +30,10 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
   }
  };
 
- const image = service.image_url || service.image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800&auto=format&fit=crop";
+ const image = service.imageUrl || service.image || "https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=800&auto=format&fit=crop";
  const name = service.name;
- const businessName = service.business_name || service.name;
- const location = service.location_name || service.location || "Lagos";
+ const businessName = service.businessName || service.name;
+ const location = service.locationName || service.location || "Lagos";
 
  return (
  <motion.div
@@ -71,17 +71,17 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  </button>
 
  <div className="absolute top-3 left-3 flex flex-wrap gap-2">
- {(isMaestroMatch || tag || service.maestro_score) && (
+ {(isMaestroMatch || tag || service.maestroScore) && (
  <div className="bg-secondary text-primary text-[10px] font-extrabold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-xl animate-pulse">
  <Sparkles className="h-3 w-3 fill-primary" />
  {tag || (
  <span>
- <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Maestro</span> Match {service.maestro_score ? `${service.maestro_score}%` : ''}
+ <span className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">Maestro</span> Match {service.maestroScore ? `${service.maestroScore}%` : ''}
  </span>
  )}
  </div>
  )}
- {service.is_verified ? (
+ {service.isVerified ? (
   <div className="bg-emerald-500/90 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-lg">
    <ShieldCheck className="h-3 w-3" />
    VERIFIED
@@ -91,7 +91,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
    UNVERIFIED (CANNOT BOOK)
   </div>
  )}
- {service.is_top_rated && (
+ {service.isTopRated && (
  <div className="bg-secondary/90 backdrop-blur-md text-primary text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-lg">
  <Star className="h-3 w-3 fill-primary" />
  TOP RATED
@@ -138,7 +138,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
     <p className="text-lg font-extrabold text-amber-600 ">₦{(service.price || 0).toLocaleString()}</p>
    </div>
   </div>
-  {service.is_verified ? (
+  {service.isVerified ? (
    <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center font-bold">
     Book Now
    </div>
@@ -161,7 +161,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
    </div>
   </div>
 
-  {service.is_verified ? (
+  {service.isVerified ? (
    <div className="w-full h-10 rounded-xl border border-primary text-primary flex items-center justify-center font-bold transition-all absolute top-0 left-0 translate-y-full opacity-0 group-hover:translate-y-4 group-hover:opacity-100 duration-300">
     Book Now
    </div>

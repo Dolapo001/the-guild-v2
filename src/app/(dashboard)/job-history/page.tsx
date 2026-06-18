@@ -35,7 +35,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { bookingService } from "@/services/booking.service";
+import { bookingService, asList } from "@/services/booking.service";
 import { Booking } from "@/types/api";
 import { toast } from "sonner";
 
@@ -50,24 +50,24 @@ export default function JobHistoryPage() {
   const fetchHistory = async () => {
     setLoading(true);
     try {
-      const bookings = await bookingService.getBookings();
+      const bookings = asList(await bookingService.getBookings());
       // Map completed and paid bookings from live backend
       const backendHistory = bookings
         .filter((b: any) => ['COMPLETED', 'PAID', 'CLEARING'].includes(b.status))
         .map((b: any) => ({
           id: b.uid,
-          service: b.service_name || b.service_details?.name || b.service?.name || "Premium Session",
-          client: b.customer_details?.name || b.walkin_name || "Guest Client",
+          service: b.serviceName || b.serviceDetails?.name || b.service?.name || "Premium Session",
+          client: b.customerDetails?.name || b.walkinName || "Guest Client",
           date: b.date ? new Date(b.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : "Today",
-          time: b.start_time,
-          duration: `${b.service_details?.duration_minutes || b.service?.duration_minutes || 60} Mins`,
-          endTime: b.end_time || "03:30 PM",
-          price: b.total_price || 12000,
+          time: b.startTime,
+          duration: `${b.serviceDetails?.durationMinutes || b.service?.durationMinutes || 60} Mins`,
+          endTime: b.endTime || "03:30 PM",
+          price: b.totalPrice || 12000,
           tip: b.review?.tip || 0,
           status: b.status === 'COMPLETED' ? 'Paid' : 'Paid',
           rating: b.review?.rating || null,
           comment: b.review?.comment || null,
-          upsells: b.sop_checklist ? b.sop_checklist.filter((item: any) => item.completed && item.price).map((item: any) => ({ name: item.text, price: item.price })) : []
+          upsells: b.sopChecklist ? b.sopChecklist.filter((item: any) => item.completed && item.price).map((item: any) => ({ name: item.text, price: item.price })) : []
         }));
 
       setHistory(backendHistory);

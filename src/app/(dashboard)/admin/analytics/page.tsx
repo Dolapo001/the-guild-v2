@@ -21,7 +21,7 @@ export default function AdminAnalyticsPage() {
   const [userData, setUserData] = useState<{ summary: AnalyticsSummary; trends: TrendItem[] } | null>(null);
   const [conversionData, setConversionData] = useState<any>(null);
   const [sectorData, setSectorData] = useState<any>(null);
-  const [fraudData, setFraudData] = useState<{ total_fraud_flags: number } | null>(null);
+  const [fraudData, setFraudData] = useState<{ totalFraudFlags: number } | null>(null);
   const [days, setDays] = useState(30);
 
   useEffect(() => {
@@ -56,9 +56,9 @@ export default function AdminAnalyticsPage() {
     );
   }
 
-  const sectorChartData = Object.keys(sectorData?.sector_bookings || {}).map(key => ({
+  const sectorChartData = Object.keys(sectorData?.sectorBookings || {}).map(key => ({
     name: key,
-    value: sectorData.sector_bookings[key]
+    value: sectorData.sectorBookings[key]
   }));
 
   return (
@@ -90,32 +90,32 @@ export default function AdminAnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
           title="New Signups" 
-          value={userData?.summary.new_signups || 0} 
+          value={userData?.summary.newSignups || 0} 
           icon={<Users className="h-5 w-5" />}
           trend="+15%"
           isUp={true}
         />
         <StatCard 
           title="Avg Daily Active" 
-          value={userData?.summary.avg_dau || 0} 
+          value={userData?.summary.avgDau || 0} 
           icon={<Activity className="h-5 w-5" />}
           trend="+5.2%"
           isUp={true}
         />
         <StatCard 
           title="Platform Fees" 
-          value={`₦${(userData?.summary.total_fees || 0).toLocaleString()}`} 
+          value={`₦${(userData?.summary.totalFees || 0).toLocaleString()}`} 
           icon={<DollarSign className="h-5 w-5" />}
           trend="+12%"
           isUp={true}
         />
         <StatCard 
           title="Fraud Alerts" 
-          value={fraudData?.total_fraud_flags || 0} 
+          value={fraudData?.totalFraudFlags || 0} 
           icon={<AlertTriangle className="h-5 w-5" />}
-          trend={fraudData?.total_fraud_flags ? "+1" : "Stable"}
+          trend={fraudData?.totalFraudFlags ? "+1" : "Stable"}
           isUp={false}
-          isWarning={!!fraudData?.total_fraud_flags}
+          isWarning={!!fraudData?.totalFraudFlags}
         />
       </div>
 
@@ -152,9 +152,9 @@ export default function AdminAnalyticsPage() {
             <TrendingUp className="h-5 w-5 text-primary/30" />
           </div>
           <div className="space-y-6">
-            <FunnelItem label="Search → Booking" value={conversionData?.search_to_booking} color="bg-primary" />
-            <FunnelItem label="Booking → Payment" value={conversionData?.booking_to_payment} color="bg-pink-500" />
-            <FunnelItem label="Visitor → Signup" value={conversionData?.visitor_to_signup} color="bg-blue-500" />
+            <FunnelItem label="Search → Booking" value={conversionData?.searchToBooking} color="bg-primary" />
+            <FunnelItem label="Booking → Payment" value={conversionData?.bookingToPayment} color="bg-pink-500" />
+            <FunnelItem label="Visitor → Signup" value={conversionData?.visitorToSignup} color="bg-blue-500" />
           </div>
         </GlassCard>
       </div>
@@ -176,7 +176,7 @@ export default function AdminAnalyticsPage() {
                   outerRadius={100}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({name, percent}) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({name, percent}) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 >
                   {sectorChartData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -195,7 +195,7 @@ export default function AdminAnalyticsPage() {
             <AlertTriangle className="h-5 w-5 text-primary/30" />
           </div>
           <div className="space-y-4">
-             {fraudData?.total_fraud_flags ? (
+             {fraudData?.totalFraudFlags ? (
                <div className="p-4 rounded-xl bg-rose-50 border border-rose-100 flex items-start gap-3">
                  <AlertTriangle className="h-5 w-5 text-rose-500 shrink-0" />
                  <div>

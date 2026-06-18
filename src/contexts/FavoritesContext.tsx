@@ -33,9 +33,9 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         const data = await socialService.getFavorites();
         // Backend returns a list of favorite objects, we need to map them to our state
         setFavorites(data.map(f => ({
-            uid: f.object_id,
-            type: f.content_type,
-            data: f.content_object
+            uid: f.objectId,
+            type: f.contentType,
+            data: f.contentObject
         })));
     } catch (e) {
         console.warn("Failed to fetch favorites from backend, falling back to local", e);

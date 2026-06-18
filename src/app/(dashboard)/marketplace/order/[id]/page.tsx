@@ -200,7 +200,7 @@ export default function OrderSuccessPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-xs font-bold uppercase tracking-widest text-foreground/40">Registered Location</p>
-                  <p className="text-sm font-extrabold text-gray-900 leading-snug">{order.delivery_address}</p>
+                  <p className="text-sm font-extrabold text-gray-900 leading-snug">{order.deliveryAddress}</p>
                   <p className="text-xs font-bold text-blue-500 uppercase">City Gated Destination: {order.city}</p>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export default function OrderSuccessPage() {
               {/* Items */}
               <div className="space-y-4 max-h-[300px] overflow-y-auto">
                 {order.items.map((item) => {
-                  const detail = (item.product_details || item.package_details) as any;
+                  const detail = (item.productDetails || item.packageDetails) as any;
                   return (
                     <div key={item.uid} className="flex justify-between items-start gap-3">
                       <div className="flex gap-2 min-w-0">
@@ -228,7 +228,7 @@ export default function OrderSuccessPage() {
                         </div>
                       </div>
                       <p className="text-xs font-black text-gray-900 shrink-0">
-                        ₦{(Number(item.price_at_order) || 0).toLocaleString()}
+                        ₦{(Number(item.priceAtOrder) || 0).toLocaleString()}
                       </p>
                     </div>
                   );
@@ -241,7 +241,7 @@ export default function OrderSuccessPage() {
               <div className="space-y-2.5 text-xs font-bold">
                 <div className="flex justify-between text-foreground/60">
                   <span>Subtotal</span>
-                  <span className="text-gray-900">₦{Number(order.total_items_price).toLocaleString()}</span>
+                  <span className="text-gray-900">₦{Number(order.totalItemsPrice).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-foreground/60">
                   <span>Delivery Fee</span>
@@ -249,7 +249,7 @@ export default function OrderSuccessPage() {
                 </div>
                 <div className="flex justify-between text-base pt-3 border-t border-dashed border-glass-border">
                   <span className="font-black text-gray-900">Total Price</span>
-                  <span className="font-black text-primary">₦{Number(order.total_price).toLocaleString()}</span>
+                  <span className="font-black text-primary">₦{Number(order.totalPrice).toLocaleString()}</span>
                 </div>
               </div>
 

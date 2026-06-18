@@ -1,16 +1,16 @@
 import { api } from "../lib/api-client";
 
 export interface AnalyticsSummary {
-  total_bookings?: number;
-  completed_bookings?: number;
+  totalBookings?: number;
+  completedBookings?: number;
   cancelled_bookings?: number;
-  total_revenue?: number;
-  unique_customers?: number;
-  repeat_customers?: number;
-  new_signups?: number;
-  avg_dau?: number;
-  total_fees?: number;
-  total_fraud_flags?: number;
+  totalRevenue?: number;
+  uniqueCustomers?: number;
+  repeatCustomers?: number;
+  newSignups?: number;
+  avgDau?: number;
+  totalFees?: number;
+  totalFraudFlags?: number;
 }
 
 export interface TrendItem {
@@ -21,7 +21,7 @@ export interface TrendItem {
 }
 
 export interface PeakData {
-  peak_hours: { hour: string; count: number }[];
+  peakHours: { hour: string; count: number }[];
   peak_days: { day: string; count: number }[];
 }
 
@@ -62,21 +62,21 @@ class AnalyticsService {
 
   async getAdminConversions() {
     return api.get<{
-      search_to_booking: number;
-      booking_to_payment: number;
-      visitor_to_signup: number;
+      searchToBooking: number;
+      bookingToPayment: number;
+      visitorToSignup: number;
     }>(`/analytics/admin/conversions/`);
   }
 
   async getAdminSectors() {
     return api.get<{
-      sector_bookings?: Record<string, number>;
+      sectorBookings?: Record<string, number>;
       sector_revenue?: Record<string, number>;
     }>(`/analytics/admin/sectors/`);
   }
 
   async getAdminFraud(days = 30) {
-    return api.get<{ total_fraud_flags: number }>(`/analytics/admin/fraud/`, {
+    return api.get<{ totalFraudFlags: number }>(`/analytics/admin/fraud/`, {
       params: { days: String(days) },
     });
   }

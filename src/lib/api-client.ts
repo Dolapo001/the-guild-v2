@@ -1,4 +1,8 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+// Same-origin by default: the browser calls the Next.js origin, which proxies
+// to the backend (see next.config.ts rewrites). This keeps the httpOnly auth
+// cookies first-party. Override with NEXT_PUBLIC_API_URL only for non-proxied
+// setups.
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -17,43 +21,29 @@ class ApiError extends Error {
  }
 }
 
-async function refreshToken(): Promise<string | null> {
-  const refresh = typeof window !== 'undefined' ? localStorage.getItem('the-guild-refresh') : null;
-  if (!refresh) return null;
-
+// Cookie-based refresh: the httpOnly refresh cookie is sent automatically with
+// credentials:'include'; the backend rotates it and sets a fresh access cookie.
+// No tokens ever touch JavaScript.
+async function refreshToken(): Promise<boolean> {
   try {
     const response = await fetch(`${BASE_URL}/auth/token/refresh/`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh }),
+      credentials: 'include',
     });
-
-    if (!response.ok) throw new Error('Refresh failed');
-
-    const data = await response.json();
-    const newAccess = data?.data?.access || data?.access;
-    
-    if (newAccess && typeof window !== 'undefined') {
-      localStorage.setItem('the-guild-token', newAccess);
-      return newAccess;
-    }
-    return null;
+    return response.ok;
   } catch (error) {
     console.error('Token refresh error:', error);
-    return null;
+    return false;
   }
 }
 
 let isRefreshing = false;
-let failedQueue: any[] = [];
+let failedQueue: { resolve: (v: boolean) => void; reject: (e: any) => void }[] = [];
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: any, success = false) => {
   failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
+    if (error) prom.reject(error);
+    else prom.resolve(success);
   });
   failedQueue = [];
 };
@@ -67,21 +57,16 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
     url += `?${query}`;
   }
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('the-guild-token') : null;
-
   const defaultHeaders: Record<string, string> = {};
-  
+
   if (!(options.body instanceof FormData)) {
     defaultHeaders['Content-Type'] = 'application/json';
-  }
-
-  if (token) {
-    defaultHeaders['Authorization'] = `Bearer ${token}`;
   }
 
   try {
     const response = await fetch(url, {
       method,
+      credentials: 'include', // send/receive httpOnly auth cookies
       headers: {
         ...defaultHeaders,
         ...headers,
@@ -91,39 +76,25 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
 
     if (response.status === 401 && !endpoint.includes('/auth/login') && !endpoint.includes('/auth/token/refresh/')) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
+        return new Promise<boolean>((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((newToken) => {
-          return request<T>(method, endpoint, {
-            ...options,
-            headers: { ...headers, 'Authorization': `Bearer ${newToken}` }
-          });
-        }).catch((err) => {
-          throw err;
+        }).then((ok) => {
+          if (!ok) throw new ApiError(401, { message: 'Session expired' });
+          return request<T>(method, endpoint, options);
         });
       }
 
       isRefreshing = true;
+      const ok = await refreshToken();
+      isRefreshing = false;
 
-      const newToken = await refreshToken();
-      
-      if (newToken) {
-        isRefreshing = false;
-        processQueue(null, newToken);
-        return request<T>(method, endpoint, {
-          ...options,
-          headers: { ...headers, 'Authorization': `Bearer ${newToken}` }
-        });
+      if (ok) {
+        processQueue(null, true);
+        return request<T>(method, endpoint, options);
       } else {
-        isRefreshing = false;
-        processQueue(new Error('Session expired'));
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('the-guild-token');
-          localStorage.removeItem('the-guild-refresh');
-          localStorage.removeItem('the-guild-user');
-          if (!window.location.pathname.includes('/login')) {
-            window.location.href = '/login?expired=true';
-          }
+        processQueue(null, false);
+        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+          window.location.href = '/login?expired=true';
         }
         throw new ApiError(401, { message: 'Session expired' });
       }
@@ -139,30 +110,22 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
     }
 
     const responseData = await response.json();
-    
-    // Normalize response data recursively if it's an object or array
+
+    // The backend now emits camelCase on the wire (DRF CamelCaseJSONRenderer),
+    // so NO snake_case↔camelCase translation happens here anymore. The only
+    // remaining transform is two display-field ALIASES (`image`/`location`),
+    // provided so generic cards can read a single field regardless of source.
     const normalize = (obj: any): any => {
       if (!obj || typeof obj !== 'object') return obj;
-      
-      if (Array.isArray(obj)) {
-        return obj.map(normalize);
-      }
+      if (Array.isArray(obj)) return obj.map(normalize);
 
       const result: any = { ...obj };
-      
-      // Critical Guild-specific Mappings
-      if ('verification_status' in result) result.verificationStatus = result.verification_status;
-      if ('verificationStatus' in result) result.verification_status = result.verificationStatus;
-      if ('is_solo_operator' in result) result.isSoloOperator = result.is_solo_operator;
-      if ('isSoloOperator' in result) result.is_solo_operator = result.isSoloOperator;
-      if ('image_url' in result) result.image = result.image_url;
-      if ('location_name' in result) result.location = result.location_name;
+      if ('imageUrl' in result && !('image' in result)) result.image = result.imageUrl;
+      if ('locationName' in result && !('location' in result)) result.location = result.locationName;
 
-      // Recurse through all keys
-      Object.keys(result).forEach(key => {
+      Object.keys(result).forEach((key) => {
         result[key] = normalize(result[key]);
       });
-
       return result;
     };
 

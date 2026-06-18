@@ -77,7 +77,7 @@ export default function StaffPage() {
  const [invitations, setInvitations] = useState<any[]>([]);
  const [shifts, setShifts] = useState<any[]>([]);
  const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
- const [newShift, setNewShift] = useState({ start_time: "", end_time: "", notes: "" });
+ const [newShift, setNewShift] = useState({ startTime: "", endTime: "", notes: "" });
  const [performancePeriod, setPerformancePeriod] = useState<"weekly" | "monthly" | "yearly">("monthly");
  const router = useRouter();
 
@@ -145,7 +145,7 @@ export default function StaffPage() {
   };
 
  useEffect(() => {
-    if (selectedStaff && (selectedStaff as any).view_status === 'ACTIVE') {
+    if (selectedStaff && (selectedStaff as any).viewStatus === 'ACTIVE') {
         fetchPerformance(selectedStaff.uid, performancePeriod);
         fetchStaffShifts(selectedStaff.uid);
     } else {
@@ -164,18 +164,18 @@ export default function StaffPage() {
  };
 
  const handleCreateShift = async () => {
-    if (!selectedStaff || !newShift.start_time || !newShift.end_time) return;
+    if (!selectedStaff || !newShift.startTime || !newShift.endTime) return;
     const toastId = toast.loading("Creating shift...");
     try {
         await staffService.createShift({
             staff: selectedStaff.uid,
-            start_time: newShift.start_time,
-            end_time: newShift.end_time,
+            startTime: newShift.startTime,
+            endTime: newShift.endTime,
             notes: newShift.notes
         });
         toast.success("Shift created successfully", { id: toastId });
         setIsShiftModalOpen(false);
-        setNewShift({ start_time: "", end_time: "", notes: "" });
+        setNewShift({ startTime: "", endTime: "", notes: "" });
         fetchStaffShifts(selectedStaff.uid);
     } catch (err: any) {
         toast.error(err?.message || "Failed to create shift", { id: toastId });
@@ -214,13 +214,13 @@ export default function StaffPage() {
   };
 
   const filteredStaff = staffList.filter(s => 
-    (s.first_name + " " + (s.last_name || "")).toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (s.firstName + " " + (s.lastName || "")).toLowerCase().includes(searchQuery.toLowerCase()) ||
     s.username.toLowerCase().includes(searchQuery.toLowerCase())
   ).map(s => ({
     ...s,
-    view_status: 'ACTIVE',
-    display_name: s.first_name ? `${s.first_name} ${s.last_name || ""}` : s.username,
-    display_role: s.staff_profile?.job_title || s.role
+    viewStatus: 'ACTIVE',
+    displayName: s.firstName ? `${s.firstName} ${s.lastName || ""}` : s.username,
+    displayRole: s.staffProfile?.jobTitle || s.role
   }));
 
   const filteredInvites = invitations.filter(i => 
@@ -229,9 +229,9 @@ export default function StaffPage() {
     uid: i.uid,
     username: i.email,
     name: i.email,
-    display_name: i.email,
-    display_role: i.job_title || 'Staff',
-    view_status: i.status,
+    displayName: i.email,
+    displayRole: i.jobTitle || 'Staff',
+    viewStatus: i.status,
     is_invitation: true
   }));
 
@@ -385,23 +385,23 @@ export default function StaffPage() {
                             <AvatarFallback className="bg-primary/5 text-primary text-[10px] font-black">{item.username[0].toUpperCase()}</AvatarFallback>
                         </Avatar>
                         <div className="flex-1 min-w-0">
-                            <p className="font-bold text-primary truncate text-xs sm:text-base">{(item as any).display_name}</p>
+                            <p className="font-bold text-primary truncate text-xs sm:text-base">{(item as any).displayName}</p>
                             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
-                                <p className="text-[8px] sm:text-[9px] font-extrabold text-foreground/30 uppercase tracking-widest">{(item as any).display_role}</p>
+                                <p className="text-[8px] sm:text-[9px] font-extrabold text-foreground/30 uppercase tracking-widest">{(item as any).displayRole}</p>
                                 <span className={cn(
                                     "text-[7px] font-black px-1.5 py-0.5 rounded-md uppercase tracking-tighter",
-                                    item.view_status === 'ACTIVE' || item.view_status === 'ACCEPTED' ? "bg-green-500/10 text-green-600" : 
-                                    item.view_status === 'PENDING' ? "bg-amber-500/10 text-amber-600" :
+                                    item.viewStatus === 'ACTIVE' || item.viewStatus === 'ACCEPTED' ? "bg-green-500/10 text-green-600" : 
+                                    item.viewStatus === 'PENDING' ? "bg-amber-500/10 text-amber-600" :
                                     "bg-red-500/10 text-red-600"
                                 )}>
-                                    {item.view_status}
+                                    {item.viewStatus}
                                 </span>
                             </div>
                         </div>
                         {activeTab === 'team' && (
                             <div className="flex items-center gap-1 px-1.5 py-1 rounded-lg bg-accent/5 shrink-0">
                                 <Star className="h-2.5 w-2.5 fill-accent text-accent" />
-                                <span className="text-[10px] font-black text-primary">{(item as any).profile?.average_rating || '0.0'}</span>
+                                <span className="text-[10px] font-black text-primary">{(item as any).profile?.averageRating || '0.0'}</span>
                             </div>
                         )}
                         {activeTab === 'invites' && (
@@ -437,22 +437,22 @@ export default function StaffPage() {
   <AvatarFallback>{selectedStaff.username[0]}</AvatarFallback>
   </Avatar>
   <div className="min-w-0">
-  <h2 className="text-base sm:text-2xl font-black text-primary truncate">{(selectedStaff as any).display_name}</h2>
+  <h2 className="text-base sm:text-2xl font-black text-primary truncate">{(selectedStaff as any).displayName}</h2>
   <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1">
-  <span className="text-[10px] sm:text-sm font-bold text-foreground/40 text-capitalize">{(selectedStaff as any).display_role}</span>
+  <span className="text-[10px] sm:text-sm font-bold text-foreground/40 text-capitalize">{(selectedStaff as any).displayRole}</span>
   <span className="h-1 w-1 rounded-full bg-foreground/20 hidden sm:block" />
   <span className={cn(
       "text-[7px] sm:text-[10px] font-black px-2 py-0.5 rounded-lg uppercase tracking-widest",
-      (selectedStaff as any).view_status === 'ACTIVE' || (selectedStaff as any).view_status === 'ACCEPTED' ? "text-green-600 bg-green-500/10" : "text-amber-600 bg-amber-500/10"
+      (selectedStaff as any).viewStatus === 'ACTIVE' || (selectedStaff as any).viewStatus === 'ACCEPTED' ? "text-green-600 bg-green-500/10" : "text-amber-600 bg-amber-500/10"
   )}>
-      {(selectedStaff as any).view_status || 'ACTIVE'}
+      {(selectedStaff as any).viewStatus || 'ACTIVE'}
   </span>
   </div>
   </div>
   </div>
 
   <div className="flex gap-2 flex-wrap sm:flex-nowrap justify-start sm:justify-end items-center sm:pr-4 w-full sm:w-auto">
-      {(selectedStaff as any).view_status === 'ACTIVE' ? (
+      {(selectedStaff as any).viewStatus === 'ACTIVE' ? (
           <>
           <Button 
               onClick={() => router.push(`/staff/${selectedStaff.uid}`)}
@@ -533,7 +533,7 @@ export default function StaffPage() {
   </div>
   </div>
 
-    {(selectedStaff as any).view_status === 'ACTIVE' && (
+    {(selectedStaff as any).viewStatus === 'ACTIVE' && (
         <div className="space-y-8">
             <div className="flex bg-primary/5 p-1 rounded-xl border border-primary/10 w-fit">
                 <button
@@ -588,7 +588,7 @@ export default function StaffPage() {
                         </div>
                         <div className="h-[300px] w-full">
                             <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={performance?.revenue_chart || []}>
+                                <BarChart data={performance?.revenueChart || []}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                                     <XAxis
                                         dataKey="label"
@@ -619,11 +619,11 @@ export default function StaffPage() {
                                         formatter={(value: any) => [`₦${Number(value).toLocaleString()}`, 'Revenue']}
                                     />
                                     <Bar dataKey="amount" radius={[4, 4, 4, 4]} barSize={performancePeriod === 'weekly' ? 40 : 30}>
-                                        {(performance?.revenue_chart || []).map((entry, index) => (
+                                        {(performance?.revenueChart || []).map((entry, index) => (
                                             <Cell
                                                 key={`cell-${index}`}
-                                                fill={index === (performance?.revenue_chart.length || 0) - 1 ? '#1a237e' : '#1a237e'}
-                                                fillOpacity={index === (performance?.revenue_chart.length || 0) - 1 ? 1 : 0.2}
+                                                fill={index === (performance?.revenueChart.length || 0) - 1 ? '#1a237e' : '#1a237e'}
+                                                fillOpacity={index === (performance?.revenueChart.length || 0) - 1 ? 1 : 0.2}
                                             />
                                         ))}
                                     </Bar>
@@ -634,10 +634,10 @@ export default function StaffPage() {
                   
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[
-                            { label: "Jobs Completed", value: performance?.total_jobs || "0", icon: Users },
+                            { label: "Jobs Completed", value: performance?.totalJobs || "0", icon: Users },
                             { label: "Avg. Rating", value: performance?.rating || "0.0", icon: Star },
-                            { label: "Retention Rate", value: performance?.completion_rate || "0%", icon: TrendingUp },
-                            { label: "Active Hours", value: performance?.active_hours || "0h", icon: CalendarIcon },
+                            { label: "Retention Rate", value: performance?.completionRate || "0%", icon: TrendingUp },
+                            { label: "Active Hours", value: performance?.activeHours || "0h", icon: CalendarIcon },
                         ].map((stat, i) => (
                             <div key={i} className="p-4 rounded-2xl bg-primary/[0.02] border border-primary/5">
                                 <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-1">{stat.label}</p>
@@ -667,12 +667,12 @@ export default function StaffPage() {
                                         <div className="flex items-center gap-2">
                                             <CalendarDays className="h-4 w-4 text-primary" />
                                             <p className="font-bold text-primary">
-                                                {new Date(shift.start_time).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+                                                {new Date(shift.startTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
                                             </p>
                                         </div>
                                         <p className="text-xs font-semibold text-foreground/50">
-                                            {new Date(shift.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                                            {new Date(shift.end_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            {new Date(shift.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                                            {new Date(shift.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </p>
                                         {shift.notes && <p className="text-[10px] text-foreground/40 italic mt-2">"{shift.notes}"</p>}
                                     </div>
@@ -715,8 +715,8 @@ export default function StaffPage() {
                                     <Input 
                                         type="datetime-local" 
                                         className="h-12 rounded-xl"
-                                        value={newShift.start_time}
-                                        onChange={(e) => setNewShift({ ...newShift, start_time: e.target.value })}
+                                        value={newShift.startTime}
+                                        onChange={(e) => setNewShift({ ...newShift, startTime: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -724,8 +724,8 @@ export default function StaffPage() {
                                     <Input 
                                         type="datetime-local" 
                                         className="h-12 rounded-xl"
-                                        value={newShift.end_time}
-                                        onChange={(e) => setNewShift({ ...newShift, end_time: e.target.value })}
+                                        value={newShift.endTime}
+                                        onChange={(e) => setNewShift({ ...newShift, endTime: e.target.value })}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -748,7 +748,7 @@ export default function StaffPage() {
         </div>
     )}
 
-  {(selectedStaff as any).view_status !== 'ACTIVE' && (
+  {(selectedStaff as any).viewStatus !== 'ACTIVE' && (
       <div className="h-[400px] flex flex-col items-center justify-center text-center space-y-6">
           <div className="h-20 w-20 rounded-full bg-amber-500/10 flex items-center justify-center">
               <Clock className="h-10 w-10 text-amber-600 animate-pulse" />

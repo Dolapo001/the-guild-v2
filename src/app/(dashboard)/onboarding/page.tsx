@@ -59,9 +59,9 @@ export default function OnboardingPage() {
 
  const handleComplete = async () => {
   try {
-   await api.patch('/profile/', {
+   await api.patch('/auth/profile/', {
     profile: {
-     business_name: formData.name,
+     businessName: formData.name,
      cac_number: formData.cacNumber,
      address: formData.address
     }

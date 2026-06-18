@@ -81,9 +81,9 @@ export default function AdminDashboard() {
   {/* Platform Stats */}
   <div className="grid gap-6 md:grid-cols-4">
   {[
-  { label: "Total Users", value: stats?.total_users || "...", icon: Users, color: "text-primary" },
-  { label: "Verified SMEs", value: stats?.verified_businesses || "...", icon: ShieldCheck, color: "text-accent" },
-  { label: "Revenue Volume", value: `₦${(stats?.total_revenue || 0).toLocaleString()}`, icon: TrendingUp, color: "text-secondary" },
+  { label: "Total Users", value: stats?.totalUsers || "...", icon: Users, color: "text-primary" },
+  { label: "Verified SMEs", value: stats?.verifiedBusinesses || "...", icon: ShieldCheck, color: "text-accent" },
+  { label: "Revenue Volume", value: `₦${(stats?.totalRevenue || 0).toLocaleString()}`, icon: TrendingUp, color: "text-secondary" },
   { label: "Pending Verifications", value: queue.length.toString(), icon: FileText, color: "text-amber-500" },
   ].map((stat, i) => (
   <GlassCard key={i} className="p-6 border-white/40">
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
   <td className="px-6 py-4 text-sm font-bold text-foreground/60">Today</td>
   <td className="px-6 py-4">
   <Badge className="bg-amber-500/10 text-amber-600 border-0 font-bold text-[10px] uppercase tracking-widest">
-  {item.verification_status}
+  {item.verificationStatus}
   </Badge>
   </td>
   <td className="px-6 py-4 text-right">
