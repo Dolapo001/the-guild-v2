@@ -1,6 +1,7 @@
 "use client";
 
 import { GlassCard } from "@/components/ui/glass-card";
+import { KpiCard } from "@/components/ui/kpi-card";
 import { Badge } from "@/components/ui/badge";
 import {
   Users,
@@ -339,41 +340,16 @@ export default function DashboardHome() {
 
       <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {dashboardStats.map((stat, index) => (
-          <motion.div
+          <KpiCard
             key={index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-          >
-            <GlassCard className="p-4 sm:p-6 border-white/40 hover:bg-white/60 transition-all group">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`p-2.5 rounded-xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
-                  <stat.icon className="h-5 w-5" />
-                </div>
-                <div
-                  className={`flex items-center text-xs font-bold px-2 py-1 rounded-full ${stat.trend === "up"
-                    ? "bg-green-500/10 text-green-600"
-                    : stat.trend === "down"
-                      ? "bg-red-500/10 text-red-600"
-                      : "bg-foreground/5 text-foreground/40"
-                    }`}
-                >
-                  {stat.trend === "up" ? (
-                    <ArrowUpRight className="mr-1 h-3 w-3" />
-                  ) : stat.trend === "down" ? (
-                    <ArrowDownRight className="mr-1 h-3 w-3" />
-                  ) : null}
-                  {stat.change}
-                </div>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-foreground/40 uppercase tracking-wider mb-1">
-                  {stat.title}
-                </p>
-                <div className="text-3xl font-extrabold text-primary">{stat.value}</div>
-              </div>
-            </GlassCard>
-          </motion.div>
+            label={stat.title}
+            value={stat.value}
+            delta={stat.change}
+            trend={stat.trend as "up" | "down" | "neutral"}
+            icon={stat.icon}
+            iconClassName={`${stat.bg} ${stat.color}`}
+            delay={index * 0.08}
+          />
         ))}
       </div>
 
