@@ -44,12 +44,14 @@ export function MobileBottomNav() {
     {
       label: "Home",
       icon: role === "customer" ? Home : LayoutDashboard,
-      href: getHomeHref()
+      href: getHomeHref(),
+      isFloating: false
     },
     {
       label: "Schedule",
       icon: Calendar,
-      href: role === "customer" ? "/customer/activities" : "/bookings"
+      href: role === "customer" ? "/customer/activities" : "/bookings",
+      isFloating: false
     },
     {
       ...middleNav,
@@ -58,7 +60,8 @@ export function MobileBottomNav() {
     {
       label: "Wallet",
       icon: Wallet,
-      href: "/wallet"
+      href: "/wallet",
+      isFloating: false
     },
   ];
 
