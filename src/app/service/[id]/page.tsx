@@ -287,13 +287,13 @@ export default function ServiceDetailPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-4">Date</p>
-                      <Button variant="outline" className="w-full h-12 rounded-xl border-glass-border font-bold text-primary justify-start hover:bg-primary/5 ">
+                      <Button onClick={() => setIsBookingModalOpen(true)} variant="outline" className="w-full h-12 rounded-xl border-glass-border font-bold text-primary justify-start hover:bg-primary/5 ">
                         <CalendarIcon className="mr-2 h-4 w-4 opacity-40" /> Select Date
                       </Button>
                     </div>
                     <div>
                       <p className="text-[10px] font-extrabold text-foreground/30 uppercase tracking-widest mb-4">Time</p>
-                      <Button variant="outline" className="w-full h-12 rounded-xl border-glass-border font-bold text-primary justify-start hover:bg-primary/5 ">
+                      <Button onClick={() => setIsBookingModalOpen(true)} variant="outline" className="w-full h-12 rounded-xl border-glass-border font-bold text-primary justify-start hover:bg-primary/5 ">
                         <Clock className="mr-2 h-4 w-4 opacity-40" /> Select Time
                       </Button>
                     </div>

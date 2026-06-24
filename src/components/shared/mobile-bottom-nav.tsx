@@ -41,7 +41,7 @@ export function MobileBottomNav() {
     {
       label: "Schedule",
       icon: Calendar,
-      href: "/bookings"
+      href: role === "customer" ? "/customer/activities" : "/bookings"
     },
     {
       label: role === "staff" ? "Active" : "Market",

@@ -68,7 +68,8 @@ export interface Product {
   price: number;
   stockCount: number;
   status?: string;
-  imageUrl: string;
+  imageUrl?: string;
+  image?: string;
   tag?: string;
   description?: string;
 }

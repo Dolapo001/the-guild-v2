@@ -3,6 +3,7 @@
 import {
  Dialog,
  DialogContent,
+ DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -78,6 +79,7 @@ export function StaffProfileModal({ isOpen, onClose, staff, onBookNow }: StaffPr
  return (
  <Dialog open={isOpen} onOpenChange={onClose}>
  <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden border-0 bg-transparent shadow-none">
+ <DialogTitle className="sr-only">Staff Profile</DialogTitle>
  <GlassCard className="border-white/40 shadow-2xl overflow-hidden flex flex-col max-h-[85vh] bg-white/90 backdrop-blur-2xl">
 
  {/* Header / Cover */}

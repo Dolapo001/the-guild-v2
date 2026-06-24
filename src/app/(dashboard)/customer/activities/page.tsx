@@ -76,12 +76,18 @@ export default function ActivitiesPage() {
         const mapped: Activity[] = bookings.map(b => ({
             id: b.uid,
             type: 'Service',
-            title: b.serviceDetails?.name || 'Service',
-            subtitle: b.business?.name || 'Business',
+            title: (b as any).serviceName || (b as any).serviceDetails?.name || 'Service',
+            subtitle: (b as any).businessName || (b as any).serviceDetails?.businessName || 'Business',
             date: b.date,
             amount: `₦${Number(b.totalPrice).toLocaleString()}`,
-            status: b.status.replace('_', ' ').toLowerCase().split(' ').map(s => s.charAt(0).toUpperCase() + s.substring(1)).join(' ') as any,
-            hasReview: !!b.review
+            status: (() => {
+                const s = b.status;
+                if (s === 'COMPLETED' || s === 'REVIEWED') return 'Completed';
+                if (s === 'CANCELLED') return 'Cancelled';
+                if (s === 'IN_PROGRESS') return 'In Progress';
+                return 'Pending';
+            })() as ActivityStatus,
+            hasReview: !!(b as any).review
         }));
         setActivities(mapped);
     } catch (err) {

@@ -77,7 +77,7 @@ export default function CustomerDashboard() {
     const fetchData = async () => {
       try {
         const [bksRaw, recsRaw, ordersRaw] = await Promise.all([
-          bookingService.getBookings(),
+          bookingService.getMyBookings(),
           maestroService.getRecommendations(),
           marketplaceService.getMyOrders()
         ]);
@@ -88,11 +88,12 @@ export default function CustomerDashboard() {
 
         setRecentOrders(orders);
         // Find first active/meaningful booking
-        const active = bks.find(b => ['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'DECLINED_WITH_OPTION'].includes(b.status));
+        // Backend serializer maps: PENDING->REQUESTED, CONFIRMED->ACCEPTED
+        const active = bks.find(b => ['PENDING', 'CONFIRMED', 'IN_PROGRESS', 'DECLINED_WITH_OPTION', 'REQUESTED', 'ACCEPTED'].includes(b.status));
         setActiveBooking(active || null);
 
-        // History is completed/cancelled
-        const hist = bks.filter(b => ['COMPLETED', 'CANCELLED'].includes(b.status));
+        // History is completed/cancelled/reviewed
+        const hist = bks.filter(b => ['COMPLETED', 'CANCELLED', 'REVIEWED'].includes(b.status));
         setHistory(hist);
 
         setRecommendations(recs as any);
@@ -424,7 +425,7 @@ export default function CustomerDashboard() {
               </Button>
             </div>
             <div className="grid gap-3 sm:gap-4">
-              {history.map((item) => (
+              {history.length > 0 ? history.slice(0, 5).map((item) => (
                 <GlassCard key={item.uid} className="p-4 sm:p-5 border-white/40 flex items-center justify-between hover:bg-white/60 transition-all group">
                   <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                     <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
@@ -455,7 +456,13 @@ export default function CustomerDashboard() {
                     </div>
                   </div>
                 </GlassCard>
-              ))}
+              )) : (
+                <GlassCard className="p-8 border-dashed border-foreground/10 bg-foreground/5 text-center">
+                  <Calendar className="h-8 w-8 text-foreground/20 mx-auto mb-3" />
+                  <p className="text-sm font-bold text-foreground/40">No past activities yet.</p>
+                  <p className="text-xs text-foreground/30 mt-1">Completed and cancelled bookings will appear here.</p>
+                </GlassCard>
+              )}
             </div>
           </section>
         </div>

@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import {
  Dialog,
- DialogContent
+ DialogContent,
+ DialogTitle
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { GlassCard } from "@/components/ui/glass-card";
@@ -219,6 +220,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  startTime: timeStr,
  staff: bookingState.staffId === 'AUTO' ? undefined : bookingState.staffId,
  specialNote: bookingState.specialNote,
+ reference_image: bookingState.customImage,
  booking_type: bookingState.bookingType,
  recurrence_rule: bookingState.bookingType === 'RECURRING' ? bookingState.recurrenceRule : undefined,
  recurrence_interval: bookingState.bookingType === 'RECURRING' ? bookingState.recurrenceInterval : undefined,
@@ -257,6 +259,7 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  return (
  <Dialog open={isOpen} onOpenChange={onClose}>
  <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden border-0 bg-transparent shadow-none">
+ <DialogTitle className="sr-only">{mode === 'reschedule' ? 'Reschedule Appointment' : 'Book Appointment'}</DialogTitle>
  <GlassCard className="border-white/40 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] bg-white/80 backdrop-blur-2xl">
  {/* Header */}
  <div className="p-6 border-b border-glass-border flex justify-between items-center bg-white/40 ">
@@ -431,9 +434,11 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  );
  })}
  </div>
- ) : (
- <p className="text-sm font-bold text-foreground/40 text-center italic py-4">Please select a date first</p>
- )}
+ ) : bookingState.date ? (
+                <p className="text-sm font-bold text-foreground/40 text-center italic py-4">No available time slots for the selected date.</p>
+              ) : (
+                <p className="text-sm font-bold text-foreground/40 text-center italic py-4">Please select a date first</p>
+              )}
  </div>
 
  {/* Recurring Booking Options */}
@@ -528,12 +533,45 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  <div className="space-y-6">
  <div className="space-y-3">
  <label className="text-xs font-extrabold uppercase tracking-widest text-foreground/60">Reference Photo (Optional)</label>
- <div className="h-32 rounded-2xl border-2 border-dashed border-gray-300 bg-white/40 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group">
- <div className="h-10 w-10 rounded-full bg-card flex items-center justify-center group-hover:scale-110 transition-transform">
- <UploadCloud className="h-5 w-5 text-primary" />
- </div>
- <p className="text-xs font-bold text-foreground/60">Click to upload reference</p>
- </div>
+ <label className="h-32 rounded-2xl border-2 border-dashed border-gray-300 bg-white/40 flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group relative overflow-hidden">
+ <input 
+   type="file" 
+   accept="image/*" 
+   className="hidden" 
+   onChange={(e) => {
+     const file = e.target.files?.[0];
+     if (file) {
+       const reader = new FileReader();
+       reader.onload = (event) => {
+         updateState('customImage', event.target?.result as string);
+       };
+       reader.readAsDataURL(file);
+     }
+   }} 
+ />
+ {bookingState.customImage ? (
+   <>
+     {/* eslint-disable-next-line @next/next/no-img-element */}
+     <img src={bookingState.customImage} alt="Reference" className="w-full h-full object-cover opacity-60" />
+     <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+       <Button 
+         variant="secondary" 
+         size="sm" 
+         onClick={(e) => { e.preventDefault(); updateState('customImage', null); }}
+       >
+         Remove
+       </Button>
+     </div>
+   </>
+ ) : (
+   <>
+     <div className="h-10 w-10 rounded-full bg-card flex items-center justify-center group-hover:scale-110 transition-transform">
+     <UploadCloud className="h-5 w-5 text-primary" />
+     </div>
+     <p className="text-xs font-bold text-foreground/60">Click to upload reference</p>
+   </>
+ )}
+ </label>
  </div>
 
  <div className="space-y-3">

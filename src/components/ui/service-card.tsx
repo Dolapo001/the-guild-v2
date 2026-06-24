@@ -42,7 +42,7 @@ export function ServiceCard({ service, isMaestroMatch, tag, distance }: ServiceC
  whileHover={{ y: -8 }}
  transition={{ duration: 0.3 }}
  >
- <Link href={`/service/${service.uid}`} className="block h-full">
+ <Link href={`/service/${(service as any).businessUid || service.uid}`} className="block h-full">
  <div className={`h-full flex flex-col overflow-hidden rounded-2xl border border-border bg-card backdrop-blur-md shadow-sm hover:shadow-md transition-all group ${isMaestroMatch ? 'ring-2 ring-secondary/50 shadow-xl shadow-secondary/10' : ''}`}>
  <div className="relative h-48 w-full overflow-hidden bg-muted ">
  <Image

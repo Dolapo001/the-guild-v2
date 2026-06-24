@@ -106,8 +106,14 @@ export default function BookingsPage() {
   };
 
   useEffect(() => {
-     fetchData();
-  }, []);
+    // Wait until user is resolved (non-null) before acting
+    if (!user) return;
+    if (user.role === "customer") {
+      router.replace("/customer/activities");
+      return;
+    }
+    fetchData();
+  }, [user, router]);
 
   const assignStaff = async (uid: string, staffUid: string) => {
       const toastId = toast.loading("Assigning staff member...");

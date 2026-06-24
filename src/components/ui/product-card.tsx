@@ -48,7 +48,7 @@ export function ProductCard({ product, isMaestroMatch, onAddToCart }: ProductCar
  whileHover={{ y: -8 }}
  transition={{ duration: 0.3 }}
  >
- <Link href={`/marketplace/product/${uid}`} className="block h-full">
+ <Link href={(product as any).businessUid ? `/service/${(product as any).businessUid}` : `/marketplace/product/${uid}`} className="block h-full">
  <div className={cn(
  "h-full flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-card backdrop-blur-md shadow-sm hover:shadow-md transition-all group",
  isMaestroMatch && "ring-2 ring-secondary/50 shadow-xl shadow-secondary/10"

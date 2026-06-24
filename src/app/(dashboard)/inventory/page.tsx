@@ -85,15 +85,19 @@ export default function InventoryPage() {
   // AI Product Auto-Tagging simulation
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const url = URL.createObjectURL(e.target.files[0]);
-      setUploadedImage(url);
-      setIsTagging(true);
-      setAiTags([]);
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result as string);
+        setIsTagging(true);
+        setAiTags([]);
 
-      setTimeout(() => {
-        setAiTags(["Organic", "Premium", "Vendor Sourced", "Eco-Friendly"]);
-        setIsTagging(false);
-      }, 1200);
+        setTimeout(() => {
+          setAiTags(["Organic", "Premium", "Vendor Sourced", "Eco-Friendly"]);
+          setIsTagging(false);
+        }, 1200);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -107,7 +111,7 @@ export default function InventoryPage() {
         category: newProduct.category || "General",
         price: Number(newProduct.price),
         stockCount: Number(newProduct.stock) || 0,
-        imageUrl: uploadedImage || (editingProduct?.imageUrl) || "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?q=80&w=300&auto=format&fit=crop",
+        image: uploadedImage || (editingProduct?.imageUrl || editingProduct?.image) || null,
         description: newProduct.description || (aiTags.length > 0 ? `Tags: ${aiTags.join(', ')}` : "Quality product."),
         city: newProduct.city || "Lagos"
       };
