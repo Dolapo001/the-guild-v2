@@ -89,7 +89,7 @@ export default function ServiceDetailPage() {
   return (
     <div className="min-h-screen bg-background bg-mesh-gradient pb-24">
       {/* Top Nav */}
-      <div className="fixed top-0 w-full z-50 bg-white/40 backdrop-blur-xl border-b border-glass-border">
+      <div className="fixed top-0 w-full z-50 bg-white/40 backdrop-blur-xl border-b border-glass-border pt-[env(safe-area-inset-top)]">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <Button variant="ghost" size="sm" asChild className="font-bold text-primary ">
             <Link href="/search">
@@ -107,7 +107,7 @@ export default function ServiceDetailPage() {
         </div>
       </div>
 
-      <main className="container mx-auto px-4 pt-24">
+      <main className="container mx-auto px-4 pt-[calc(6rem+env(safe-area-inset-top))]">
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Left Content */}
           <div className="flex-1 space-y-10">
