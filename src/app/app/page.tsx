@@ -33,7 +33,22 @@ export default function AppEntry() {
   useEffect(() => {
     if (isLoading || routed.current) return;
     routed.current = true;
-    router.replace(user ? dashboardFor(user) : "/login?expired=true");
+
+    if (user) {
+      router.replace(dashboardFor(user));
+      return;
+    }
+
+    // Unauthenticated. First-ever launch goes to registration; returning users
+    // go to login. (Previously handled by PwaEntryGuard; `/app` is now the
+    // single, authoritative entry point.)
+    const isNewInstall = !localStorage.getItem("has_launched_pwa");
+    if (isNewInstall) {
+      localStorage.setItem("has_launched_pwa", "true");
+      router.replace("/register");
+    } else {
+      router.replace("/login");
+    }
   }, [user, isLoading, router]);
 
   return <AppSplash label={isLoading ? "Validating session…" : "Opening…"} />;
