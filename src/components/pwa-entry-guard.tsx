@@ -24,7 +24,13 @@ export function PwaEntryGuard() {
       window.matchMedia?.("(display-mode: standalone)").matches ||
       (window.navigator as any).standalone === true;
 
-    if (!isStandalone) return;
+    // Strict Rule: If NOT running as an installed PWA, restrict access to ONLY the landing page.
+    if (!isStandalone) {
+      if (pathname !== "/") {
+        window.location.replace("/");
+      }
+      return;
+    }
 
     // We only intercept routing if they land on the root (which is the install funnel)
     // OR if they launched via the PWA start_url (source=pwa).
