@@ -70,7 +70,7 @@ export function MaestroChatWidget() {
  };
 
  return (
- <div className="fixed bottom-6 right-24 z-50">
+ <div className="fixed bottom-[110px] md:bottom-6 right-4 md:right-6 z-[100]">
  <AnimatePresence>
  {isOpen && (
  <motion.div
@@ -79,7 +79,7 @@ export function MaestroChatWidget() {
  exit={{ opacity: 0, y: 20, scale: 0.95 }}
  className="mb-4"
  >
- <GlassCard className="w-[380px] h-[520px] flex flex-col overflow-hidden border-primary/20 shadow-2xl bg-card/95 backdrop-blur-2xl">
+ <GlassCard className="w-[calc(100vw-32px)] md:w-[380px] h-[480px] md:h-[520px] flex flex-col overflow-hidden border-primary/20 shadow-2xl bg-card/95 backdrop-blur-2xl">
  {/* Header */}
  <div className="p-4 bg-primary text-white flex items-center justify-between">
  <div className="flex items-center gap-3">

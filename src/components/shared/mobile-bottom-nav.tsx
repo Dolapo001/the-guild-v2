@@ -13,7 +13,8 @@ import {
   UserCircle,
   Settings,
   RefreshCw,
-  LogOut
+  LogOut,
+  Package
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,6 +33,13 @@ export function MobileBottomNav() {
     return "/customer";
   };
 
+  const getMiddleNavConfig = () => {
+    if (role === "ceo") return { label: "Inventory", icon: Package, href: "/inventory" };
+    if (role === "staff") return { label: "Active", icon: PlayCircle, href: "/active-job" };
+    return { label: "Market", icon: ShoppingBag, href: "/marketplace" };
+  };
+  const middleNav = getMiddleNavConfig();
+
   const navItems = [
     {
       label: "Home",
@@ -44,9 +52,7 @@ export function MobileBottomNav() {
       href: role === "customer" ? "/customer/activities" : "/bookings"
     },
     {
-      label: role === "staff" ? "Active" : "Market",
-      icon: role === "staff" ? PlayCircle : ShoppingBag,
-      href: role === "staff" ? "/active-job" : "/marketplace",
+      ...middleNav,
       isFloating: true
     },
     {

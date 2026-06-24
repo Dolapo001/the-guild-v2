@@ -147,7 +147,7 @@ function CustomerWalletView({ balance, pendingEscrow, isObscured, toggleObscure,
               </button>
             </div>
 
-            <div className="relative z-10 flex gap-4">
+            <div className="relative z-10 flex flex-wrap gap-4">
               <Dialog open={fundOpen} onOpenChange={setFundOpen}>
                 <DialogTrigger asChild>
                   <Button className="h-12 px-8 rounded-xl bg-card text-blue-700 font-bold hover:bg-white/90 shadow-lg">
@@ -524,7 +524,7 @@ function BusinessWalletView({
                 </h2>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button
                   disabled
                   className="flex-1 h-12 rounded-xl bg-white/50 text-primary/40 cursor-not-allowed border-0 backdrop-blur-sm"
