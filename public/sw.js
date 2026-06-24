@@ -5,8 +5,14 @@ const SHELL = ["/", "/manifest.json", "/logo.png", "/icons/icon-192x192.png", "/
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting())
+    caches.open(CACHE).then((cache) => cache.addAll(SHELL))
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", (event) => {
