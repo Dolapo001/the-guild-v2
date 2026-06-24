@@ -64,6 +64,7 @@ const getRandomStaff = (staffList: any[]) => {
 export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 'book', initialData }: BookingModalProps) {
  const [step, setStep] = useState<Step>("services");
  const [isLoading, setIsLoading] = useState(false);
+ const [errorMessage, setErrorMessage] = useState<string | null>(null);
  const [availableSlots, setAvailableSlots] = useState<Array<{ startTime: string, endTime: string, isAvailable: boolean }>>([]);
  const [loadingSlots, setLoadingSlots] = useState(false);
 
@@ -194,7 +195,10 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  }
  setStep("summary");
  }
- else if (step === "summary") handlePayment();
+ else if (step === "summary") {
+ setErrorMessage(null);
+ handlePayment();
+ }
  };
 
  const handleBack = () => {
@@ -241,8 +245,9 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  const response = await bookingService.createBooking(payload);
  updateState('ticketId', response.uid || (response as any).id);
  setStep("success");
- } catch (err) {
+ } catch (err: any) {
  console.error("Failed to make actual booking", err);
+ setErrorMessage(err.response?.data?.detail || err.response?.data?.error || err.message || "Failed to process booking. Please try again.");
  } finally {
  setIsLoading(false);
  }
@@ -747,6 +752,12 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  </div>
  </GlassCard>
 
+ {errorMessage && (
+   <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 text-xs font-bold text-center">
+     {errorMessage}
+   </div>
+ )}
+
  <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
  <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
  <div>
@@ -839,7 +850,6 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  ) : step === "summary" ? (
  <>
  Pay & Secure Booking <ShieldCheck className="ml-2 h-4 w-4" />
- Trimmed Booking
  </>
  ) : (
  <>
