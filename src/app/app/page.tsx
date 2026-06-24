@@ -33,7 +33,7 @@ export default function AppEntry() {
   useEffect(() => {
     if (isLoading || routed.current) return;
     routed.current = true;
-    router.replace(user ? dashboardFor(user) : "/login");
+    router.replace(user ? dashboardFor(user) : "/login?expired=true");
   }, [user, isLoading, router]);
 
   return <AppSplash label={isLoading ? "Validating session…" : "Opening…"} />;

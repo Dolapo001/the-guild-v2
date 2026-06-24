@@ -64,10 +64,10 @@ export function GuildSeal({
               return (
                 <line
                   key={i}
-                  x1={r + Math.cos(a) * inner}
-                  y1={r + Math.sin(a) * inner}
-                  x2={r + Math.cos(a) * outer}
-                  y2={r + Math.sin(a) * outer}
+                  x1={(r + Math.cos(a) * inner).toFixed(3)}
+                  y1={(r + Math.sin(a) * inner).toFixed(3)}
+                  x2={(r + Math.cos(a) * outer).toFixed(3)}
+                  y2={(r + Math.sin(a) * outer).toFixed(3)}
                   stroke="rgba(255,255,255,0.35)"
                   strokeWidth={1.4}
                   strokeLinecap="round"

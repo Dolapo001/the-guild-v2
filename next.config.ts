@@ -4,12 +4,13 @@ import type { NextConfig } from "next";
 // Next.js origin, so httpOnly auth cookies stay first-party (SameSite=Lax)
 // and there are no cross-site/CORS cookie pitfalls.
 const BACKEND_ORIGIN =
-  process.env.BACKEND_ORIGIN || "http://localhost:8000";
+  process.env.BACKEND_ORIGIN || "http://127.0.0.1:8000";
 
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
-      { source: "/api/v1/:path*", destination: `${BACKEND_ORIGIN}/api/v1/:path*` },
+      { source: "/api/v1/:path*", destination: `${BACKEND_ORIGIN}/api/v1/:path*/` },
+      { source: "/media/:path*", destination: `${BACKEND_ORIGIN}/media/:path*` },
     ];
   },
   images: {

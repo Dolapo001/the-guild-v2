@@ -55,7 +55,8 @@ export default function proxy(req: NextRequest) {
 
   // 3) Authenticated users shouldn't see the auth screens — route via the app
   //    entry point so it can pick the right role dashboard.
-  if (isAuthPage && hasSession) {
+  //    If the session is expired (client passed ?expired=true), stay on login.
+  if (isAuthPage && hasSession && !req.nextUrl.searchParams.has("expired")) {
     const url = req.nextUrl.clone();
     url.pathname = "/app";
     url.search = "";
