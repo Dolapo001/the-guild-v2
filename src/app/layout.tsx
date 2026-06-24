@@ -76,10 +76,12 @@ export default function RootLayout({
                     <InstallBanner />
                     <PwaEntryGuard />
                     <Toaster
-                      position="top-right"
+                      position="top-center"
                       richColors
                       expand={true}
+                      offset={16}
                       toastOptions={{
+                        className: "mt-10 md:mt-0", // Adds margin on mobile to clear iOS notch, resets on desktop
                         style: {
                           background: "rgba(255, 255, 255, 0.98)",
                           backdropFilter: "blur(8px)",
@@ -87,6 +89,7 @@ export default function RootLayout({
                           borderRadius: "16px",
                           boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
                           color: "#1A237E",
+                          marginTop: "env(safe-area-inset-top, 40px)",
                         },
                       }}
                     />

@@ -752,11 +752,17 @@ export function BookingModal({ isOpen, onClose, service, initialStaffId, mode = 
  </div>
  </GlassCard>
 
- {errorMessage && (
-   <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 text-xs font-bold text-center">
-     {errorMessage}
-   </div>
- )}
+  {errorMessage && (
+    <div className="p-5 rounded-2xl bg-red-600 border border-red-500 shadow-xl shadow-red-500/20 text-white flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+      <div className="bg-white/20 p-1.5 rounded-full shrink-0 mt-0.5">
+        <X className="h-4 w-4 text-white" />
+      </div>
+      <div>
+        <p className="text-sm font-extrabold uppercase tracking-wider mb-1">Action Required</p>
+        <p className="text-xs font-medium text-white/90 leading-relaxed">{errorMessage}</p>
+      </div>
+    </div>
+  )}
 
  <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
  <ShieldCheck className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
