@@ -26,6 +26,7 @@ export function PwaEntryGuard() {
 
     // Strict Rule: If NOT running as an installed PWA, restrict access to ONLY the landing page.
     if (!isStandalone) {
+      setIsRedirecting(false);
       if (pathname !== "/") {
         window.location.replace("/");
       }
@@ -38,7 +39,13 @@ export function PwaEntryGuard() {
     const source = searchParams.get("source");
     const isEntryLaunch = pathname === "/" || source === "pwa";
 
-    if (!isEntryLaunch) return;
+    // Not an entry launch (e.g. PWAModeSync/AppEntry already moved us to /app or
+    // a dashboard). Make sure the overlay is cleared so it can never get stuck
+    // covering the screen — this was the cause of the "infinite spinner".
+    if (!isEntryLaunch) {
+      setIsRedirecting(false);
+      return;
+    }
 
     // We are launching the PWA entry. Show the loading overlay to hide the landing page.
     setIsRedirecting(true);
@@ -73,6 +80,15 @@ export function PwaEntryGuard() {
       window.location.replace(dashboardRoute);
     }
   }, [isLoading, user, pathname]);
+
+  // Watchdog: the overlay should only ever be transient. If anything keeps it up
+  // longer than expected (e.g. an unexpected auth stall), drop it so the user is
+  // never left staring at a spinner with no way forward.
+  useEffect(() => {
+    if (!isRedirecting) return;
+    const timer = setTimeout(() => setIsRedirecting(false), 18000);
+    return () => clearTimeout(timer);
+  }, [isRedirecting]);
 
   if (isRedirecting) {
     return (

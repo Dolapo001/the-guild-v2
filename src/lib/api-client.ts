@@ -4,6 +4,12 @@
 // setups.
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 
+// Hard ceiling on any single request. Without this a slow/unreachable backend
+// leaves the fetch pending forever, which keeps AuthContext.isLoading=true and
+// traps the PWA on its launch splash/spinner. On timeout we abort and surface a
+// normal network error so callers (e.g. session rehydration) can move on.
+const REQUEST_TIMEOUT_MS = 15000;
+
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 interface RequestOptions extends RequestInit {
@@ -25,15 +31,20 @@ class ApiError extends Error {
 // credentials:'include'; the backend rotates it and sets a fresh access cookie.
 // No tokens ever touch JavaScript.
 async function refreshToken(): Promise<boolean> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
     const response = await fetch(`${BASE_URL}/auth/token/refresh/`, {
       method: 'POST',
       credentials: 'include',
+      signal: controller.signal,
     });
     return response.ok;
   } catch (error) {
     console.error('Token refresh error:', error);
     return false;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -63,6 +74,9 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
     defaultHeaders['Content-Type'] = 'application/json';
   }
 
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
   try {
     const response = await fetch(url, {
       method,
@@ -71,6 +85,7 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
         ...defaultHeaders,
         ...headers,
       },
+      signal: controller.signal,
       ...rest,
     });
 
@@ -144,7 +159,10 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
     return normalize(responseData) as T;
   } catch (error) {
     if (error instanceof ApiError) throw error;
+    // AbortError (timeout) and genuine network failures both land here.
     throw new Error('Network error or server unreachable');
+  } finally {
+    clearTimeout(timer);
   }
 }
 
