@@ -28,7 +28,10 @@ export const authService = {
   },
 
   getProfile: async (): Promise<User> => {
-    return api.get<User>('/auth/profile/');
+    // Session-rehydration probe: a 401 means "logged out", which is an expected
+    // state on the public landing page — so it must NOT trigger a redirect to
+    // /login (that caused a landing<->login flicker loop in the browser).
+    return api.get<User>('/auth/profile/', { skipAuthRedirect: true });
   },
 
   updateProfile: async (data: Partial<User>): Promise<User> => {

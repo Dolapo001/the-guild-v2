@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useRef, ReactNod
 import { motion, AnimatePresence } from "framer-motion";
 import { Heart } from "lucide-react";
 import { socialService, FavoriteItem } from "@/services/social.service";
+import { useAuth } from "./AuthContext";
 
 type FavoriteItemState = {
  uid: string;
@@ -21,6 +22,7 @@ interface FavoritesContextType {
 const FavoritesContext = createContext<FavoritesContextType | undefined>(undefined);
 
 export function FavoritesProvider({ children }: { children: ReactNode }) {
+ const { user } = useAuth();
  const [favorites, setFavorites] = useState<FavoriteItemState[]>([]);
  const [toast, setToast] = useState<{ message: string; icon: string } | null>(null);
  const [loading, setLoading] = useState(true);
@@ -28,6 +30,17 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
  // Load from Backend
  const fetchFavorites = async () => {
+    // Favorites are an authed resource. When logged out (e.g. on the public
+    // landing page) do NOT hit the API — a 401 there would force a redirect to
+    // /login and cause a landing<->login flicker loop. Use the local cache.
+    if (!user) {
+        const stored = localStorage.getItem("the-guild-favorites");
+        if (stored) {
+            try { setFavorites(JSON.parse(stored)); } catch { /* ignore corrupt cache */ }
+        }
+        setLoading(false);
+        return;
+    }
     setLoading(true);
     try {
         const data = await socialService.getFavorites();
@@ -48,7 +61,8 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
  useEffect(() => {
     fetchFavorites();
- }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [user]);
 
  // Save to local storage as backup
  useEffect(() => {

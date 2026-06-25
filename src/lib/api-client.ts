@@ -14,6 +14,10 @@ type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 interface RequestOptions extends RequestInit {
  params?: Record<string, string>;
+ // When true, a failed 401 (after refresh) will NOT hard-redirect to /login.
+ // Used by background/bootstrap probes (e.g. session rehydration) where "not
+ // authenticated" is an expected, silent outcome — not a session expiry.
+ skipAuthRedirect?: boolean;
 }
 
 class ApiError extends Error {
@@ -60,7 +64,7 @@ const processQueue = (error: any, success = false) => {
 };
 
 async function request<T>(method: HttpMethod, endpoint: string, options: RequestOptions = {}): Promise<T> {
-  const { params, headers, ...rest } = options;
+  const { params, headers, skipAuthRedirect, ...rest } = options;
 
   let url = `${BASE_URL}${endpoint}`;
   if (params) {
@@ -108,7 +112,10 @@ async function request<T>(method: HttpMethod, endpoint: string, options: Request
         return request<T>(method, endpoint, options);
       } else {
         processQueue(null, false);
-        if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
+        // Silent probes (session rehydration) just want to know auth state; a
+        // 401 there is "logged out", not an expiry — never bounce to /login or
+        // we get a landing<->login redirect loop for logged-out browser users.
+        if (!skipAuthRedirect && typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
           window.location.href = '/login?expired=true';
         }
         throw new ApiError(401, { message: 'Session expired' });
