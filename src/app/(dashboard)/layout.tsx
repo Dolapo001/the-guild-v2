@@ -28,9 +28,8 @@ export default function DashboardLayout({
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen bg-mesh-gradient flex flex-col lg:flex-row">
-        {/* sidebar skeleton */}
-        <div className="hidden lg:block w-64 border-r border-glass-border bg-glass-surface p-4 space-y-3">
+      <div className="min-h-screen bg-[#08090e] flex flex-col lg:flex-row">
+        <div className="hidden lg:block w-64 border-r border-white/5 bg-[#0c0d12] p-4 space-y-3">
           <div className="h-10 w-32 rounded-xl bg-muted animate-pulse" />
           <div className="pt-6 space-y-2">
             {Array.from({ length: 7 }).map((_, i) => (
@@ -39,7 +38,7 @@ export default function DashboardLayout({
           </div>
         </div>
         <div className="flex-1 flex flex-col">
-          <div className="h-16 border-b border-glass-border bg-glass-surface px-6 flex items-center justify-between">
+          <div className="h-16 border-b border-white/5 bg-[#0c0d12] px-6 flex items-center justify-between">
             <div className="h-5 w-40 rounded-lg bg-muted animate-pulse" />
             <div className="h-10 w-10 rounded-xl bg-muted animate-pulse" />
           </div>
@@ -58,7 +57,7 @@ export default function DashboardLayout({
 
   return (
  <AppModeGuard>
- <div className="min-h-screen bg-mesh-gradient flex flex-col lg:flex-row">
+ <div className="min-h-screen bg-[#08090e] flex flex-col lg:flex-row">
  <Sidebar />
  <div className="flex-1 flex flex-col min-h-screen pb-20 lg:pb-0 lg:pl-64">
  <TopNav />
