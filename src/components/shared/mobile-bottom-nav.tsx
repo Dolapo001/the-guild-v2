@@ -12,7 +12,6 @@ import {
   LayoutDashboard,
   UserCircle,
   Settings,
-  RefreshCw,
   LogOut,
   Package
 } from "lucide-react";
@@ -41,32 +40,14 @@ export function MobileBottomNav() {
   const middleNav = getMiddleNavConfig();
 
   const navItems = [
-    {
-      label: "Home",
-      icon: role === "customer" ? Home : LayoutDashboard,
-      href: getHomeHref(),
-      isFloating: false
-    },
-    {
-      label: "Schedule",
-      icon: Calendar,
-      href: role === "customer" ? "/customer/activities" : "/bookings",
-      isFloating: false
-    },
-    {
-      ...middleNav,
-      isFloating: true
-    },
-    {
-      label: "Wallet",
-      icon: Wallet,
-      href: "/wallet",
-      isFloating: false
-    },
+    { label: "Home", icon: role === "customer" ? Home : LayoutDashboard, href: getHomeHref(), isFloating: false },
+    { label: "Schedule", icon: Calendar, href: role === "customer" ? "/customer/activities" : "/bookings", isFloating: false },
+    { ...middleNav, isFloating: true },
+    { label: "Wallet", icon: Wallet, href: "/wallet", isFloating: false },
   ];
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-lg border-t border-white/10 pb-safe">
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#0c0d12] border-t border-white/5 pb-safe">
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href;
@@ -79,15 +60,15 @@ export function MobileBottomNav() {
                   className={cn(
                     "h-14 w-14 rounded-full flex items-center justify-center shadow-2xl transition-all",
                     isActive
-                      ? "bg-primary text-white ring-4 ring-primary/20"
-                      : "bg-primary/80 text-white/80"
+                      ? "bg-indigo-500 text-white ring-4 ring-indigo-500/20 shadow-indigo-500/30"
+                      : "bg-indigo-500/80 text-white/80"
                   )}
                 >
                   <item.icon className="h-7 w-7" />
                 </motion.div>
                 <span className={cn(
                   "absolute -bottom-5 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-widest",
-                  isActive ? "text-primary text-glow" : "text-white/40"
+                  isActive ? "text-indigo-400" : "text-slate-500"
                 )}>
                   {item.label}
                 </span>
@@ -96,66 +77,48 @@ export function MobileBottomNav() {
           }
 
           return (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="flex flex-col items-center justify-center gap-1 w-16"
-            >
-              <item.icon className={cn(
-                "h-5 w-5 transition-all",
-                isActive ? "text-primary scale-110" : "text-white/40"
-              )} />
-              <span className={cn(
-                "text-[10px] font-bold uppercase tracking-widest transition-all",
-                isActive ? "text-primary text-glow" : "text-white/40"
-              )}>
+            <Link key={item.label} href={item.href} className="flex flex-col items-center justify-center gap-1 w-16">
+              <item.icon className={cn("h-5 w-5 transition-all", isActive ? "text-indigo-400 scale-110" : "text-slate-500")} />
+              <span className={cn("text-[10px] font-bold uppercase tracking-widest transition-all", isActive ? "text-indigo-400" : "text-slate-500")}>
                 {item.label}
               </span>
             </Link>
           );
         })}
 
-        {/* Menu Drawer */}
         <Sheet>
           <SheetTrigger asChild>
             <button className="flex flex-col items-center justify-center gap-1 w-16">
-              <Menu className="h-5 w-5 text-white/40" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-white/40">Menu</span>
+              <Menu className="h-5 w-5 text-slate-500" />
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Menu</span>
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="h-[70vh] rounded-t-[32px] bg-slate-950 border-white/10 p-0 overflow-hidden">
-            <div className="h-1.5 w-12 bg-white/20 rounded-full mx-auto mt-4 mb-8" />
+          <SheetContent side="bottom" className="h-[70vh] rounded-t-[32px] bg-[#0c0d12] border-white/5 p-0 overflow-hidden">
+            <div className="h-1.5 w-12 bg-white/10 rounded-full mx-auto mt-4 mb-8" />
             <SheetHeader className="px-6 text-left">
               <SheetTitle className="text-2xl font-extrabold text-white tracking-tight">Account & Settings</SheetTitle>
             </SheetHeader>
-
             <div className="px-4 py-8 space-y-2">
-              <Link href="/profile" className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors group">
-                <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary">
+              <Link href="/profile" className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-colors group">
+                <div className="h-12 w-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
                   <UserCircle className="h-6 w-6" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-white">Profile Settings</p>
-                  <p className="text-xs text-white/40">Manage your personal information</p>
+                  <p className="font-bold text-slate-200">Profile Settings</p>
+                  <p className="text-xs text-slate-500">Manage your personal information</p>
                 </div>
               </Link>
-
-              <Link href="/settings" className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-colors group">
-                <div className="h-12 w-12 rounded-xl bg-secondary/20 flex items-center justify-center text-secondary">
+              <Link href="/settings" className="flex items-center gap-4 p-4 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-colors group">
+                <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
                   <Settings className="h-6 w-6" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-bold text-white">App Settings</p>
-                  <p className="text-xs text-white/40">Notifications, theme, and security</p>
+                  <p className="font-bold text-slate-200">App Settings</p>
+                  <p className="text-xs text-slate-500">Notifications, theme, and security</p>
                 </div>
               </Link>
-
               <div className="pt-8">
-                <Button
-                  onClick={logout}
-                  variant="destructive"
-                  className="w-full h-14 rounded-2xl font-bold text-lg"
-                >
+                <Button onClick={logout} variant="destructive" className="w-full h-14 rounded-2xl font-bold text-lg">
                   <LogOut className="mr-2 h-5 w-5" /> Sign Out
                 </Button>
               </div>

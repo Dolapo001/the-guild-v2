@@ -87,14 +87,14 @@ export function SidebarContent({ className, onItemClick }: { className?: string;
         <div className={cn("flex flex-col h-full", className)}>
             <div className="flex h-20 items-center px-6">
                 <Link href="/" className="flex items-center gap-2.5 group" onClick={onItemClick}>
-                    <div className="h-9 w-9 bg-primary rounded-lg overflow-hidden group-hover:scale-110 transition-transform shadow-lg">
+                    <div className="h-9 w-9 bg-indigo-500 rounded-lg overflow-hidden group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/20">
                         <img src="/logo.png" alt="The Guild Logo" className="h-full w-full object-cover" />
                     </div>
-                    <span className="font-bold text-xl tracking-tight text-foreground">The Guild</span>
+                    <span className="font-bold text-xl tracking-tight text-slate-100">The Guild</span>
                 </Link>
             </div>
             <div className="flex-1 overflow-y-auto py-6">
-                <nav className="grid gap-1.5 px-3">
+                <nav className="grid gap-1 px-3">
                     {sidebarItems.map((item, index) => {
                         const isActive = pathname === item.href;
                         return (
@@ -103,16 +103,16 @@ export function SidebarContent({ className, onItemClick }: { className?: string;
                                 href={item.href}
                                 onClick={onItemClick}
                                 className={cn(
-                                    "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition-all duration-300",
+                                    "flex items-center gap-3 px-3 py-2.5 text-sm font-semibold transition-all duration-200 rounded-lg",
                                     isActive
-                                        ? "bg-primary text-white shadow-lg shadow-primary/20"
-                                        : "text-foreground/50 hover:bg-primary/5 hover:text-primary"
+                                        ? "bg-indigo-500/10 text-indigo-400 border-l-2 border-indigo-500 rounded-l-none pl-[10px]"
+                                        : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
                                 )}
                             >
                                 <item.icon className={cn(
-                                    "h-5 w-5 transition-colors",
-                                    isActive ? "text-secondary" : "text-foreground/30",
-                                    item.title === "Active Session" && "animate-pulse text-primary"
+                                    "h-4.5 w-4.5 transition-colors",
+                                    isActive ? "text-indigo-400" : "text-slate-500",
+                                    item.title === "Active Session" && "animate-pulse"
                                 )} />
                                 {item.title}
                             </Link>
@@ -123,34 +123,34 @@ export function SidebarContent({ className, onItemClick }: { className?: string;
             <div className="p-4 mt-auto">
                 {userRole === "ceo" && (
                     <div className={cn(
-                        "rounded-2xl p-4 mb-4 backdrop-blur-sm border transition-all",
-                        user?.verificationStatus === 'verified' 
-                            ? "bg-accent/5 border-accent/10" 
+                        "rounded-xl p-4 mb-4 border transition-all",
+                        user?.verificationStatus === 'verified'
+                            ? "bg-emerald-500/5 border-emerald-500/10"
                             : "bg-amber-500/5 border-amber-500/10"
                     )}>
                         {user?.verificationStatus === 'verified' ? (
                             <>
-                                <div className="flex items-center gap-2 text-accent font-bold text-xs uppercase tracking-wider mb-1">
+                                <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs uppercase tracking-wider mb-1">
                                     <ShieldCheck className="h-3.5 w-3.5" />
                                     Verified SME
                                 </div>
-                                <p className="text-[10px] text-foreground/40 leading-tight font-medium">
+                                <p className="text-[10px] text-slate-500 leading-tight font-medium">
                                     Your business is CAC verified and eligible for escrow payments.
                                 </p>
                             </>
                         ) : (
                             <>
-                                <div className="flex items-center gap-2 text-amber-600 font-bold text-xs uppercase tracking-wider mb-1">
+                                <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider mb-1">
                                     <AlertTriangle className="h-3.5 w-3.5" />
                                     Unverified SME
                                 </div>
-                                <p className="text-[10px] text-foreground/40 leading-tight font-medium mb-3">
+                                <p className="text-[10px] text-slate-500 leading-tight font-medium mb-3">
                                     Complete verification to unlock escrow payments and high-tier visibility.
                                 </p>
-                                <Link 
-                                    href="/verification" 
+                                <Link
+                                    href="/verification"
                                     onClick={onItemClick}
-                                    className="block text-center text-[10px] font-black text-amber-600 border border-amber-600/20 rounded-lg py-1.5 hover:bg-amber-600 hover:text-white transition-all uppercase tracking-tighter"
+                                    className="block text-center text-[10px] font-black text-amber-400 border border-amber-500/20 rounded-lg py-1.5 hover:bg-amber-500 hover:text-black transition-all uppercase tracking-tighter"
                                 >
                                     Verify Now
                                 </Link>
@@ -158,14 +158,14 @@ export function SidebarContent({ className, onItemClick }: { className?: string;
                         )}
                     </div>
                 )}
-                <button 
+                <button
                   onClick={() => {
                     logout();
                     onItemClick?.();
                   }}
-                  className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-500 transition-all hover:bg-red-500/5 group"
+                  className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold text-slate-400 transition-all hover:bg-red-500/5 hover:text-red-400 group"
                 >
-                    <LogOut className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+                    <LogOut className="h-4.5 w-4.5 group-hover:-translate-x-1 transition-transform" />
                     Sign Out
                 </button>
             </div>
@@ -175,7 +175,7 @@ export function SidebarContent({ className, onItemClick }: { className?: string;
 
 export function Sidebar() {
     return (
-        <aside className="hidden h-screen w-64 flex-col border-r border-glass-border bg-glass-surface backdrop-blur-xl lg:flex fixed left-0 top-0 z-40 shadow-premium">
+        <aside className="hidden h-screen w-64 flex-col border-r border-white/5 bg-[#0c0d12] lg:flex fixed left-0 top-0 z-40">
             <SidebarContent />
         </aside>
     );
