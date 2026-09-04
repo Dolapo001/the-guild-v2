@@ -38,13 +38,13 @@
  --color-info: var(--info);
  --color-info-foreground: var(--info-foreground);
 
- /* --- Design System: elevation scale (shadow-e1 … shadow-e4) --- */
+ /* --- Design System: elevation scale (shadow-e1 ... shadow-e4) --- */
  --shadow-e1: var(--elev-1);
  --shadow-e2: var(--elev-2);
  --shadow-e3: var(--elev-3);
  --shadow-e4: var(--elev-4);
 
- /* --- Design System: type scale (text-display … text-caption) --- */
+ /* --- Design System: type scale --- */
  --text-display: 3.5rem;
  --text-display--line-height: 1.04;
  --text-display--font-weight: 800;
@@ -81,18 +81,13 @@
  --radius-card: 1rem;
  --radius-panel: 1.5rem;
 
- --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
- --shadow-glass-sm: 0 4px 16px 0 rgba(31, 38, 135, 0.05);
- --shadow-premium: 0 20px 50px rgba(0, 0, 0, 0.1);
+ --shadow-glass: 0 8px 32px 0 rgba(0,0,0,0.4);
+ --shadow-glass-sm: 0 4px 16px 0 rgba(0,0,0,0.3);
+ --shadow-premium: 0 20px 50px rgba(0, 0, 0, 0.6);
 
  @keyframes spin-slow {
- from {
- transform: rotate(0deg);
- }
-
- to {
- transform: rotate(360deg);
- }
+ from { transform: rotate(0deg); }
+ to { transform: rotate(360deg); }
  }
 
  --animate-spin-slow: spin-slow 8s linear infinite;
@@ -107,7 +102,7 @@
 }
 
 @utility shadow-premium-violet {
- box-shadow: 0 20px 40px -10px rgba(26, 35, 126, 0.3);
+ box-shadow: 0 20px 40px -10px rgba(99,102,241,0.3);
 }
 
 @utility pt-safe {
@@ -150,95 +145,94 @@
 }
 
 :root {
-  --font-inter: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-plus-jakarta: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  --background: #f4f7fa;
-  --foreground: #1e293b;
-  --primary: #1a237e;
-  --secondary: #ffb74d;
-  --accent: #00695c;
-  --glass-border: rgba(30, 41, 59, 0.1);
-  --glass-surface: rgba(255, 255, 255, 0.65);
-  --glass-highlight: rgba(255, 255, 255, 0.85);
-  --mesh-1: rgba(26, 35, 126, 0.08);
-  --mesh-2: rgba(255, 183, 77, 0.08);
-  --mesh-3: rgba(0, 105, 92, 0.08);
+ --font-inter: 'Inter', ui-sans-serif, system-ui, sans-serif;
+ --font-plus-jakarta: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+ --background: #08090e;
+ --foreground: #f1f5f9;
+ --primary: #6366f1;
+ --primary-foreground: #ffffff;
+ --secondary: #f59e0b;
+ --secondary-foreground: #08090e;
+ --accent: #10b981;
+ --accent-foreground: #ffffff;
+ --glass-border: rgba(255,255,255,0.07);
+ --glass-surface: #0f1117;
+ --glass-highlight: rgba(255,255,255,0.04);
+ --mesh-1: rgba(99,102,241,0.06);
+ --mesh-2: rgba(245,158,11,0.04);
+ --mesh-3: rgba(16,185,129,0.04);
 
-  --card: #ffffff;
-  --card-foreground: #1e293b;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
+ --card: #0f1117;
+ --card-foreground: #f1f5f9;
+ --muted: #161922;
+ --muted-foreground: #64748b;
 
-  /* Surfaces */
-  --surface: #ffffff;
-  --surface-2: #eef2f7;
-  --border: rgba(15, 23, 42, 0.08);
-  --ring: #1a237e;
+ --surface: #0f1117;
+ --surface-2: #161922;
+ --border: rgba(255,255,255,0.07);
+ --ring: #6366f1;
 
-  /* State colors — all AA-contrast on white */
-  --success: #047857;
-  --success-foreground: #ffffff;
-  --warning: #b45309;
-  --warning-foreground: #ffffff;
-  --error: #dc2626;
-  --error-foreground: #ffffff;
-  --info: #1d4ed8;
-  --info-foreground: #ffffff;
+ --success: #10b981;
+ --success-foreground: #ffffff;
+ --warning: #f59e0b;
+ --warning-foreground: #08090e;
+ --error: #ef4444;
+ --error-foreground: #ffffff;
+ --info: #3b82f6;
+ --info-foreground: #ffffff;
 
-  /* Elevation */
-  --elev-1: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
-  --elev-2: 0 4px 12px rgba(15, 23, 42, 0.08);
-  --elev-3: 0 12px 32px rgba(15, 23, 42, 0.10);
-  --elev-4: 0 24px 60px rgba(15, 23, 42, 0.14);
+ --elev-1: 0 1px 3px rgba(0,0,0,0.4);
+ --elev-2: 0 4px 16px rgba(0,0,0,0.5);
+ --elev-3: 0 12px 40px rgba(0,0,0,0.6);
+ --elev-4: 0 24px 60px rgba(0,0,0,0.7);
 }
 
-/* ---------------------------------------------------------------------------
- * Dark mode tokens. The product currently forces light, but the full dark
- * palette is defined here so dark mode can be enabled app-wide via a single
- * `.dark` class with no component changes. All values are tuned for AA contrast.
- * ------------------------------------------------------------------------- */
 .dark {
-  --background: #05070f;
-  --foreground: #e7eaf3;
-  --card: #0c1022;
-  --card-foreground: #e7eaf3;
-  --muted: #11162b;
-  --muted-foreground: #94a3b8;
-  --primary: #5c6bc0;
-  --secondary: #ffb74d;
-  --accent: #26a69a;
+ --background: #08090e;
+ --foreground: #f1f5f9;
+ --primary: #6366f1;
+ --primary-foreground: #ffffff;
+ --secondary: #f59e0b;
+ --secondary-foreground: #08090e;
+ --accent: #10b981;
+ --accent-foreground: #ffffff;
 
-  --surface: #0c1022;
-  --surface-2: #141a30;
-  --border: rgba(255, 255, 255, 0.10);
-  --ring: #5c6bc0;
+ --card: #0f1117;
+ --card-foreground: #f1f5f9;
+ --muted: #161922;
+ --muted-foreground: #64748b;
 
-  --glass-border: rgba(255, 255, 255, 0.10);
-  --glass-surface: rgba(20, 26, 48, 0.60);
-  --glass-highlight: rgba(255, 255, 255, 0.06);
-  --mesh-1: rgba(57, 73, 171, 0.16);
-  --mesh-2: rgba(255, 183, 77, 0.08);
-  --mesh-3: rgba(0, 150, 136, 0.10);
+ --surface: #0f1117;
+ --surface-2: #161922;
+ --border: rgba(255,255,255,0.07);
+ --ring: #6366f1;
 
-  --success: #34d399;
-  --success-foreground: #04140d;
-  --warning: #fbbf24;
-  --warning-foreground: #1a1203;
-  --error: #f87171;
-  --error-foreground: #1a0606;
-  --info: #60a5fa;
-  --info-foreground: #04101f;
+ --glass-border: rgba(255,255,255,0.07);
+ --glass-surface: #0f1117;
+ --glass-highlight: rgba(255,255,255,0.04);
+ --mesh-1: rgba(99,102,241,0.06);
+ --mesh-2: rgba(245,158,11,0.04);
+ --mesh-3: rgba(16,185,129,0.04);
 
-  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.40);
-  --elev-2: 0 6px 18px rgba(0, 0, 0, 0.45);
-  --elev-3: 0 16px 40px rgba(0, 0, 0, 0.50);
-  --elev-4: 0 28px 70px rgba(0, 0, 0, 0.60);
+ --success: #10b981;
+ --success-foreground: #ffffff;
+ --warning: #f59e0b;
+ --warning-foreground: #08090e;
+ --error: #ef4444;
+ --error-foreground: #ffffff;
+ --info: #3b82f6;
+ --info-foreground: #ffffff;
+
+ --elev-1: 0 1px 3px rgba(0,0,0,0.4);
+ --elev-2: 0 4px 16px rgba(0,0,0,0.5);
+ --elev-3: 0 12px 40px rgba(0,0,0,0.6);
+ --elev-4: 0 24px 60px rgba(0,0,0,0.7);
 }
-
-
 
 body {
+ background-color: #08090e;
+ color: #f1f5f9;
  overscroll-behavior-y: none;
  -webkit-tap-highlight-color: transparent;
- @apply bg-background text-foreground antialiased selection:bg-primary/10 selection:text-primary transition-colors duration-700;
+ @apply bg-background text-foreground antialiased selection:bg-indigo-500/10 selection:text-indigo-400 transition-colors duration-700;
 }
